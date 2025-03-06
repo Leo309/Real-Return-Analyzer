@@ -1,4 +1,5 @@
 import React from 'react';
+import { useEffect, useState } from 'react';
 import { countries, getAvailableYears } from '@/data/countries';
 import useCalculatorStore from '@/store/calculatorStore';
 
@@ -21,7 +22,12 @@ const CalculatorForm: React.FC = () => {
   const countryOptions = Object.values(countries);
   
   // Check if dark mode is active
-  const isDarkMode = document.documentElement.classList.contains('dark');
+  const [isDarkMode, setIsDarkMode] = useState(false);
+
+  useEffect(() => {
+    // 这段代码只会在浏览器环境中执行
+    setIsDarkMode(document.documentElement.classList.contains('dark'));
+  }, []);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
