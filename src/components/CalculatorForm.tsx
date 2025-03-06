@@ -43,8 +43,8 @@ const CalculatorForm: React.FC = () => {
             type="number"
             min="1"
             step="any"
-            value={amount}
-            onChange={(e) => setAmount(Number(e.target.value))}
+            value={amount || ''} // Allow null value
+            onChange={(e) => setAmount(Number(e.target.value) || 0)} // will set to 0 if empty
             className={`pl-8 w-full p-2 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500
               ${isDarkMode 
                 ? 'bg-gray-700 border-gray-600 text-white' 

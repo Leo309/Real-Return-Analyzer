@@ -57,7 +57,6 @@ export default function Home() {
               <div className="lg:col-span-1">
                 <CalculatorForm />
                 <div className="mt-6">
-                  <FeedbackForm />
                 </div>
               </div>
               

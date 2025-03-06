@@ -51,6 +51,9 @@ const ResultsDisplay: React.FC = () => {
   const opportunityCostImpact = investmentType !== 'none' 
     ? ((result.opportunityCostValue - amount) / amount) * 100
     : 0;
+  const realInvestmentImpact = investmentType !== 'none'
+    ? ((result.combinedValue - amount) / amount) * 100
+    : 0;
 
   // Prepare chart data
   const labels = result.yearlyBreakdown.map(item => item.year.toString());
@@ -80,6 +83,13 @@ const ResultsDisplay: React.FC = () => {
       data: result.yearlyBreakdown.map(item => item.opportunityCost),
       borderColor: 'rgb(34, 197, 94)',
       backgroundColor: 'rgba(34, 197, 94, 0.5)',
+    });
+    
+    chartData.datasets.push({
+      label: 'Real Investment Value',
+      data: result.yearlyBreakdown.map(item => item.combined),
+      borderColor: 'rgb(168, 85, 247)', // Purple color
+      backgroundColor: 'rgba(168, 85, 247, 0.5)',
     });
   }
 
@@ -133,11 +143,9 @@ const ResultsDisplay: React.FC = () => {
               ${formatPercentage(inflationImpact)} in purchasing power from ${startYear} to ${endYear}.`;
     } else {
       const investmentName = investmentType === 'savings' ? 'a savings account' : 'the stock market';
-      return `If you had invested ${formatCurrency(amount)} in ${investmentName} in ${startYear}, 
-              it would be worth ${formatCurrency(result.opportunityCostValue)} today 
-              (${formatPercentage(opportunityCostImpact)}). After adjusting for inflation, 
-              the real value is ${formatCurrency(result.inflationAdjustedValue)} 
-              (${formatPercentage(inflationImpact)}).`;
+      return `After applying ${investmentName} returns and adjusting for inflation, 
+              your real investment value is ${formatCurrency(result.combinedValue)} 
+              (${formatPercentage(realInvestmentImpact)}).`;
     }
   };
 
@@ -199,20 +207,37 @@ const ResultsDisplay: React.FC = () => {
         </div>
         
         {investmentType !== 'none' && (
-          <div className={`${isDarkMode ? 'bg-green-900/30' : 'bg-green-100'} p-4 rounded-lg`}>
-            <p className={`text-sm ${isDarkMode ? 'text-gray-300' : 'text-gray-600'}`}>
-              {investmentType === 'savings' ? 'Savings Account Value' : 'Stock Market Value'}
-            </p>
-            <p className={`text-2xl font-bold ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
-              {formatCurrency(result.opportunityCostValue)}
-            </p>
-            <p className={`text-sm ${opportunityCostImpact < 0 
-              ? (isDarkMode ? 'text-red-300' : 'text-red-600') 
-              : (isDarkMode ? 'text-green-300' : 'text-green-600')}`}
-            >
-              {formatPercentage(opportunityCostImpact)}
-            </p>
-          </div>
+          <>
+            <div className={`${isDarkMode ? 'bg-green-900/30' : 'bg-green-100'} p-4 rounded-lg`}>
+              <p className={`text-sm ${isDarkMode ? 'text-gray-300' : 'text-gray-600'}`}>
+                {investmentType === 'savings' ? 'Savings Account Value' : 'Stock Market Value'}
+              </p>
+              <p className={`text-2xl font-bold ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
+                {formatCurrency(result.opportunityCostValue)}
+              </p>
+              <p className={`text-sm ${opportunityCostImpact < 0 
+                ? (isDarkMode ? 'text-red-300' : 'text-red-600') 
+                : (isDarkMode ? 'text-green-300' : 'text-green-600')}`}
+              >
+                {formatPercentage(opportunityCostImpact)}
+              </p>
+            </div>
+            
+            <div className={`${isDarkMode ? 'bg-purple-900/30' : 'bg-purple-100'} p-4 rounded-lg`}>
+              <p className={`text-sm ${isDarkMode ? 'text-gray-300' : 'text-gray-600'}`}>
+                Real Investment Value
+              </p>
+              <p className={`text-2xl font-bold ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
+                {formatCurrency(result.combinedValue)}
+              </p>
+              <p className={`text-sm ${(result.combinedValue - amount) < 0 
+                ? (isDarkMode ? 'text-red-300' : 'text-red-600') 
+                : (isDarkMode ? 'text-green-300' : 'text-green-600')}`}
+              >
+                {formatPercentage(((result.combinedValue - amount)/amount)*100)}
+              </p>
+            </div>
+          </>
         )}
       </div>
       

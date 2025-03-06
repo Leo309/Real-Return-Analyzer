@@ -8,16 +8,18 @@ interface CalculationResult {
   nominalValue: number;
   inflationAdjustedValue: number;
   opportunityCostValue: number;
+  combinedValue: number;
   yearlyBreakdown: {
     year: number;
     nominal: number;
     inflationAdjusted: number;
     opportunityCost: number;
+    combined: number;
   }[];
 }
 
 interface CalculatorState {
-  amount: number;
+  amount: number | null; // allow null value
   countryCode: string;
   startYear: number;
   endYear: number;
@@ -34,7 +36,7 @@ interface CalculatorState {
 }
 
 const useCalculatorStore = create<CalculatorState>((set, get) => ({
-  amount: 10000,
+  amount: null,
   countryCode: 'US',
   startYear: 2020,
   endYear: 2024,
@@ -42,7 +44,7 @@ const useCalculatorStore = create<CalculatorState>((set, get) => ({
   result: null,
   isCalculating: false,
   
-  setAmount: (amount) => set({ amount }),
+  setAmount: (amount) => set({ amount: amount || 0 }), // will set to 0 if empty
   setCountryCode: (code) => set({ countryCode: code }),
   setStartYear: (year) => set({ startYear: year }),
   setEndYear: (year) => set({ endYear: year }),
@@ -65,6 +67,7 @@ const useCalculatorStore = create<CalculatorState>((set, get) => ({
     let currentNominal = new Decimal(amount);
     let currentInflationAdjusted = new Decimal(amount);
     let currentOpportunityCost = new Decimal(amount);
+    let currentCombined = new Decimal(amount);
     
     for (let year = startYear; year <= endYear; year++) {
       // Skip if we don't have data for this year
@@ -76,7 +79,8 @@ const useCalculatorStore = create<CalculatorState>((set, get) => ({
           year,
           nominal: currentNominal.toNumber(),
           inflationAdjusted: currentInflationAdjusted.toNumber(),
-          opportunityCost: currentOpportunityCost.toNumber()
+          opportunityCost: currentOpportunityCost.toNumber(),
+          combined: currentCombined.toNumber()
         });
         continue;
       }
@@ -101,12 +105,29 @@ const useCalculatorStore = create<CalculatorState>((set, get) => ({
           new Decimal(1).plus(stockReturn)
         );
       }
+      // Combine inlfation and opportunity cost
+      if (investmentType !== 'none') {
+        if (investmentType === 'savings') {
+          const savingsRate = new Decimal(countryData.savingsRates[year]).dividedBy(100);
+          currentCombined = currentCombined.times(new Decimal(1).plus(savingsRate));
+        } else if (investmentType === 'stockMarket') {
+          const stockReturn = new Decimal(countryData.stockMarketReturns[year]).dividedBy(100);
+          currentCombined = currentCombined.times(new Decimal(1).plus(stockReturn));
+        }
+      }
+      
+      // 应用通胀调整
+      currentCombined = currentCombined.dividedBy(new Decimal(1).plus(inflationRate));
+      
+      // 更新年度数据
+      yearlyBreakdown[yearlyBreakdown.length - 1].combined = currentCombined.toNumber();
       
       yearlyBreakdown.push({
         year,
         nominal: currentNominal.toNumber(),
         inflationAdjusted: currentInflationAdjusted.toNumber(),
-        opportunityCost: currentOpportunityCost.toNumber()
+        opportunityCost: currentOpportunityCost.toNumber(),
+        combined: currentCombined.toNumber()
       });
     }
     
@@ -115,6 +136,7 @@ const useCalculatorStore = create<CalculatorState>((set, get) => ({
       nominalValue: currentNominal.toNumber(),
       inflationAdjustedValue: currentInflationAdjusted.toNumber(),
       opportunityCostValue: currentOpportunityCost.toNumber(),
+      combinedValue: currentCombined.toNumber(), // 新增
       yearlyBreakdown
     };
     
