@@ -26,6 +26,9 @@ ChartJS.register(
 const ResultsDisplay: React.FC = () => {
   const { result, amount, countryCode, startYear, endYear, investmentType } = useCalculatorStore();
   const countryData = countries[countryCode];
+  
+  // Check if dark mode is active
+  const isDarkMode = document.documentElement.classList.contains('dark');
 
   if (!result) {
     return null;
@@ -85,12 +88,42 @@ const ResultsDisplay: React.FC = () => {
     plugins: {
       legend: {
         position: 'top' as const,
+        labels: {
+          color: isDarkMode ? '#FFFFFF' : '#000000'
+        }
       },
       title: {
         display: true,
         text: 'Value Over Time',
+        color: isDarkMode ? '#FFFFFF' : '#000000'
       },
+      tooltip: {
+        backgroundColor: isDarkMode ? 'rgba(50, 50, 50, 0.8)' : 'rgba(255, 255, 255, 0.8)',
+        titleColor: isDarkMode ? '#FFFFFF' : '#000000',
+        bodyColor: isDarkMode ? '#FFFFFF' : '#000000',
+        borderColor: isDarkMode ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.1)',
+        borderWidth: 1
+      }
     },
+    scales: {
+      x: {
+        ticks: {
+          color: isDarkMode ? '#CCCCCC' : '#666666'
+        },
+        grid: {
+          color: isDarkMode ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.1)'
+        }
+      },
+      y: {
+        ticks: {
+          color: isDarkMode ? '#CCCCCC' : '#666666',
+          callback: (value: number) => formatCurrency(value)
+        },
+        grid: {
+          color: isDarkMode ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.1)'
+        }
+      }
+    }
   };
 
   // Message based on results
@@ -119,42 +152,64 @@ const ResultsDisplay: React.FC = () => {
     const hourlyWage = countryCode === 'US' ? 20 : 25;
     
     return (
-      <div className="mt-4 p-4 bg-red-50 rounded-lg">
-        <h3 className="font-bold text-lg mb-2">What You've Lost:</h3>
+      <div className={`mt-4 p-4 ${isDarkMode ? 'bg-red-900/30' : 'bg-red-50'} rounded-lg`}>
+        <h3 className={`font-bold text-lg mb-2 ${isDarkMode ? 'text-red-300' : 'text-red-800'}`}>
+          What You've Lost:
+        </h3>
         <ul className="space-y-2">
-          <li>☕ Equivalent to {Math.round(lostValue / coffeePrice)} premium coffees</li>
-          <li>📱 That's {(lostValue / iphonePrice).toFixed(2)} new smartphones</li>
-          <li>⏱️ Represents {Math.round(lostValue / hourlyWage)} hours of work</li>
+          <li className={isDarkMode ? 'text-red-200' : 'text-red-700'}>
+            ☕ Equivalent to {Math.round(lostValue / coffeePrice)} premium coffees
+          </li>
+          <li className={isDarkMode ? 'text-red-200' : 'text-red-700'}>
+            📱 That's {(lostValue / iphonePrice).toFixed(2)} new smartphones
+          </li>
+          <li className={isDarkMode ? 'text-red-200' : 'text-red-700'}>
+            ⏱️ Represents {Math.round(lostValue / hourlyWage)} hours of work
+          </li>
         </ul>
       </div>
     );
   };
 
   return (
-    <div className="bg-white p-6 rounded-lg shadow-md">
-      <h2 className="text-xl font-bold mb-4">Results</h2>
+    <div className={`${isDarkMode ? 'bg-gray-800' : 'bg-white'} p-6 rounded-lg shadow-md`}>
+      <h2 className={`text-xl font-bold mb-4 ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>Results</h2>
       
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
-        <div className="bg-gray-100 p-4 rounded-lg">
-          <p className="text-gray-600 text-sm">Nominal Value</p>
-          <p className="text-2xl font-bold">{formatCurrency(amount)}</p>
+        <div className={`${isDarkMode ? 'bg-gray-700' : 'bg-gray-100'} p-4 rounded-lg`}>
+          <p className={`text-sm ${isDarkMode ? 'text-gray-300' : 'text-gray-600'}`}>Nominal Value</p>
+          <p className={`text-2xl font-bold ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
+            {formatCurrency(amount)}
+          </p>
         </div>
         
-        <div className="bg-red-100 p-4 rounded-lg">
-          <p className="text-gray-600 text-sm">Inflation-Adjusted Value</p>
-          <p className="text-2xl font-bold">{formatCurrency(result.inflationAdjustedValue)}</p>
-          <p className={`text-sm ${inflationImpact < 0 ? 'text-red-600' : 'text-green-600'}`}>
+        <div className={`${isDarkMode ? 'bg-red-900/30' : 'bg-red-100'} p-4 rounded-lg`}>
+          <p className={`text-sm ${isDarkMode ? 'text-gray-300' : 'text-gray-600'}`}>
+            Inflation-Adjusted Value
+          </p>
+          <p className={`text-2xl font-bold ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
+            {formatCurrency(result.inflationAdjustedValue)}
+          </p>
+          <p className={`text-sm ${inflationImpact < 0 
+            ? (isDarkMode ? 'text-red-300' : 'text-red-600') 
+            : (isDarkMode ? 'text-green-300' : 'text-green-600')}`}
+          >
             {formatPercentage(inflationImpact)}
           </p>
         </div>
         
         {investmentType !== 'none' && (
-          <div className="bg-green-100 p-4 rounded-lg">
-            <p className="text-gray-600 text-sm">
+          <div className={`${isDarkMode ? 'bg-green-900/30' : 'bg-green-100'} p-4 rounded-lg`}>
+            <p className={`text-sm ${isDarkMode ? 'text-gray-300' : 'text-gray-600'}`}>
               {investmentType === 'savings' ? 'Savings Account Value' : 'Stock Market Value'}
             </p>
-            <p className="text-2xl font-bold">{formatCurrency(result.opportunityCostValue)}</p>
-            <p className={`text-sm ${opportunityCostImpact < 0 ? 'text-red-600' : 'text-green-600'}`}>
+            <p className={`text-2xl font-bold ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
+              {formatCurrency(result.opportunityCostValue)}
+            </p>
+            <p className={`text-sm ${opportunityCostImpact < 0 
+              ? (isDarkMode ? 'text-red-300' : 'text-red-600') 
+              : (isDarkMode ? 'text-green-300' : 'text-green-600')}`}
+            >
               {formatPercentage(opportunityCostImpact)}
             </p>
           </div>
@@ -162,11 +217,11 @@ const ResultsDisplay: React.FC = () => {
       </div>
       
       <div className="mb-6">
-        <p className="text-lg">{getMessage()}</p>
+        <p className={`text-lg ${isDarkMode ? 'text-gray-200' : 'text-gray-800'}`}>{getMessage()}</p>
         {inflationImpact < 0 && getShockingComparisons()}
       </div>
       
-      <div className="h-64">
+      <div className="h-64 mt-8">
         <Line options={chartOptions} data={chartData} />
       </div>
     </div>
