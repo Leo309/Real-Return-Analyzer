@@ -62,13 +62,13 @@ const ResultsDisplay: React.FC = () => {
     labels,
     datasets: [
       {
-        label: 'Nominal Value',
+        label: 'Original Amount',
         data: result.yearlyBreakdown.map(item => item.nominal),
         borderColor: 'rgb(75, 85, 99)',
         backgroundColor: 'rgba(75, 85, 99, 0.5)',
       },
       {
-        label: 'Inflation-Adjusted Value',
+        label: 'True Value (Inflation Impact)',
         data: result.yearlyBreakdown.map(item => item.inflationAdjusted),
         borderColor: 'rgb(239, 68, 68)',
         backgroundColor: 'rgba(239, 68, 68, 0.5)',
@@ -79,14 +79,14 @@ const ResultsDisplay: React.FC = () => {
   // Add opportunity cost data if an investment type was selected
   if (investmentType !== 'none') {
     chartData.datasets.push({
-      label: investmentType === 'savings' ? 'Savings Account Value' : 'Stock Market Value',
+      label: investmentType === 'savings' ? 'With Savings Interest' : 'With Stock Returns',
       data: result.yearlyBreakdown.map(item => item.opportunityCost),
       borderColor: 'rgb(34, 197, 94)',
       backgroundColor: 'rgba(34, 197, 94, 0.5)',
     });
     
     chartData.datasets.push({
-      label: 'Real Investment Value',
+      label: 'Real Growth After Inflation',
       data: result.yearlyBreakdown.map(item => item.combined),
       borderColor: 'rgb(168, 85, 247)', // Purple color
       backgroundColor: 'rgba(168, 85, 247, 0.5)',
@@ -136,16 +136,26 @@ const ResultsDisplay: React.FC = () => {
     }
   };
 
-  // Message based on results
+  // Message based on results with dark mode support
   const getMessage = () => {
+    const messageClass = isDarkMode ? 'text-gray-200' : 'text-gray-800';
+    
     if (investmentType === 'none') {
-      return `Due to inflation, your ${formatCurrency(amount)} has lost 
-              ${formatPercentage(inflationImpact)} in purchasing power from ${startYear} to ${endYear}.`;
+      return (
+        <p className={`text-lg ${messageClass}`}>
+          Due to inflation, your {formatCurrency(amount)} has lost 
+          {formatPercentage(inflationImpact)} in purchasing power from {startYear} to {endYear}.
+        </p>
+      );
     } else {
       const investmentName = investmentType === 'savings' ? 'a savings account' : 'the stock market';
-      return `After applying ${investmentName} returns and adjusting for inflation, 
-              your real investment value is ${formatCurrency(result.combinedValue)} 
-              (${formatPercentage(realInvestmentImpact)}).`;
+      return (
+        <p className={`text-lg ${messageClass}`}>
+          After applying {investmentName} returns and adjusting for inflation, 
+          your real investment value is {formatCurrency(result.combinedValue)} 
+          ({formatPercentage(realInvestmentImpact)}).
+        </p>
+      );
     }
   };
 
@@ -185,7 +195,7 @@ const ResultsDisplay: React.FC = () => {
       
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
         <div className={`${isDarkMode ? 'bg-gray-700' : 'bg-gray-100'} p-4 rounded-lg`}>
-          <p className={`text-sm ${isDarkMode ? 'text-gray-300' : 'text-gray-600'}`}>Nominal Value</p>
+          <p className={`text-sm ${isDarkMode ? 'text-gray-300' : 'text-gray-600'}`}>Original Amount</p>
           <p className={`text-2xl font-bold ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
             {formatCurrency(amount)}
           </p>
@@ -193,7 +203,7 @@ const ResultsDisplay: React.FC = () => {
         
         <div className={`${isDarkMode ? 'bg-red-900/30' : 'bg-red-100'} p-4 rounded-lg`}>
           <p className={`text-sm ${isDarkMode ? 'text-gray-300' : 'text-gray-600'}`}>
-            Inflation-Adjusted Value
+            True Value Today
           </p>
           <p className={`text-2xl font-bold ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
             {formatCurrency(result.inflationAdjustedValue)}
@@ -210,7 +220,7 @@ const ResultsDisplay: React.FC = () => {
           <>
             <div className={`${isDarkMode ? 'bg-green-900/30' : 'bg-green-100'} p-4 rounded-lg`}>
               <p className={`text-sm ${isDarkMode ? 'text-gray-300' : 'text-gray-600'}`}>
-                {investmentType === 'savings' ? 'Savings Account Value' : 'Stock Market Value'}
+                {investmentType === 'savings' ? 'If You Used Savings' : 'If You Invested in Stocks'}
               </p>
               <p className={`text-2xl font-bold ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
                 {formatCurrency(result.opportunityCostValue)}
@@ -225,7 +235,7 @@ const ResultsDisplay: React.FC = () => {
             
             <div className={`${isDarkMode ? 'bg-purple-900/30' : 'bg-purple-100'} p-4 rounded-lg`}>
               <p className={`text-sm ${isDarkMode ? 'text-gray-300' : 'text-gray-600'}`}>
-                Real Investment Value
+                Actual Growth After Inflation
               </p>
               <p className={`text-2xl font-bold ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
                 {formatCurrency(result.combinedValue)}
@@ -241,8 +251,23 @@ const ResultsDisplay: React.FC = () => {
         )}
       </div>
       
+      {/* Add Money Lost section when inflation has negative impact */}
+      {inflationImpact < 0 && (
+        <div className={`mt-4 mb-6 p-4 ${isDarkMode ? 'bg-red-900/30' : 'bg-red-50'} rounded-lg`}>
+          <h3 className={`font-bold text-lg mb-2 ${isDarkMode ? 'text-red-300' : 'text-red-800'}`}>
+            Money Lost to Inflation:
+          </h3>
+          <p className={`text-xl font-bold ${isDarkMode ? 'text-red-200' : 'text-red-700'}`}>
+            {formatCurrency(Math.abs(amount - result.inflationAdjustedValue))}
+          </p>
+          <p className={isDarkMode ? 'text-red-200' : 'text-red-700'}>
+            That's {formatPercentage(Math.abs(inflationImpact))} of your original investment gone.
+          </p>
+        </div>
+      )}
+      
       <div className="mb-6">
-        <p className={`text-lg ${isDarkMode ? 'text-gray-200' : 'text-gray-800'}`}>{getMessage()}</p>
+        {getMessage()}
         {inflationImpact < 0 && getShockingComparisons()}
       </div>
       
