@@ -27,7 +27,7 @@ ChartJS.register(
 const ResultsDisplay: React.FC = () => {
   const { result, amount, countryCode, startYear, endYear, investmentType } = useCalculatorStore();
   const countryData = countries[countryCode];
-  
+
   const isDarkMode = document.documentElement.classList.contains('dark');
 
   if (!result) {
@@ -48,7 +48,7 @@ const ResultsDisplay: React.FC = () => {
 
   // Calculate changes
   const inflationImpact = ((result.inflationAdjustedValue - amount) / amount) * 100;
-  const opportunityCostImpact = investmentType !== 'none' 
+  const opportunityCostImpact = investmentType !== 'none'
     ? ((result.opportunityCostValue - amount) / amount) * 100
     : 0;
   const realInvestmentImpact = investmentType !== 'none'
@@ -57,7 +57,7 @@ const ResultsDisplay: React.FC = () => {
 
   // Prepare inflation chart data
   const labels = result.yearlyBreakdown.map(item => item.year.toString());
-  
+
   const inflationChartData = {
     labels,
     datasets: [
@@ -101,7 +101,7 @@ const ResultsDisplay: React.FC = () => {
         borderColor: isDarkMode ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.1)',
         borderWidth: 1,
         callbacks: {
-          label: function(context) {
+          label: function (context) {
             return context.dataset.label + ': ' + formatCurrency(context.parsed.y);
           }
         }
@@ -160,13 +160,13 @@ const ResultsDisplay: React.FC = () => {
   return (
     <div className="space-y-8">
       <h2 className={`text-xl font-bold ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>Results</h2>
-      
+
       {/* Section 1: Original Amount vs. True Value Today */}
       <div className={`p-6 rounded-lg ${isDarkMode ? 'bg-gray-700/50' : 'bg-gray-100'}`}>
         <h3 className={`text-lg font-semibold mb-4 ${isDarkMode ? 'text-white' : 'text-gray-800'}`}>
           Inflation Impact ({startYear} - {endYear})
         </h3>
-        
+
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
           <div className={`p-5 rounded-lg ${isDarkMode ? 'bg-gray-800' : 'bg-white'} shadow-md`}>
             <p className={`text-sm ${isDarkMode ? 'text-gray-300' : 'text-gray-600'}`}>
@@ -176,9 +176,9 @@ const ResultsDisplay: React.FC = () => {
               {formatCurrency(amount)}
             </p>
           </div>
-          
-          <div className={`p-5 rounded-lg ${inflationImpact < 0 
-            ? (isDarkMode ? 'bg-red-900/40' : 'bg-red-100') 
+
+          <div className={`p-5 rounded-lg ${inflationImpact < 0
+            ? (isDarkMode ? 'bg-red-900/40' : 'bg-red-100')
             : (isDarkMode ? 'bg-green-900/40' : 'bg-green-100')
             } shadow-md`}>
             <div className="flex items-center justify-between">
@@ -190,22 +190,22 @@ const ResultsDisplay: React.FC = () => {
                   {formatCurrency(result.inflationAdjustedValue)}
                 </p>
               </div>
-              <div className={`p-3 rounded-full ${inflationImpact < 0 
-                ? (isDarkMode ? 'bg-red-800/50' : 'bg-red-200') 
+              <div className={`p-3 rounded-full ${inflationImpact < 0
+                ? (isDarkMode ? 'bg-red-800/50' : 'bg-red-200')
                 : (isDarkMode ? 'bg-green-800/50' : 'bg-green-200')}`}>
-                {inflationImpact < 0 
-                  ? <TrendingDown size={24} className={isDarkMode ? 'text-red-300' : 'text-red-600'} /> 
+                {inflationImpact < 0
+                  ? <TrendingDown size={24} className={isDarkMode ? 'text-red-300' : 'text-red-600'} />
                   : <TrendingUp size={24} className={isDarkMode ? 'text-green-300' : 'text-green-600'} />}
               </div>
             </div>
-            <p className={`mt-2 text-sm font-medium ${inflationImpact < 0 
-              ? (isDarkMode ? 'text-red-300' : 'text-red-600') 
+            <p className={`mt-2 text-sm font-medium ${inflationImpact < 0
+              ? (isDarkMode ? 'text-red-300' : 'text-red-600')
               : (isDarkMode ? 'text-green-300' : 'text-green-600')}`}>
               {formatPercentage(inflationImpact)} change in purchasing power
             </p>
           </div>
         </div>
-        
+
         {/* Loss breakdown */}
         {inflationImpact < 0 && (
           <div className={`p-4 mb-4 rounded-lg ${isDarkMode ? 'bg-red-900/30' : 'bg-red-50'}`}>
@@ -216,25 +216,28 @@ const ResultsDisplay: React.FC = () => {
               </h4>
             </div>
             <p className={`mt-1 ${isDarkMode ? 'text-red-200' : 'text-red-700'}`}>
-              That's equivalent to {Math.round((amount - result.inflationAdjustedValue) / (countryCode === 'US' ? 5 : 6))} premium coffees 
+              That's equivalent to {Math.round((amount - result.inflationAdjustedValue) / (countryCode === 'US' ? 5 : 6))} premium coffees
               or {Math.round((amount - result.inflationAdjustedValue) / (countryCode === 'US' ? 20 : 25))} hours of work.
             </p>
           </div>
         )}
-        
+
         {/* Inflation chart */}
         <div className="h-60 mt-6">
           <Line options={chartOptions} data={inflationChartData} />
         </div>
       </div>
-      
+
       {/* Section 2: Investment Impact (Only show if investment type is not none) */}
       {investmentType !== 'none' && (
         <div className={`p-6 rounded-lg ${isDarkMode ? 'bg-gray-700/50' : 'bg-gray-100'}`}>
           <h3 className={`text-lg font-semibold mb-4 ${isDarkMode ? 'text-white' : 'text-gray-800'}`}>
-            {investmentType === 'savings' ? 'Savings Account' : 'Stock Market'} Performance
+            {investmentType === 'custom'
+              ? `Custom Investment (${useCalculatorStore.getState().customRate}%)`
+              : investmentType === 'savings'
+                ? 'Savings Account'
+                : 'Stock Market'} Performance
           </h3>
-          
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
             <div className={`p-5 rounded-lg ${isDarkMode ? 'bg-green-900/40' : 'bg-green-100'} shadow-md`}>
               <div className="flex items-center justify-between">
@@ -254,9 +257,9 @@ const ResultsDisplay: React.FC = () => {
                 {formatPercentage(opportunityCostImpact)} nominal growth
               </p>
             </div>
-            
-            <div className={`p-5 rounded-lg ${realInvestmentImpact < 0 
-              ? (isDarkMode ? 'bg-red-900/40' : 'bg-red-100') 
+
+            <div className={`p-5 rounded-lg ${realInvestmentImpact < 0
+              ? (isDarkMode ? 'bg-red-900/40' : 'bg-red-100')
               : (isDarkMode ? 'bg-purple-900/40' : 'bg-purple-100')
               } shadow-md`}>
               <div className="flex items-center justify-between">
@@ -268,35 +271,37 @@ const ResultsDisplay: React.FC = () => {
                     {formatCurrency(result.combinedValue)}
                   </p>
                 </div>
-                <div className={`p-3 rounded-full ${realInvestmentImpact < 0 
-                  ? (isDarkMode ? 'bg-red-800/50' : 'bg-red-200') 
+                <div className={`p-3 rounded-full ${realInvestmentImpact < 0
+                  ? (isDarkMode ? 'bg-red-800/50' : 'bg-red-200')
                   : (isDarkMode ? 'bg-purple-800/50' : 'bg-purple-200')}`}>
-                  {realInvestmentImpact < 0 
-                    ? <TrendingDown size={24} className={isDarkMode ? 'text-red-300' : 'text-red-600'} /> 
+                  {realInvestmentImpact < 0
+                    ? <TrendingDown size={24} className={isDarkMode ? 'text-red-300' : 'text-red-600'} />
                     : <TrendingUp size={24} className={isDarkMode ? 'text-purple-300' : 'text-purple-600'} />}
                 </div>
               </div>
-              <p className={`mt-2 text-sm font-medium ${realInvestmentImpact < 0 
-                ? (isDarkMode ? 'text-red-300' : 'text-red-600') 
+              <p className={`mt-2 text-sm font-medium ${realInvestmentImpact < 0
+                ? (isDarkMode ? 'text-red-300' : 'text-red-600')
                 : (isDarkMode ? 'text-purple-300' : 'text-purple-600')}`}>
                 {formatPercentage(realInvestmentImpact)} real growth
               </p>
             </div>
           </div>
-          
+
           {/* Investment chart */}
           <div className="h-60 mt-6">
             <Line options={chartOptions} data={investmentChartData} />
           </div>
         </div>
       )}
-      
+
       {/* Summary message */}
       <div className={`p-5 rounded-lg ${isDarkMode ? 'bg-blue-900/30' : 'bg-blue-50'} shadow-md text-center`}>
         <p className={`text-lg font-medium ${isDarkMode ? 'text-blue-200' : 'text-blue-800'}`}>
-          {investmentType === 'none' 
-            ? `Due to inflation, your ${formatCurrency(amount)} from ${startYear} has ${inflationImpact < 0 ? 'lost' : 'gained'} ${formatPercentage(Math.abs(inflationImpact))} in purchasing power.` 
-            : `By investing in ${investmentType === 'savings' ? 'a savings account' : 'the stock market'}, your ${formatCurrency(amount)} from ${startYear} has ${realInvestmentImpact < 0 ? 'decreased' : 'increased'} to ${formatCurrency(result.combinedValue)} in real terms (${formatPercentage(realInvestmentImpact)}).`}
+          {investmentType === 'none'
+            ? `Due to inflation...`
+            : investmentType === 'custom'
+              ? `With custom ${useCalculatorStore.getState().customRate}% annual return, your ${formatCurrency(amount)}`
+              : `By investing in ${investmentType === 'savings' ? 'a savings account' : 'the stock market'},...`}
         </p>
       </div>
     </div>

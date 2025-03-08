@@ -2,6 +2,7 @@ import React from 'react';
 import { useEffect, useState } from 'react';
 import { countries, getAvailableYears } from '@/data/countries';
 import useCalculatorStore from '@/store/calculatorStore';
+import { Sun, Moon, TrendingUp, DollarSign, BarChart2, Wand2 } from 'lucide-react';
 
 const CalculatorForm: React.FC = () => {
   const {
@@ -10,22 +11,23 @@ const CalculatorForm: React.FC = () => {
     startYear,
     endYear,
     investmentType,
+    customRate,
     setAmount,
     setCountryCode,
     setStartYear,
     setEndYear,
     setInvestmentType,
+    setCustomRate,
     calculate
   } = useCalculatorStore();
   
   const availableYears = getAvailableYears();
   const countryOptions = Object.values(countries);
   
-  // Check if dark mode is active
+  // Dark mode state
   const [isDarkMode, setIsDarkMode] = useState(false);
 
   useEffect(() => {
-    // 这段代码只会在浏览器环境中执行
     setIsDarkMode(document.documentElement.classList.contains('dark'));
   }, []);
 
@@ -49,8 +51,8 @@ const CalculatorForm: React.FC = () => {
             type="number"
             min="1"
             step="any"
-            value={amount || ''} // Allow null value
-            onChange={(e) => setAmount(Number(e.target.value) || 0)} // will set to 0 if empty
+            value={amount || ''}
+            onChange={(e) => setAmount(Number(e.target.value) || 0)}
             className={`pl-8 w-full p-2 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500
               ${isDarkMode 
                 ? 'bg-gray-700 border-gray-600 text-white' 
@@ -124,11 +126,12 @@ const CalculatorForm: React.FC = () => {
         </div>
       </div>
 
+      {/* 修改后的 Investment Type 区块 */}
       <div className="mb-6">
         <label className={`block font-medium mb-2 ${isDarkMode ? 'text-gray-200' : 'text-gray-700'}`}>
           Investment Type
         </label>
-        <div className="grid grid-cols-3 gap-2">
+        <div className="grid grid-cols-2 gap-2">
           <label className={`
             flex items-center justify-center p-3 border rounded cursor-pointer
             ${investmentType === 'none' 
@@ -163,7 +166,7 @@ const CalculatorForm: React.FC = () => {
           </label>
           <label className={`
             flex items-center justify-center p-3 border rounded cursor-pointer
-             ${investmentType === 'stockMarket' 
+            ${investmentType === 'stockMarket' 
               ? (isDarkMode ? 'bg-blue-900/40 border-blue-500' : 'bg-blue-100 border-blue-500') 
               : (isDarkMode ? 'bg-gray-700 border-gray-600' : 'bg-white border-gray-300')}
           `}>
@@ -177,7 +180,51 @@ const CalculatorForm: React.FC = () => {
             />
             <span className={isDarkMode ? 'text-gray-200' : 'text-gray-900'}>Stock Market</span>
           </label>
+          <label className={`
+            flex items-center justify-center p-3 border rounded cursor-pointer
+            ${investmentType === 'custom' 
+              ? (isDarkMode ? 'bg-purple-900/40 border-purple-500' : 'bg-purple-100 border-purple-500') 
+              : (isDarkMode ? 'bg-gray-700 border-gray-600' : 'bg-white border-gray-300')}
+          `}>
+            <input
+              type="radio"
+              name="investmentType"
+              value="custom"
+              checked={investmentType === 'custom'}
+              onChange={() => setInvestmentType('custom')}
+              className="sr-only"
+            />
+            <Wand2 size={16} className={`mr-2 ${isDarkMode ? 'text-purple-300' : 'text-purple-600'}`} />
+            <span className={isDarkMode ? 'text-gray-200' : 'text-gray-900'}>Custom</span>
+          </label>
         </div>
+
+        {/* 自定义收益率输入框 */}
+        {investmentType === 'custom' && (
+          <div className="mt-4 animate-fade-in">
+            <label htmlFor="customRate" className={`block font-medium mb-2 ${isDarkMode ? 'text-gray-200' : 'text-gray-700'}`}>
+              Expected Annual Return (%)
+            </label>
+            <input
+              id="customRate"
+              type="number"
+              min="0"
+              max="50"
+              step="0.1"
+              value={customRate ?? ''}
+              onChange={(e) => setCustomRate(Number(e.target.value))}
+              className={`w-full p-2 border rounded focus:outline-none focus:ring-2 focus:ring-purple-500
+                ${isDarkMode 
+                  ? 'bg-gray-700 border-gray-600 text-white placeholder-gray-400' 
+                  : 'border-gray-300 text-gray-900 placeholder-gray-500'}`}
+              placeholder="Enter annual return percentage"
+              required
+            />
+            <p className={`text-xs mt-1 ${isDarkMode ? 'text-gray-400' : 'text-gray-500'}`}>
+              Example: For 8.5% annual return, enter 8.5
+            </p>
+          </div>
+        )}
       </div>
 
       <button
