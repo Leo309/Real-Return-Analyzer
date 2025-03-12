@@ -109,3 +109,16 @@
   transform: translateY(-4px);
   box-shadow: 0 10px 25px -5px var(--shadow);
 }
+
+
+/* 优化按钮按压效果 */
+button:active {
+  transform: scale(0.98);
+  transition: transform 0.1s ease;
+}
+
+/* 优化国旗显示 */
+[role="button"] > span[role="img"] {
+  font-size: 1.2em;
+  vertical-align: text-bottom;
+}

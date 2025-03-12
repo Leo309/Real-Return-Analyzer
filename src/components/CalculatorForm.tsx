@@ -3,6 +3,7 @@ import { useEffect, useState } from 'react';
 import { countries, getAvailableYears } from '@/data/countries';
 import useCalculatorStore from '@/store/calculatorStore';
 import { Sun, Moon, TrendingUp, DollarSign, BarChart2, Wand2 } from 'lucide-react';
+import { Flag } from 'lucide-react';
 
 const CalculatorForm: React.FC = () => {
   const {
@@ -63,24 +64,44 @@ const CalculatorForm: React.FC = () => {
       </div>
 
       <div className="mb-4">
-        <label htmlFor="country" className={`block font-medium mb-2 ${isDarkMode ? 'text-gray-200' : 'text-gray-700'}`}>
+        <label className={`block font-medium mb-2 ${isDarkMode ? 'text-gray-200' : 'text-gray-700'}`}>
           Country
         </label>
-        <select
-          id="country"
-          value={countryCode}
-          onChange={(e) => setCountryCode(e.target.value)}
-          className={`w-full p-2 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500
-            ${isDarkMode 
-              ? 'bg-gray-700 border-gray-600 text-white' 
-              : 'border-gray-300 text-gray-900'}`}
-        >
-          {countryOptions.map((country) => (
-            <option key={country.code} value={country.code}>
-              {country.name}
-            </option>
-          ))}
-        </select>
+        <div className="flex gap-2">
+          <button
+            type="button"
+            onClick={() => setCountryCode('US')}
+            className={`flex-1 p-3 rounded-lg border transition-all
+        ${countryCode === 'US'
+                ? (isDarkMode
+                  ? 'bg-blue-600 border-blue-500 text-white'
+                  : 'bg-blue-500 border-blue-400 text-white')
+                : (isDarkMode
+                  ? 'bg-gray-700 border-gray-600 hover:bg-gray-600 text-gray-300'
+                  : 'bg-gray-100 border-gray-300 hover:bg-gray-200 text-gray-700')}
+      `}
+          >
+            <span className="text-xl mr-2">🇺🇸</span>
+            United States
+          </button>
+
+          <button
+            type="button"
+            onClick={() => setCountryCode('CA')}
+            className={`flex-1 p-3 rounded-lg border transition-all
+        ${countryCode === 'CA'
+                ? (isDarkMode
+                  ? 'bg-red-600 border-red-500 text-white'
+                  : 'bg-red-500 border-red-400 text-white')
+                : (isDarkMode
+                  ? 'bg-gray-700 border-gray-600 hover:bg-gray-600 text-gray-300'
+                  : 'bg-gray-100 border-gray-300 hover:bg-gray-200 text-gray-700')}
+      `}
+          >
+            <span className="text-xl mr-2">🇨🇦</span>
+            Canada
+          </button>
+        </div>
       </div>
 
       <div className="grid grid-cols-2 gap-4 mb-4">
