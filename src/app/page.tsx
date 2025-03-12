@@ -64,7 +64,7 @@ export default function Home() {
                   <DollarSign className={`mr-2 ${darkMode ? 'text-blue-400' : 'text-blue-500'}`} size={18} />
                   Adjust Calculation
                 </h2>
-                <CalculatorForm />
+                <CalculatorForm darkMode={darkMode} />
               </div>
             </div>
             
@@ -89,7 +89,7 @@ export default function Home() {
                   <DollarSign className={`mr-2 ${darkMode ? 'text-blue-400' : 'text-blue-500'}`} size={18} />
                   Enter Your Details
                 </h2>
-                <CalculatorForm />
+                <CalculatorForm darkMode={darkMode} />
               </div>
               
               <div className={`${darkMode ? 'bg-gray-800' : 'bg-white'} rounded-xl shadow-lg p-6 transition-all duration-300 hover:shadow-xl`}>

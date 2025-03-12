@@ -4,8 +4,12 @@ import { countries, getAvailableYears } from '@/data/countries';
 import useCalculatorStore from '@/store/calculatorStore';
 import { Sun, Moon, TrendingUp, DollarSign, BarChart2, Wand2, Flag } from 'lucide-react';
 
+// Add darkMode prop to component interface
+interface CalculatorFormProps {
+  darkMode?: boolean;
+}
 
-const CalculatorForm: React.FC = () => {
+const CalculatorForm: React.FC<CalculatorFormProps> = ({ darkMode = false }) => {
   const {
     amount,
     countryCode,
@@ -25,12 +29,8 @@ const CalculatorForm: React.FC = () => {
   const availableYears = getAvailableYears();
   const countryOptions = Object.values(countries);
   
-  // Dark mode state
-  const [isDarkMode, setIsDarkMode] = useState(false);
-
-  useEffect(() => {
-    setIsDarkMode(document.documentElement.classList.contains('dark'));
-  }, []);
+  // Use the passed darkMode prop directly
+  const isDarkMode = darkMode;
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -38,7 +38,7 @@ const CalculatorForm: React.FC = () => {
   };
 
   return (
-    <form onSubmit={handleSubmit} className={`${isDarkMode ? 'bg-gray-800' : 'bg-white'} p-6 rounded-lg shadow-md`}>
+    <form onSubmit={handleSubmit} className="p-6 rounded-lg">
       <div className="mb-4">
         <label htmlFor="amount" className={`block font-medium mb-2 ${isDarkMode ? 'text-gray-200' : 'text-gray-700'}`}>
           Initial Amount
