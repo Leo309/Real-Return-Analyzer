@@ -27,7 +27,6 @@ ChartJS.register(
 const ResultsDisplay: React.FC = () => {
   const { result, amount, countryCode, startYear, endYear, investmentType } = useCalculatorStore();
   const countryData = countries[countryCode];
-
   const isDarkMode = document.documentElement.classList.contains('dark');
 
   if (!result) {
@@ -101,7 +100,7 @@ const ResultsDisplay: React.FC = () => {
         borderColor: isDarkMode ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.1)',
         borderWidth: 1,
         callbacks: {
-          label: function (context) {
+          label: function (context: any) {
             return context.dataset.label + ': ' + formatCurrency(context.parsed.y);
           }
         }
@@ -161,7 +160,7 @@ const ResultsDisplay: React.FC = () => {
     <div className="space-y-8">
       <h2 className={`text-xl font-bold ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>Results</h2>
 
-      {/* Section 1: Original Amount vs. True Value Today */}
+      {/* Inflation Impact Section */}
       <div className={`p-6 rounded-lg ${isDarkMode ? 'bg-gray-700/50' : 'bg-gray-100'}`}>
         <h3 className={`text-lg font-semibold mb-4 ${isDarkMode ? 'text-white' : 'text-gray-800'}`}>
           Inflation Impact ({startYear} - {endYear})
@@ -206,7 +205,6 @@ const ResultsDisplay: React.FC = () => {
           </div>
         </div>
 
-        {/* Loss breakdown */}
         {inflationImpact < 0 && (
           <div className={`p-4 mb-4 rounded-lg ${isDarkMode ? 'bg-red-900/30' : 'bg-red-50'}`}>
             <div className="flex items-center">
@@ -222,13 +220,20 @@ const ResultsDisplay: React.FC = () => {
           </div>
         )}
 
-        {/* Inflation chart */}
         <div className="h-60 mt-6">
           <Line options={chartOptions} data={inflationChartData} />
         </div>
+
+        {investmentType === 'none' && (
+          <div className={`p-5 rounded-lg ${isDarkMode ? 'bg-blue-900/30' : 'bg-blue-50'} shadow-md text-center mt-6`}>
+            <p className={`text-lg font-medium ${isDarkMode ? 'text-blue-200' : 'text-blue-800'}`}>
+              {`Due to inflation, your ${formatCurrency(amount)} lost ${formatCurrency(amount - result.inflationAdjustedValue)} 
+              purchasing power (${formatPercentage(inflationImpact)}) from ${startYear} to ${endYear}`}
+            </p>
+          </div>
+        )}
       </div>
 
-      {/* Section 2: Investment Impact (Only show if investment type is not none) */}
       {investmentType !== 'none' && (
         <div className={`p-6 rounded-lg ${isDarkMode ? 'bg-gray-700/50' : 'bg-gray-100'}`}>
           <h3 className={`text-lg font-semibold mb-4 ${isDarkMode ? 'text-white' : 'text-gray-800'}`}>
@@ -238,6 +243,7 @@ const ResultsDisplay: React.FC = () => {
                 ? 'Savings Account'
                 : 'Stock Market'} Performance
           </h3>
+
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
             <div className={`p-5 rounded-lg ${isDarkMode ? 'bg-green-900/40' : 'bg-green-100'} shadow-md`}>
               <div className="flex items-center justify-between">
@@ -287,23 +293,22 @@ const ResultsDisplay: React.FC = () => {
             </div>
           </div>
 
-          {/* Investment chart */}
           <div className="h-60 mt-6">
             <Line options={chartOptions} data={investmentChartData} />
           </div>
+
+          <div className={`p-5 rounded-lg ${isDarkMode ? 'bg-purple-900/30' : 'bg-purple-50'} shadow-md text-center mt-6`}>
+            <p className={`text-lg font-medium ${isDarkMode ? 'text-purple-200' : 'text-purple-800'}`}>
+              {investmentType === 'custom' 
+                ? `With ${useCalculatorStore.getState().customRate}% annual returns: ${formatCurrency(amount)} ➔ 
+                  ${formatCurrency(result.combinedValue)} after inflation`
+                : `By investing in ${investmentType === 'savings' ? 'a savings account' : 'the stock market'}: 
+                  ${formatCurrency(amount)} ➔ ${formatCurrency(result.combinedValue)} 
+                  (${formatPercentage(realInvestmentImpact)})`}
+            </p>
+          </div>
         </div>
       )}
-
-      {/* Summary message */}
-      <div className={`p-5 rounded-lg ${isDarkMode ? 'bg-blue-900/30' : 'bg-blue-50'} shadow-md text-center`}>
-        <p className={`text-lg font-medium ${isDarkMode ? 'text-blue-200' : 'text-blue-800'}`}>
-          {investmentType === 'none'
-            ? `Due to inflation...`
-            : investmentType === 'custom'
-              ? `With custom ${useCalculatorStore.getState().customRate}% annual return, your ${formatCurrency(amount)}`
-              : `By investing in ${investmentType === 'savings' ? 'a savings account' : 'the stock market'},...`}
-        </p>
-      </div>
     </div>
   );
 };

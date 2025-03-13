@@ -3,6 +3,12 @@
 @tailwind components;
 @tailwind utilities;
 
+
+@layer utilities {
+  .content-area {
+    min-height: calc(100vh - 160px);
+  }
+}
 :root {
   --background: #f9fafb;
   --foreground: #171717;
@@ -90,7 +96,12 @@
            dark:focus:border-blue-500 transition-all duration-200;
   }
 }
-
+@layer components {
+  .mobile-safe-padding {
+    padding-left: max(1rem, env(safe-area-inset-left));
+    padding-right: max(1rem, env(safe-area-inset-right));
+  }
+}
 /* Add subtle animations for interactive elements */
 .hover-lift {
   transition: transform 0.2s ease;
