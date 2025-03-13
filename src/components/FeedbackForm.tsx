@@ -17,23 +17,26 @@ const FeedbackForm: React.FC = () => {
     setError(null);
 
     try {
-      // Make sure you've created this table in your Supabase project
-      const { error: supabaseError } = await supabase
+      console.log('Attempting to connect to:', process.env.NEXT_PUBLIC_SUPABASE_URL);
+      
+      const { error: supabaseError, data } = await supabase
         .from('feedback')
         .insert([{ feedback, email, created_at: new Date() }]);
-
-      if (supabaseError) throw supabaseError;
-
+    
+      console.log('Response:', data);
+      
+      if (supabaseError) {
+        console.error('Supabase error details:', supabaseError);
+        throw supabaseError;
+      }
+    
       setSubmitted(true);
       setFeedback('');
       setEmail('');
     } catch (err) {
       console.error('Error submitting feedback:', err);
       setError('Failed to submit feedback. Please try again.');
-    } finally {
-      setIsSubmitting(false);
     }
-  };
 
   if (submitted) {
     return (
