@@ -135,8 +135,8 @@ export default function Home() {
 
         {/* Feedback form placed at the bottom of the page when results are shown */}
         {result && (
-          <div className="mt-8">
-            <div className={`${darkMode ? 'bg-gray-800' : 'bg-white'} rounded-xl shadow-lg p-6 transition-all duration-300 hover:shadow-xl`}>
+          <div className="fixed bottom-20 right-4 w-60 z-50"> {/* 固定右下角 */}
+            <div className={`${darkMode ? 'bg-gray-800' : 'bg-white'} rounded-lg shadow-xl p-3`}>
               <FeedbackForm />
             </div>
           </div>

@@ -16,7 +16,7 @@ const FeedbackForm: React.FC = () => {
       try {
         // Just a simple ping to see if Supabase is responding
         const { data, error } = await supabase.from('feedback').select('count', { count: 'exact', head: true });
-        
+
         if (error) {
           console.error('Supabase connection error:', error);
           setConnectionStatus('error');
@@ -56,7 +56,7 @@ const FeedbackForm: React.FC = () => {
       if (!process.env.NEXT_PUBLIC_SUPABASE_URL) {
         throw new Error('Supabase URL is not configured');
       }
-      
+
       if (!process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY) {
         throw new Error('Supabase Anon Key is not configured');
       }
@@ -65,10 +65,10 @@ const FeedbackForm: React.FC = () => {
 
       const { error: supabaseError, data } = await supabase
         .from('feedback')
-        .insert([{ 
-          feedback, 
+        .insert([{
+          feedback,
           email: email || null, // Handle empty email gracefully
-          created_at: new Date().toISOString() 
+          created_at: new Date().toISOString()
         }]);
 
       console.log('Response:', data);
@@ -90,8 +90,8 @@ const FeedbackForm: React.FC = () => {
   };
 
   return (
-    <form onSubmit={handleSubmit} className={`${isDarkMode ? 'bg-gray-800' : 'bg-white'} p-6 rounded-lg shadow-md`}>
-      <h3 className={`text-lg font-medium mb-4 ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>Help us improve</h3>
+    <form onSubmit={handleSubmit} className={`${isDarkMode ? 'bg-gray-800' : 'bg-white'} p-3 rounded-lg shadow-sm text-sm`}>
+      <h3 className={`font-medium mb-2 ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>Quick Feedback</h3>
 
       {connectionStatus === 'error' && (
         <div className={`${isDarkMode ? 'bg-yellow-900/30' : 'bg-yellow-100'} p-3 rounded-lg mb-4`}>
