@@ -54,7 +54,7 @@ export default function Home() {
         </div>
       </header>
 
-      <main className="max-w-7xl mx-auto py-8 px-4 sm:px-6 lg:px-8 flex-grow content-area" >
+      <main className="max-w-5xl mx-auto py-6 px-4 sm:px-6 lg:px-8 flex-grow content-area" >
         {result ? (
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
             <div className="lg:col-span-1">
@@ -92,9 +92,9 @@ export default function Home() {
               </div>
 
               <div className={`${darkMode ? 'bg-gray-800' : 'bg-white'} rounded-xl shadow-lg p-6 transition-all duration-300 hover:shadow-xl`}>
-                <div>
-                  <h2 className={`text-2xl font-bold mb-6 ${darkMode ? 'text-white' : 'text-gray-900'} flex items-center justify-center`}>
-                    <BarChart2 className={`mr-2 ${darkMode ? 'text-blue-400' : 'text-blue-500'}`} size={24} />
+                <div className="compact-card">
+                  <h2 className="text-xl font-bold mb-4 flex items-center justify-center">
+                    <BarChart2 className="mr-2" size={20} />
                     How It Works
                   </h2>
 
