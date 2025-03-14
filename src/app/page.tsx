@@ -45,15 +45,16 @@ export default function Home() {
           </div>
           <button
             onClick={toggleDarkMode}
-            className={`p-3 rounded-full transition-colors duration-200 ${darkMode ? 'bg-gray-700 hover:bg-gray-600 text-yellow-300' : 'bg-gray-200 hover:bg-gray-300 text-gray-800'
-              }`}
+            className={`p-3 rounded-full transition-colors duration-200 ${
+              darkMode ? 'bg-gray-700 hover:bg-gray-600 text-yellow-300' : 'bg-gray-200 hover:bg-gray-300 text-gray-800'
+            }`}
             aria-label="Toggle dark mode"
           >
             {darkMode ? <Sun size={20} /> : <Moon size={20} />}
           </button>
         </div>
       </header>
-
+      
       <main className="max-w-7xl mx-auto py-8 px-4 sm:px-6 lg:px-8 flex-grow content-area" >
         {result ? (
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
@@ -66,7 +67,7 @@ export default function Home() {
                 <CalculatorForm darkMode={darkMode} />
               </div>
             </div>
-
+            
             <div className="lg:col-span-2">
               <div className={`${darkMode ? 'bg-gray-800' : 'bg-white'} rounded-xl shadow-lg p-6 transition-all duration-300 hover:shadow-xl`}>
                 <ResultsDisplay />
@@ -81,7 +82,7 @@ export default function Home() {
                 Understand how your money transforms over time with our powerful investment calculator
               </p>
             </div>
-
+            
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-start">
               <div className={`${darkMode ? 'bg-gray-800' : 'bg-white'} rounded-xl shadow-lg p-6 transition-all duration-300 hover:shadow-xl`}>
                 <h2 className={`text-xl font-bold mb-4 ${darkMode ? 'text-white' : 'text-gray-900'} flex items-center`}>
@@ -90,14 +91,14 @@ export default function Home() {
                 </h2>
                 <CalculatorForm darkMode={darkMode} />
               </div>
-
+              
               <div className={`${darkMode ? 'bg-gray-800' : 'bg-white'} rounded-xl shadow-lg p-6 transition-all duration-300 hover:shadow-xl`}>
                 <div>
                   <h2 className={`text-2xl font-bold mb-6 ${darkMode ? 'text-white' : 'text-gray-900'} flex items-center justify-center`}>
                     <BarChart2 className={`mr-2 ${darkMode ? 'text-blue-400' : 'text-blue-500'}`} size={24} />
                     How It Works
                   </h2>
-
+                  
                   <div className="space-y-6">
                     <div className={`${darkMode ? 'bg-gray-700' : 'bg-blue-50'} p-5 rounded-lg transition-transform duration-300 hover:scale-102 hover:shadow-md`}>
                       <h3 className={`font-bold mb-2 text-lg ${darkMode ? 'text-white' : 'text-gray-800'} flex items-center`}>
@@ -108,7 +109,7 @@ export default function Home() {
                         See how inflation erodes your money's purchasing power over time, with historical data customized to your country.
                       </p>
                     </div>
-
+                    
                     <div className={`${darkMode ? 'bg-gray-700' : 'bg-green-50'} p-5 rounded-lg transition-transform duration-300 hover:scale-102 hover:shadow-md`}>
                       <h3 className={`font-bold mb-2 text-lg ${darkMode ? 'text-white' : 'text-gray-800'} flex items-center`}>
                         <span className={`inline-flex items-center justify-center w-6 h-6 rounded-full mr-2 ${darkMode ? 'bg-green-600' : 'bg-green-500'} text-white text-sm font-bold`}>2</span>
@@ -118,7 +119,7 @@ export default function Home() {
                         Compare different investment strategies to combat inflation and grow your wealth based on historical performance data.
                       </p>
                     </div>
-
+                    
                     <div className={`${darkMode ? 'bg-gray-700' : 'bg-yellow-50'} p-5 rounded-lg transition-transform duration-300 hover:scale-102 hover:shadow-md`}>
                       <h3 className={`font-bold mb-2 text-lg ${darkMode ? 'text-white' : 'text-gray-800'} flex items-center`}>
                         <span className={`inline-flex items-center justify-center w-6 h-6 rounded-full mr-2 ${darkMode ? 'bg-yellow-600' : 'bg-yellow-500'} text-white text-sm font-bold`}>3</span>
@@ -134,7 +135,7 @@ export default function Home() {
             </div>
           </div>
         )}
-
+        
         {/* Feedback form placed at the bottom of the page when results are shown */}
         {result && (
           <div className="mt-8">
@@ -144,17 +145,17 @@ export default function Home() {
           </div>
         )}
       </main>
-
+      
       <footer className={`${darkMode ? 'bg-gray-800 border-t border-gray-700' : 'bg-white border-t border-gray-200'} mt-auto py-6`}>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex flex-col md:flex-row justify-between items-center">
             <p className={`text-center md:text-left ${darkMode ? 'text-gray-400' : 'text-gray-500'}`}>
-              © {new Date().getFullYear()} SKYNEX GLOBAL COMMERCE & TECH INC. All data is provided for informational purposes only and does not constitute financial advice.
+              © {new Date().getFullYear()} SKYNEX GLOBAL COMMERCE & TECH INC. All data is provided for informational purposes only.
             </p>
             <div className="mt-4 md:mt-0">
-              <a href="/privacy" className={`${darkMode ? 'text-gray-400 hover:text-gray-300' : 'text-gray-500 hover:text-gray-700'} mx-3`}>Privacy Policy</a>
-              <a href="/terms" className={`${darkMode ? 'text-gray-400 hover:text-gray-300' : 'text-gray-500 hover:text-gray-700'} mx-3`}>Terms of Use</a>
-              <a href="mailto:support@skynexdigital.com" className={`${darkMode ? 'text-gray-400 hover:text-gray-300' : 'text-gray-500 hover:text-gray-700'} mx-3`}>Contact</a>
+              <a href="#" className={`${darkMode ? 'text-gray-400 hover:text-gray-300' : 'text-gray-500 hover:text-gray-700'} mx-3`}>Privacy Policy</a>
+              <a href="#" className={`${darkMode ? 'text-gray-400 hover:text-gray-300' : 'text-gray-500 hover:text-gray-700'} mx-3`}>Terms of Use</a>
+              <a href="#" className={`${darkMode ? 'text-gray-400 hover:text-gray-300' : 'text-gray-500 hover:text-gray-700'} mx-3`}>Contact</a>
             </div>
           </div>
         </div>
