@@ -13,6 +13,7 @@ import {
 import useCalculatorStore from '@/store/calculatorStore';
 import { countries } from '@/data/countries';
 import { TrendingDown, TrendingUp, DollarSign } from 'lucide-react';
+import ShareCard from '@/components/ShareCard';
 
 ChartJS.register(
   CategoryScale,
@@ -157,7 +158,7 @@ const ResultsDisplay: React.FC = () => {
   } : null;
 
   return (
-    <div className="flex flex-col gap-6"> {/* 改为上下布局 */}
+    <div className="flex flex-col gap-6">
       <h2 className={`text-xl font-bold ${isDarkMode ? 'text-white' : 'text-gray-900'} mb-4`}>Results</h2>
 
       {/* Inflation Impact Section */}
@@ -299,7 +300,7 @@ const ResultsDisplay: React.FC = () => {
 
           <div className={`p-5 rounded-lg ${isDarkMode ? 'bg-purple-900/30' : 'bg-purple-50'} shadow-md text-center mt-6`}>
             <p className={`text-lg font-medium ${isDarkMode ? 'text-purple-200' : 'text-purple-800'}`}>
-              {investmentType === 'custom' 
+              {investmentType === 'custom'
                 ? `With ${useCalculatorStore.getState().customRate}% annual returns: ${formatCurrency(amount)} ➔ 
                   ${formatCurrency(result.combinedValue)} after inflation`
                 : `By investing in ${investmentType === 'savings' ? 'a savings account' : 'the stock market'}: 
@@ -307,6 +308,13 @@ const ResultsDisplay: React.FC = () => {
                   (${formatPercentage(realInvestmentImpact)})`}
             </p>
           </div>
+        </div>
+      )}
+
+      {/* Add Share Card component */}
+      {result && (
+        <div className="mt-4">
+          <ShareCard />
         </div>
       )}
     </div>
