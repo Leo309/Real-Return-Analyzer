@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Share2, Copy, Twitter, Facebook, Linkedin, Mail, Check } from 'lucide-react';
+import { Share2, Copy, Twitter, Facebook, Mail, Check, Instagram,Linkedin, Video } from 'lucide-react';
 import useCalculatorStore from '@/store/calculatorStore';
 import { countries } from '@/data/countries';
 
@@ -55,6 +55,8 @@ const ShareCard: React.FC = () => {
   const facebookUrl = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(window.location.href)}&quote=${encodeURIComponent(shareText)}`;
   const linkedinUrl = `https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(window.location.href)}`;
   const mailUrl = `mailto:?subject=Investment Time Machine Results&body=${encodeURIComponent(shareText)}`;
+  const instagramUrl = `https://www.instagram.com/create/story?source_url=${encodeURIComponent(window.location.href)}`;
+  const tiktokUrl = `https://www.tiktok.com/upload?refer=web`;
   
   return (
     <div className={`p-6 rounded-lg ${isDarkMode ? 'bg-gray-800' : 'bg-white'} shadow-lg border ${isDarkMode ? 'border-gray-700' : 'border-gray-200'}`}>
@@ -159,7 +161,7 @@ const ShareCard: React.FC = () => {
           Share your results with friends and colleagues
         </p>
         
-        <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-3">
           <a 
             href={twitterUrl} 
             target="_blank" 
@@ -189,6 +191,33 @@ const ShareCard: React.FC = () => {
           </a>
           
           <a 
+            href={instagramUrl}
+            target="_blank" 
+            rel="noopener noreferrer"
+            className={`flex items-center justify-center p-3 rounded-lg transition-all ${
+              isDarkMode 
+                ? 'bg-gray-700 hover:bg-pink-900/80 text-pink-300 hover:text-pink-100 border border-gray-600' 
+                : 'bg-gray-100 hover:bg-pink-100 text-pink-500 hover:text-pink-700 border border-gray-200'
+            }`}
+          >
+            <Instagram size={20} className="mr-2" />
+            <span className="font-medium">Instagram</span>
+          </a>
+          
+          <a 
+            href={tiktokUrl}
+            target="_blank" 
+            rel="noopener noreferrer"
+            className={`flex items-center justify-center p-3 rounded-lg transition-all ${
+              isDarkMode 
+                ? 'bg-gray-700 hover:bg-gray-900/80 text-gray-300 hover:text-gray-100 border border-gray-600' 
+                : 'bg-gray-100 hover:bg-gray-200 text-gray-700 hover:text-gray-900 border border-gray-200'
+            }`}
+          >
+            <Video size={20} className="mr-2" />
+            <span className="font-medium">TikTok</span>
+          </a>
+          <a 
             href={linkedinUrl} 
             target="_blank" 
             rel="noopener noreferrer"
@@ -201,7 +230,6 @@ const ShareCard: React.FC = () => {
             <Linkedin size={20} className="mr-2" />
             <span className="font-medium">LinkedIn</span>
           </a>
-          
           <a 
             href={mailUrl}
             className={`flex items-center justify-center p-3 rounded-lg transition-all ${
