@@ -25,10 +25,10 @@ const CalculatorForm: React.FC<CalculatorFormProps> = ({ darkMode = false }) => 
     setCustomRate,
     calculate
   } = useCalculatorStore();
-  
+
   const availableYears = getAvailableYears();
   const countryOptions = Object.values(countries);
-  
+
   // Use the passed darkMode prop directly
   const isDarkMode = darkMode;
 
@@ -55,8 +55,8 @@ const CalculatorForm: React.FC<CalculatorFormProps> = ({ darkMode = false }) => 
             value={amount || ''}
             onChange={(e) => setAmount(Number(e.target.value) || 0)}
             className={`pl-8 w-full p-2 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500
-              ${isDarkMode 
-                ? 'bg-gray-700 border-gray-600 text-white' 
+              ${isDarkMode
+                ? 'bg-gray-700 border-gray-600 text-white'
                 : 'border-gray-300 text-gray-900'}`}
             required
           />
@@ -114,8 +114,8 @@ const CalculatorForm: React.FC<CalculatorFormProps> = ({ darkMode = false }) => 
             value={startYear}
             onChange={(e) => setStartYear(Number(e.target.value))}
             className={`w-full p-2 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500
-              ${isDarkMode 
-                ? 'bg-gray-700 border-gray-600 text-white' 
+              ${isDarkMode
+                ? 'bg-gray-700 border-gray-600 text-white'
                 : 'border-gray-300 text-gray-900'}`}
           >
             {availableYears.map((year) => (
@@ -134,8 +134,8 @@ const CalculatorForm: React.FC<CalculatorFormProps> = ({ darkMode = false }) => 
             value={endYear}
             onChange={(e) => setEndYear(Number(e.target.value))}
             className={`w-full p-2 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500
-              ${isDarkMode 
-                ? 'bg-gray-700 border-gray-600 text-white' 
+              ${isDarkMode
+                ? 'bg-gray-700 border-gray-600 text-white'
                 : 'border-gray-300 text-gray-900'}`}
           >
             {availableYears.filter(year => year >= startYear).map((year) => (
@@ -155,8 +155,8 @@ const CalculatorForm: React.FC<CalculatorFormProps> = ({ darkMode = false }) => 
         <div className="grid grid-cols-2 gap-2">
           <label className={`
             flex items-center justify-center p-3 border rounded cursor-pointer
-            ${investmentType === 'none' 
-              ? (isDarkMode ? 'bg-blue-900/40 border-blue-500' : 'bg-blue-100 border-blue-500') 
+            ${investmentType === 'none'
+              ? (isDarkMode ? 'bg-blue-900/40 border-blue-500' : 'bg-blue-100 border-blue-500')
               : (isDarkMode ? 'bg-gray-700 border-gray-600' : 'bg-white border-gray-300')}
           `}>
             <input
@@ -171,8 +171,8 @@ const CalculatorForm: React.FC<CalculatorFormProps> = ({ darkMode = false }) => 
           </label>
           <label className={`
             flex items-center justify-center p-3 border rounded cursor-pointer
-            ${investmentType === 'savings' 
-              ? (isDarkMode ? 'bg-blue-900/40 border-blue-500' : 'bg-blue-100 border-blue-500') 
+            ${investmentType === 'savings'
+              ? (isDarkMode ? 'bg-blue-900/40 border-blue-500' : 'bg-blue-100 border-blue-500')
               : (isDarkMode ? 'bg-gray-700 border-gray-600' : 'bg-white border-gray-300')}
           `}>
             <input
@@ -187,8 +187,8 @@ const CalculatorForm: React.FC<CalculatorFormProps> = ({ darkMode = false }) => 
           </label>
           <label className={`
             flex items-center justify-center p-3 border rounded cursor-pointer
-            ${investmentType === 'stockMarket' 
-              ? (isDarkMode ? 'bg-blue-900/40 border-blue-500' : 'bg-blue-100 border-blue-500') 
+            ${investmentType === 'stockMarket'
+              ? (isDarkMode ? 'bg-blue-900/40 border-blue-500' : 'bg-blue-100 border-blue-500')
               : (isDarkMode ? 'bg-gray-700 border-gray-600' : 'bg-white border-gray-300')}
           `}>
             <input
@@ -203,8 +203,8 @@ const CalculatorForm: React.FC<CalculatorFormProps> = ({ darkMode = false }) => 
           </label>
           <label className={`
             flex items-center justify-center p-3 border rounded cursor-pointer
-            ${investmentType === 'custom' 
-              ? (isDarkMode ? 'bg-purple-900/40 border-purple-500' : 'bg-purple-100 border-purple-500') 
+            ${investmentType === 'custom'
+              ? (isDarkMode ? 'bg-purple-900/40 border-purple-500' : 'bg-purple-100 border-purple-500')
               : (isDarkMode ? 'bg-gray-700 border-gray-600' : 'bg-white border-gray-300')}
           `}>
             <input
@@ -235,8 +235,8 @@ const CalculatorForm: React.FC<CalculatorFormProps> = ({ darkMode = false }) => 
               value={customRate ?? ''}
               onChange={(e) => setCustomRate(Number(e.target.value))}
               className={`w-full p-2 border rounded focus:outline-none focus:ring-2 focus:ring-purple-500
-                ${isDarkMode 
-                  ? 'bg-gray-700 border-gray-600 text-white placeholder-gray-400' 
+                ${isDarkMode
+                  ? 'bg-gray-700 border-gray-600 text-white placeholder-gray-400'
                   : 'border-gray-300 text-gray-900 placeholder-gray-500'}`}
               placeholder="Enter annual return percentage"
               required
@@ -261,5 +261,4 @@ const CalculatorForm: React.FC<CalculatorFormProps> = ({ darkMode = false }) => 
     </form>
   );
 };
-
 export default CalculatorForm;
