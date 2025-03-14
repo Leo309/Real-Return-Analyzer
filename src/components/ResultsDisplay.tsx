@@ -157,8 +157,8 @@ const ResultsDisplay: React.FC = () => {
   } : null;
 
   return (
-    <div className="space-y-8">
-      <h2 className={`text-xl font-bold ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>Results</h2>
+    <div className="flex flex-col gap-6"> {/* 改为上下布局 */}
+      <h2 className={`text-xl font-bold ${isDarkMode ? 'text-white' : 'text-gray-900'} mb-4`}>Results</h2>
 
       {/* Inflation Impact Section */}
       <div className={`p-6 rounded-lg ${isDarkMode ? 'bg-gray-700/50' : 'bg-gray-100'}`}>

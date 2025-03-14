@@ -54,23 +54,21 @@ export default function Home() {
         </div>
       </header>
 
-      <main className="max-w-5xl mx-auto py-6 px-4 sm:px-6 lg:px-8 flex-grow content-area" >
+      <main className="max-w-5xl mx-auto py-6 px-4 sm:px-6 lg:px-8 flex-grow content-area">
         {result ? (
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-            <div className="lg:col-span-1">
-              <div className={`${darkMode ? 'bg-gray-800' : 'bg-white'} rounded-xl shadow-lg p-6 transition-all duration-300 hover:shadow-xl`}>
-                <h2 className={`text-xl font-bold mb-4 ${darkMode ? 'text-white' : 'text-gray-900'} flex items-center`}>
-                  <DollarSign className={`mr-2 ${darkMode ? 'text-blue-400' : 'text-blue-500'}`} size={18} />
-                  Adjust Calculation
-                </h2>
-                <CalculatorForm darkMode={darkMode} />
-              </div>
+          <div className="grid grid-cols-1 gap-8">
+            {/* calculator on the top */}
+            <div className={`${darkMode ? 'bg-gray-800' : 'bg-white'} rounded-xl shadow-lg p-6 transition-all duration-300 hover:shadow-xl`}>
+              <h2 className={`text-xl font-bold mb-4 ${darkMode ? 'text-white' : 'text-gray-900'} flex items-center`}>
+                <DollarSign className={`mr-2 ${darkMode ? 'text-blue-400' : 'text-blue-500'}`} size={18} />
+                Adjust Calculation
+              </h2>
+              <CalculatorForm darkMode={darkMode} />
             </div>
 
-            <div className="lg:col-span-2">
-              <div className={`${darkMode ? 'bg-gray-800' : 'bg-white'} rounded-xl shadow-lg p-6 transition-all duration-300 hover:shadow-xl`}>
-                <ResultsDisplay />
-              </div>
+            {/* Result */}
+            <div className={`${darkMode ? 'bg-gray-800' : 'bg-white'} rounded-xl shadow-lg p-6 transition-all duration-300 hover:shadow-xl`}>
+              <ResultsDisplay />
             </div>
           </div>
         ) : (
