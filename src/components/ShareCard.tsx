@@ -1,12 +1,12 @@
 import React, { useState } from 'react';
 import { Share2, Copy, Check, Mail } from 'lucide-react';
 import { 
-  FaX,
+  FaXTwitter,
   FaFacebookF,
   FaLinkedinIn,
   FaInstagram,
-  FaTiktok
-} from 'react-icons/fa6';
+  FaTiktok 
+} from "react-icons/fa6";
 import useCalculatorStore from '@/store/calculatorStore';
 import { countries } from '@/data/countries';
 
@@ -57,9 +57,9 @@ const ShareCard: React.FC = () => {
 
   const socialPlatforms = [
     {
-      name: 'X',
+      name: 'X(Twitter)',
       url: `https://x.com/intent/post?text=${encodeURIComponent(shareText)}`,
-      icon: <FaX className="w-4 h-4" />,
+      icon: <FaXTwitter className="w-4 h-4" />,
       color: 'text-gray-900 dark:text-gray-100',
       bg: 'bg-gray-900/10 hover:bg-gray-900/20 dark:bg-gray-100/10 dark:hover:bg-gray-100/20'
     },
