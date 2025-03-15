@@ -90,9 +90,8 @@ export default function Home() {
               </div>
 
               <div className={`${darkMode ? 'bg-gray-800' : 'bg-white'} rounded-xl shadow-lg p-6 transition-all duration-300 hover:shadow-xl`}>
-                <div className="compact-card">
-                  <h2 className="text-xl font-bold mb-4 flex items-center justify-center">
-                    <BarChart2 className="mr-2" size={20} />
+                  <h2 className={`text-xl font-bold mb-4 flex items-center justify-center ${darkMode ? 'text-white' : 'text-gray-900'}`}>
+                    <BarChart2 className={`mr-2 ${darkMode ? 'text-blue-400' : 'text-blue-500'}`} size={20} />
                     How It Works
                   </h2>
 
@@ -130,7 +129,6 @@ export default function Home() {
                 </div>
               </div>
             </div>
-          </div>
         )}
 
         {/* Feedback form placed at the bottom of the page when results are shown */}
