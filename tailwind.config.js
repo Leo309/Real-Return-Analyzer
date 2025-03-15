@@ -1,22 +1,23 @@
+// tailwind.config.js
+const colors = require('tailwindcss/colors')
+
 module.exports = {
   content: [
-    './src/pages/**/*.{js,ts,jsx,tsx,mdx}',
-    './src/components/**/*.{js,ts,jsx,tsx,mdx}',
-    './src/app/**/*.{js,ts,jsx,tsx,mdx}',
+    './src/**/*.{js,jsx,ts,tsx}',
+    './public/index.html',
   ],
+  darkMode: 'class',
   theme: {
     extend: {
       colors: {
-        background: 'var(--background)',
-        foreground: 'var(--foreground)',
-        'card-bg': 'var(--card-bg)',
-        'card-hover': 'var(--card-hover)',
-        primary: 'var(--primary)',
-        'primary-hover': 'var(--primary-hover)',
-        'primary-foreground': 'var(--primary-foreground)',
-        accent: 'var(--accent)',
-        border: 'var(--border)',
-        shadow: 'var(--shadow)',
+        primary: 'rgb(var(--primary) / <alpha-value>)',
+        'primary-hover': 'rgb(var(--primary-hover) / <alpha-value>)',
+        foreground: 'rgb(var(--foreground) / <alpha-value>)',
+        background: 'rgb(var(--background) / <alpha-value>)',
+        border: 'rgb(var(--border) / <alpha-value>)',
+        'card-bg': 'rgb(var(--background) / <alpha-value>)',
+        'primary-foreground': 'white',
+        accent: colors.gray[200],
       },
     },
   },

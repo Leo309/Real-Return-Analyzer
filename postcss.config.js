@@ -1,7 +1,7 @@
 // postcss.config.js
 module.exports = {
   plugins: {
-    '@tailwindcss/postcss': {},  // 新增的核心插件
+    '@tailwindcss/postcss': {},  // 关键修改点
     autoprefixer: {},
   }
 }
