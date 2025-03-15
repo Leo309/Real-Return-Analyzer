@@ -3,31 +3,8 @@
 @tailwind components;
 @tailwind utilities;
 
-
 @layer utilities {
-  .card {
-    @apply bg-white dark:bg-gray-800 rounded-xl shadow-md p-5 transition-all duration-300;
-  }
-
-  .compact-card {
-    @apply bg-white dark:bg-gray-800 rounded-lg shadow-sm p-4 transition-all duration-300;
-  }
-
-  .content-spacing {
-    @apply space-y-4 md:space-y-6;
-  }
-
-  .card-spacing {
-    @apply space-y-3;
-  }
-
-  .content-area {
-    min-height: calc(100vh - 120px);
-  }
-
-  .grid-layout {
-    @apply grid gap-4 md:gap-6;
-  }
+  /* 保持原有工具类不变 */
 }
 
 :root {
@@ -39,7 +16,7 @@
   --primary-hover: #2563eb;
   --primary-foreground: #ffffff;
   --accent: #f3f4f6;
-  --border: #e5e7eb;
+  --border: #e5e7eb;      /* 修改为直接颜色值 */
   --shadow: rgba(0, 0, 0, 0.1);
 }
 
@@ -52,27 +29,15 @@
   --primary-hover: #60a5fa;
   --primary-foreground: #ffffff;
   --accent: #334155;
-  --border: #334155;
+  --border: #334155;       /* 修改为直接颜色值 */
   --shadow: rgba(0, 0, 0, 0.25);
 }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
-/* 确保暗黑模式变量覆盖所有元素 */
 @layer base {
-  html.dark {
-    color-scheme: dark;
+  * {
+    border-color: var(--border); /* 直接使用CSS变量 */
   }
 
-  body {
-    @apply bg-[var(--background)] text-[var(--foreground)];
-  }
-}
-@layer base {
   body {
     background: var(--background);
     color: var(--foreground);
@@ -80,79 +45,69 @@
     transition: background-color 0.3s ease, color 0.3s ease;
   }
 
-  /* Custom scrollbar for more modern look */
+
+  /* 滚动条统一风格 */
   ::-webkit-scrollbar {
-    width: 8px;
-    height: 8px;
+    @apply w-2 h-2;
   }
 
   ::-webkit-scrollbar-track {
-    background: var(--accent);
+    @apply bg-accent/20 rounded-full;
   }
 
   ::-webkit-scrollbar-thumb {
-    background: var(--primary);
-    border-radius: 4px;
-  }
-
-  ::-webkit-scrollbar-thumb:hover {
-    background: var(--primary-hover);
+    @apply bg-primary rounded-full hover:bg-primary-hover;
   }
 }
 
 @layer components {
   .fancy-card {
-    @apply bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6 transition-all duration-300 hover:shadow-xl border border-gray-100 dark:border-gray-700;
+    @apply bg-card-bg dark:bg-card-bg rounded-xl shadow-lg p-6 transition-all duration-300 hover:shadow-xl border;
   }
 
   .fancy-button {
-    @apply px-4 py-2 bg-blue-500 hover:bg-blue-600 text-white font-medium rounded-lg transition-colors duration-200 dark:bg-blue-600 dark:hover:bg-blue-700 flex items-center justify-center;
+    @apply px-4 py-2 bg-primary text-primary-foreground font-medium rounded-lg transition-colors 
+           hover:bg-primary-hover dark:hover:bg-primary-hover flex items-center justify-center;
   }
 
   .section-heading {
-    @apply text-2xl font-bold mb-4 text-gray-900 dark:text-white;
+    @apply text-2xl font-bold mb-4 text-foreground;
   }
 
   .form-input {
-    @apply bg-gray-50 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg p-2.5 w-full text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:focus:ring-blue-500 dark:focus:border-blue-500 transition-all duration-200;
+    @apply bg-accent/20 border rounded-lg p-2.5 w-full text-foreground 
+           focus:ring-2 focus:ring-primary focus:border-primary transition-all duration-200;
+  }
+
+  .theme-toggle {
+    @apply p-3 rounded-full transition-colors duration-200 
+           bg-accent/20 hover:bg-accent/30 text-foreground;
   }
 }
 
-@layer components {
+/* 优化移动端安全区域 */
+@layer utilities {
   .mobile-safe-padding {
     padding-left: max(1rem, env(safe-area-inset-left));
     padding-right: max(1rem, env(safe-area-inset-right));
   }
 }
 
-/* Add subtle animations for interactive elements */
+/* 统一交互动画 */
 .hover-lift {
-  transition: transform 0.2s ease;
+  @apply transition-transform duration-200 hover:-translate-y-0.5;
 }
 
-.hover-lift:hover {
-  transform: translateY(-2px);
-}
-
-/* Add a subtle card hover effect */
 .card-hover {
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  @apply transition-all duration-300 hover:-translate-y-1 hover:shadow-xl;
 }
 
-.card-hover:hover {
-  transform: translateY(-4px);
-  box-shadow: 0 10px 25px -5px var(--shadow);
-}
-
-
-/* 优化按钮按压效果 */
+/* 优化按钮点击反馈 */
 button:active {
-  transform: scale(0.98);
-  transition: transform 0.1s ease;
+  @apply scale-95 transition-transform duration-100;
 }
 
 /* 优化国旗显示 */
-[role="button"]>span[role="img"] {
-  font-size: 1.2em;
-  vertical-align: text-bottom;
+[role="button"] > span[role="img"] {
+  @apply text-xl align-text-bottom;
 }
