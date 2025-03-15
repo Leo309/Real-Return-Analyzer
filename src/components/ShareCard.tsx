@@ -1,12 +1,5 @@
 import React, { useState } from 'react';
-import { Share2, Copy, Check, Mail } from 'lucide-react';
-import { 
-  FaX,
-  FaFacebookF,
-  FaLinkedinIn,
-  FaInstagram,
-  FaTiktok
-} from 'react-icons/fa6';
+import { Share2, Copy, Twitter, Facebook, Mail, Check, Instagram,Linkedin, Video } from 'lucide-react';
 import useCalculatorStore from '@/store/calculatorStore';
 import { countries } from '@/data/countries';
 
@@ -27,9 +20,11 @@ const ShareCard: React.FC = () => {
     }).format(value);
   };
   
+  // Calculate the percentage change
   const percentageChange = ((result.inflationAdjustedValue - amount) / amount) * 100;
   const formattedPercentage = (percentageChange >= 0 ? '+' : '') + percentageChange.toFixed(2) + '%';
   
+  // Generate share text
   const getShareText = () => {
     let baseText = `I calculated that ${formatCurrency(amount)} in ${startYear} is worth ${formatCurrency(result.inflationAdjustedValue)} in ${endYear} (${formattedPercentage}).`;
     
@@ -54,52 +49,15 @@ const ShareCard: React.FC = () => {
       setTimeout(() => setCopied(false), 2000);
     });
   };
-
-  const socialPlatforms = [
-    {
-      name: 'X',
-      url: `https://x.com/intent/post?text=${encodeURIComponent(shareText)}`,
-      icon: <FaX className="w-4 h-4" />,
-      color: 'text-gray-900 dark:text-gray-100',
-      bg: 'bg-gray-900/10 hover:bg-gray-900/20 dark:bg-gray-100/10 dark:hover:bg-gray-100/20'
-    },
-    {
-      name: 'Facebook',
-      url: `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(window.location.href)}`,
-      icon: <FaFacebookF className="w-4 h-4" />,
-      color: 'text-[#1877f2]',
-      bg: 'bg-[#1877f2]/10 hover:bg-[#1877f2]/20'
-    },
-    {
-      name: 'Instagram',
-      url: `https://www.instagram.com/create/story?source_url=${encodeURIComponent(window.location.href)}`,
-      icon: <FaInstagram className="w-4 h-4" />,
-      color: 'text-[#e4405f]',
-      bg: 'bg-[#e4405f]/10 hover:bg-[#e4405f]/20'
-    },
-    {
-      name: 'TikTok',
-      url: 'https://www.tiktok.com/upload?refer=web',
-      icon: <FaTiktok className="w-4 h-4" />,
-      color: 'text-[#ff0050]',
-      bg: 'bg-[#ff0050]/10 hover:bg-[#ff0050]/20'
-    },
-    {
-      name: 'LinkedIn',
-      url: `https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(window.location.href)}&title=${encodeURIComponent(shareText)}`,
-      icon: <FaLinkedinIn className="w-4 h-4" />,
-      color: 'text-[#0a66c2]',
-      bg: 'bg-[#0a66c2]/10 hover:bg-[#0a66c2]/20'
-    },
-    {
-      name: 'Email',
-      url: `mailto:?subject=Investment Time Machine Results&body=${encodeURIComponent(shareText)}`,
-      icon: <Mail size={16} />,
-      color: 'text-gray-900 dark:text-gray-100',
-      bg: 'bg-gray-900/10 hover:bg-gray-900/20 dark:bg-gray-100/10 dark:hover:bg-gray-100/20'
-    }
-  ];
-
+  
+  // Generate share URLs
+  const twitterUrl = `https://twitter.com/intent/tweet?text=${encodeURIComponent(shareText)}`;
+  const facebookUrl = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(window.location.href)}&quote=${encodeURIComponent(shareText)}`;
+  const linkedinUrl = `https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(window.location.href)}`;
+  const mailUrl = `mailto:?subject=Investment Time Machine Results&body=${encodeURIComponent(shareText)}`;
+  const instagramUrl = `https://www.instagram.com/create/story?source_url=${encodeURIComponent(window.location.href)}`;
+  const tiktokUrl = `https://www.tiktok.com/upload?refer=web`;
+  
   return (
     <div className={`p-6 rounded-lg ${isDarkMode ? 'bg-gray-800' : 'bg-white'} shadow-lg border ${isDarkMode ? 'border-gray-700' : 'border-gray-200'}`}>
       <h3 className={`text-xl font-bold mb-4 flex items-center ${isDarkMode ? 'text-white' : 'text-gray-800'}`}>
@@ -107,6 +65,7 @@ const ShareCard: React.FC = () => {
         Share Your Results
       </h3>
       
+      {/* Tab Navigation */}
       <div className="flex mb-4 border-b border-gray-200 dark:border-gray-700">
         <button
           className={`py-2 px-4 font-medium text-sm rounded-t-lg ${activeTab === 'text' 
@@ -126,6 +85,7 @@ const ShareCard: React.FC = () => {
         </button>
       </div>
       
+      {/* Content Area */}
       <div className="mb-6">
         {activeTab === 'text' ? (
           <div className={`p-4 rounded-lg ${isDarkMode ? 'bg-gray-700' : 'bg-gray-100'} border ${isDarkMode ? 'border-gray-600' : 'border-gray-200'}`}>
@@ -201,21 +161,86 @@ const ShareCard: React.FC = () => {
           Share your results with friends and colleagues
         </p>
         
-        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-2">
-          {socialPlatforms.map((platform) => (
-            <a
-              key={platform.name}
-              href={platform.url}
-              target="_blank"
-              rel="noopener noreferrer"
-              className={`flex flex-col items-center justify-center p-2 rounded-lg transition-colors ${platform.bg} ${platform.color} border ${
-                isDarkMode ? 'border-gray-700' : 'border-gray-200'
-              }`}
-            >
-              <span className="mb-1">{platform.icon}</span>
-              <span className="text-xs font-medium">{platform.name}</span>
-            </a>
-          ))}
+        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-3">
+          <a 
+            href={twitterUrl} 
+            target="_blank" 
+            rel="noopener noreferrer"
+            className={`flex items-center justify-center p-3 rounded-lg transition-all ${
+              isDarkMode 
+                ? 'bg-gray-700 hover:bg-blue-900/80 text-blue-300 hover:text-blue-100 border border-gray-600' 
+                : 'bg-gray-100 hover:bg-blue-100 text-blue-500 hover:text-blue-700 border border-gray-200'
+            }`}
+          >
+            <Twitter size={20} className="mr-2" />
+            <span className="font-medium">Twitter</span>
+          </a>
+          
+          <a 
+            href={facebookUrl} 
+            target="_blank" 
+            rel="noopener noreferrer"
+            className={`flex items-center justify-center p-3 rounded-lg transition-all ${
+              isDarkMode 
+                ? 'bg-gray-700 hover:bg-blue-900/80 text-blue-300 hover:text-blue-100 border border-gray-600' 
+                : 'bg-gray-100 hover:bg-blue-100 text-blue-500 hover:text-blue-700 border border-gray-200'
+            }`}
+          >
+            <Facebook size={20} className="mr-2" />
+            <span className="font-medium">Facebook</span>
+          </a>
+          
+          <a 
+            href={instagramUrl}
+            target="_blank" 
+            rel="noopener noreferrer"
+            className={`flex items-center justify-center p-3 rounded-lg transition-all ${
+              isDarkMode 
+                ? 'bg-gray-700 hover:bg-pink-900/80 text-pink-300 hover:text-pink-100 border border-gray-600' 
+                : 'bg-gray-100 hover:bg-pink-100 text-pink-500 hover:text-pink-700 border border-gray-200'
+            }`}
+          >
+            <Instagram size={20} className="mr-2" />
+            <span className="font-medium">Instagram</span>
+          </a>
+          
+          <a 
+            href={tiktokUrl}
+            target="_blank" 
+            rel="noopener noreferrer"
+            className={`flex items-center justify-center p-3 rounded-lg transition-all ${
+              isDarkMode 
+                ? 'bg-gray-700 hover:bg-gray-900/80 text-gray-300 hover:text-gray-100 border border-gray-600' 
+                : 'bg-gray-100 hover:bg-gray-200 text-gray-700 hover:text-gray-900 border border-gray-200'
+            }`}
+          >
+            <Video size={20} className="mr-2" />
+            <span className="font-medium">TikTok</span>
+          </a>
+          <a 
+            href={linkedinUrl} 
+            target="_blank" 
+            rel="noopener noreferrer"
+            className={`flex items-center justify-center p-3 rounded-lg transition-all ${
+              isDarkMode 
+                ? 'bg-gray-700 hover:bg-blue-900/80 text-blue-300 hover:text-blue-100 border border-gray-600' 
+                : 'bg-gray-100 hover:bg-blue-100 text-blue-500 hover:text-blue-700 border border-gray-200'
+            }`}
+          >
+            <Linkedin size={20} className="mr-2" />
+            <span className="font-medium">LinkedIn</span>
+          </a>
+          <a 
+            href={mailUrl}
+            className={`flex items-center justify-center p-3 rounded-lg transition-all ${
+              isDarkMode 
+                ? 'bg-gray-700 hover:bg-blue-900/80 text-blue-300 hover:text-blue-100 border border-gray-600' 
+                : 'bg-gray-100 hover:bg-blue-100 text-blue-500 hover:text-blue-700 border border-gray-200'
+            }`}
+          >
+            <Mail size={20} className="mr-2" />
+            <span className="font-medium">Email</span>
+          </a>
         </div>
       </div>
     </div>
