@@ -29,7 +29,7 @@ export default function Home() {
   };
 
   return (
-    <div className={`min-h-screen transition-colors duration-300 flex flex-col ${darkMode ? 'dark bg-gray-900' : 'bg-gray-50'}`}>
+    <div className={`min-h-screen transition-colors duration-300 flex flex-col ${darkMode ? 'bg-gray-900' : 'bg-gray-50'}`}>
       <header className={`${darkMode ? 'bg-gray-800' : 'bg-white'} sticky top-0 z-10 shadow-md border-b ${darkMode ? 'border-gray-700' : 'border-gray-200'}`}>
         <div className="max-w-7xl mx-auto py-4 px-4 sm:px-6 lg:px-8 flex justify-between items-center">
           <div>
@@ -135,9 +135,9 @@ export default function Home() {
 
         {/* Feedback form placed at the bottom of the page when results are shown */}
         {result && (
-          <div className="fixed bottom-20 right-4 w-60 z-50"> {/* 固定右下角 */}
+          <div className="fixed bottom-20 right-4 w-50 z-50">
             <div className={`${darkMode ? 'bg-gray-800' : 'bg-white'} rounded-lg shadow-xl p-3`}>
-              <FeedbackForm />
+              <FeedbackForm darkMode={darkMode} />
             </div>
           </div>
         )}

@@ -147,7 +147,7 @@ const CalculatorForm: React.FC<CalculatorFormProps> = ({ darkMode = false }) => 
         </div>
       </div>
 
-      {/* 修改后的 Investment Type 区块 */}
+      {/*  Investment Type */}
       <div className="mb-6">
         <label className={`block font-medium mb-2 ${isDarkMode ? 'text-gray-200' : 'text-gray-700'}`}>
           Investment Type
@@ -220,7 +220,7 @@ const CalculatorForm: React.FC<CalculatorFormProps> = ({ darkMode = false }) => 
           </label>
         </div>
 
-        {/* 自定义收益率输入框 */}
+        {/* customized profit rate */}
         {investmentType === 'custom' && (
           <div className="mt-4 animate-fade-in">
             <label htmlFor="customRate" className={`block font-medium mb-2 ${isDarkMode ? 'text-gray-200' : 'text-gray-700'}`}>

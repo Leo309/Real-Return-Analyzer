@@ -1,13 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import { supabase } from '@/lib/supabase';
 
-const FeedbackForm: React.FC = () => {
+const FeedbackForm: React.FC<{ darkMode?: boolean }> = ({ darkMode }) => {
   const [feedback, setFeedback] = useState('');
   const [email, setEmail] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitted, setSubmitted] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [isDarkMode, setIsDarkMode] = useState(false);
+  const isDarkMode = darkMode ?? false;
   const [connectionStatus, setConnectionStatus] = useState<'unknown' | 'ok' | 'error'>('unknown');
 
   // Check if Supabase connection is working
@@ -34,9 +34,9 @@ const FeedbackForm: React.FC = () => {
   }, []);
 
   // Check dark mode on client side only
-  useEffect(() => {
-    setIsDarkMode(document.documentElement.classList.contains('dark'));
-  }, []);
+  // useEffect(() => {
+  //   setIsDarkMode(document.documentElement.classList.contains('dark'));
+  // }, []);
 
   if (submitted) {
     return (
