@@ -90,53 +90,51 @@ export default function Home() {
               </div>
 
               <div className={`${darkMode ? 'bg-gray-800' : 'bg-white'} rounded-xl shadow-lg p-6 transition-all duration-300 hover:shadow-xl`}>
-                  <h2 className={`text-xl font-bold mb-4 flex items-center justify-center ${darkMode ? 'text-white' : 'text-gray-900'}`}>
-                    <BarChart2 className={`mr-2 ${darkMode ? 'text-blue-400' : 'text-blue-500'}`} size={20} />
-                    How It Works
-                  </h2>
+                <h2 className={`text-xl font-bold mb-4 flex items-center justify-center ${darkMode ? 'text-white' : 'text-gray-900'}`}>
+                  <BarChart2 className={`mr-2 ${darkMode ? 'text-blue-400' : 'text-blue-500'}`} size={20} />
+                  How It Works
+                </h2>
 
-                  <div className="space-y-6">
-                    <div className={`${darkMode ? 'bg-gray-700' : 'bg-blue-50'} p-5 rounded-lg transition-transform duration-300 hover:scale-102 hover:shadow-md`}>
-                      <h3 className={`font-bold mb-2 text-lg ${darkMode ? 'text-white' : 'text-gray-800'} flex items-center`}>
-                        <span className={`inline-flex items-center justify-center w-6 h-6 rounded-full mr-2 ${darkMode ? 'bg-blue-600' : 'bg-blue-500'} text-white text-sm font-bold`}>1</span>
-                        Inflation Impact
-                      </h3>
-                      <p className={`${darkMode ? 'text-gray-300' : 'text-gray-600'}`}>
-                        See how inflation erodes your money's purchasing power over time, with historical data customized to your country.
-                      </p>
-                    </div>
+                <div className="space-y-6">
+                  <div className={`${darkMode ? 'bg-gray-700' : 'bg-blue-50'} p-5 rounded-lg transition-transform duration-300 hover:scale-102 hover:shadow-md`}>
+                    <h3 className={`font-bold mb-2 text-lg ${darkMode ? 'text-white' : 'text-gray-800'} flex items-center`}>
+                      <span className={`inline-flex items-center justify-center w-6 h-6 rounded-full mr-2 ${darkMode ? 'bg-blue-600' : 'bg-blue-500'} text-white text-sm font-bold`}>1</span>
+                      Inflation Impact
+                    </h3>
+                    <p className={`${darkMode ? 'text-gray-300' : 'text-gray-600'}`}>
+                      See how inflation erodes your money's purchasing power over time, with historical data customized to your country.
+                    </p>
+                  </div>
 
-                    <div className={`${darkMode ? 'bg-gray-700' : 'bg-green-50'} p-5 rounded-lg transition-transform duration-300 hover:scale-102 hover:shadow-md`}>
-                      <h3 className={`font-bold mb-2 text-lg ${darkMode ? 'text-white' : 'text-gray-800'} flex items-center`}>
-                        <span className={`inline-flex items-center justify-center w-6 h-6 rounded-full mr-2 ${darkMode ? 'bg-green-600' : 'bg-green-500'} text-white text-sm font-bold`}>2</span>
-                        Investment Growth
-                      </h3>
-                      <p className={`${darkMode ? 'text-gray-300' : 'text-gray-600'}`}>
-                        Compare different investment strategies to combat inflation and grow your wealth based on historical performance data.
-                      </p>
-                    </div>
+                  <div className={`${darkMode ? 'bg-gray-700' : 'bg-green-50'} p-5 rounded-lg transition-transform duration-300 hover:scale-102 hover:shadow-md`}>
+                    <h3 className={`font-bold mb-2 text-lg ${darkMode ? 'text-white' : 'text-gray-800'} flex items-center`}>
+                      <span className={`inline-flex items-center justify-center w-6 h-6 rounded-full mr-2 ${darkMode ? 'bg-green-600' : 'bg-green-500'} text-white text-sm font-bold`}>2</span>
+                      Investment Growth
+                    </h3>
+                    <p className={`${darkMode ? 'text-gray-300' : 'text-gray-600'}`}>
+                      Compare different investment strategies to combat inflation and grow your wealth based on historical performance data.
+                    </p>
+                  </div>
 
-                    <div className={`${darkMode ? 'bg-gray-700' : 'bg-yellow-50'} p-5 rounded-lg transition-transform duration-300 hover:scale-102 hover:shadow-md`}>
-                      <h3 className={`font-bold mb-2 text-lg ${darkMode ? 'text-white' : 'text-gray-800'} flex items-center`}>
-                        <span className={`inline-flex items-center justify-center w-6 h-6 rounded-full mr-2 ${darkMode ? 'bg-yellow-600' : 'bg-yellow-500'} text-white text-sm font-bold`}>3</span>
-                        Visual Analysis
-                      </h3>
-                      <p className={`${darkMode ? 'text-gray-300' : 'text-gray-600'}`}>
-                        Get clear charts and practical comparisons showing the real impact of time, inflation, and investment choices on your finances.
-                      </p>
-                    </div>
+                  <div className={`${darkMode ? 'bg-gray-700' : 'bg-yellow-50'} p-5 rounded-lg transition-transform duration-300 hover:scale-102 hover:shadow-md`}>
+                    <h3 className={`font-bold mb-2 text-lg ${darkMode ? 'text-white' : 'text-gray-800'} flex items-center`}>
+                      <span className={`inline-flex items-center justify-center w-6 h-6 rounded-full mr-2 ${darkMode ? 'bg-yellow-600' : 'bg-yellow-500'} text-white text-sm font-bold`}>3</span>
+                      Visual Analysis
+                    </h3>
+                    <p className={`${darkMode ? 'text-gray-300' : 'text-gray-600'}`}>
+                      Get clear charts and practical comparisons showing the real impact of time, inflation, and investment choices on your finances.
+                    </p>
                   </div>
                 </div>
               </div>
             </div>
+          </div>
         )}
 
         {/* Feedback form placed at the bottom of the page when results are shown */}
         {result && (
-          <div className="fixed bottom-20 right-4 w-50 z-50">
-            <div className={`${darkMode ? 'bg-gray-800' : 'bg-white'} rounded-lg shadow-xl p-3`}>
-              <FeedbackForm darkMode={darkMode} />
-            </div>
+          <div className="fixed bottom-6 right-6 z-50">
+            <FeedbackForm darkMode={darkMode} />
           </div>
         )}
       </main>
