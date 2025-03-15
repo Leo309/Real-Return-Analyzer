@@ -5,28 +5,27 @@ import CalculatorForm from '@/components/CalculatorForm';
 import ResultsDisplay from '@/components/ResultsDisplay';
 import FeedbackForm from '@/components/FeedbackForm';
 import useCalculatorStore from '@/store/calculatorStore';
-import { Sun, Moon, TrendingUp, DollarSign, BarChart2, Share2, X } from 'lucide-react';
-import { Dialog } from '@headlessui/react';
+import { Sun, Moon, TrendingUp, DollarSign, BarChart2 } from 'lucide-react';
 
 export default function Home() {
   const { result } = useCalculatorStore();
   const [darkMode, setDarkMode] = useState(false);
-  const [showFeedback, setShowFeedback] = useState(false);
 
+  // Initialize dark mode based on user's system preference
   useEffect(() => {
     if (typeof window !== 'undefined') {
-      const savedTheme = localStorage.getItem('theme') || 
-        (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
-      setDarkMode(savedTheme === 'dark');
-      document.documentElement.classList.toggle('dark', savedTheme === 'dark');
+      const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+      setDarkMode(prefersDark);
+      if (prefersDark) {
+        document.documentElement.classList.add('dark');
+      }
     }
   }, []);
 
+  // Toggle dark mode
   const toggleDarkMode = () => {
-    const newMode = !darkMode;
-    setDarkMode(newMode);
-    localStorage.setItem('theme', newMode ? 'dark' : 'light');
-    document.documentElement.classList.toggle('dark', newMode);
+    setDarkMode(!darkMode);
+    document.documentElement.classList.toggle('dark');
   };
 
   return (
@@ -136,43 +135,10 @@ export default function Home() {
 
         {/* Feedback form placed at the bottom of the page when results are shown */}
         {result && (
-          <div className="fixed bottom-4 right-4 z-50">
-            <button
-              onClick={() => setShowFeedback(true)}
-              className={`p-3 rounded-full shadow-lg transition-all hover:scale-110 ${
-                darkMode 
-                  ? 'bg-blue-600 hover:bg-blue-700 text-white' 
-                  : 'bg-blue-500 hover:bg-blue-600 text-white'
-              }`}
-            >
-              <Share2 size={20} />
-            </button>
-
-            <Dialog
-              open={showFeedback}
-              onClose={() => setShowFeedback(false)}
-              className="relative z-50"
-            >
-              <div className="fixed inset-0 bg-black/30" aria-hidden="true" />
-              <div className="fixed bottom-0 right-0 sm:bottom-4 sm:right-4">
-                <Dialog.Panel className={`w-screen sm:w-96 p-4 rounded-t-lg sm:rounded-lg shadow-xl ${
-                  darkMode ? 'bg-gray-800' : 'bg-white'
-                }`}>
-                  <div className="flex justify-between items-center mb-4">
-                    <Dialog.Title className={`text-lg font-bold ${darkMode ? 'text-white' : 'text-gray-900'}`}>
-                      提供反馈
-                    </Dialog.Title>
-                    <button
-                      onClick={() => setShowFeedback(false)}
-                      className={`p-1 rounded-full hover:bg-gray-100 dark:hover:bg-gray-700`}
-                    >
-                      <X size={20} className={darkMode ? 'text-gray-300' : 'text-gray-600'} />
-                    </button>
-                  </div>
-                  <FeedbackForm darkMode={darkMode} />
-                </Dialog.Panel>
-              </div>
-            </Dialog>
+          <div className="fixed bottom-20 right-4 w-60 z-50"> {/* 固定右下角 */}
+            <div className={`${darkMode ? 'bg-gray-800' : 'bg-white'} rounded-lg shadow-xl p-3`}>
+              <FeedbackForm />
+            </div>
           </div>
         )}
       </main>
