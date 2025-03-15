@@ -1,27 +1,27 @@
 import React, { useState, useEffect } from 'react';
 import { supabase } from '@/lib/supabase';
+import { Send, X, CheckCircle, AlertTriangle } from 'lucide-react';
 
-const FeedbackForm: React.FC = () => {
+const FeedbackForm: React.FC<{ darkMode?: boolean }> = ({ darkMode }) => {
   const [feedback, setFeedback] = useState('');
   const [email, setEmail] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitted, setSubmitted] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [isDarkMode, setIsDarkMode] = useState(false);
+  const [isOpen, setIsOpen] = useState(false);
+  const isDarkMode = darkMode ?? false;
   const [connectionStatus, setConnectionStatus] = useState<'unknown' | 'ok' | 'error'>('unknown');
 
   // Check if Supabase connection is working
   useEffect(() => {
     const checkConnection = async () => {
       try {
-        // Just a simple ping to see if Supabase is responding
-        const { data, error } = await supabase.from('feedback').select('count', { count: 'exact', head: true });
+        const { error } = await supabase.from('feedback').select('count', { count: 'exact', head: true });
 
         if (error) {
           console.error('Supabase connection error:', error);
           setConnectionStatus('error');
         } else {
-          console.log('Supabase connected successfully');
           setConnectionStatus('ok');
         }
       } catch (err) {
@@ -33,19 +33,6 @@ const FeedbackForm: React.FC = () => {
     checkConnection();
   }, []);
 
-  // Check dark mode on client side only
-  useEffect(() => {
-    setIsDarkMode(document.documentElement.classList.contains('dark'));
-  }, []);
-
-  if (submitted) {
-    return (
-      <div className={`${isDarkMode ? 'bg-green-900/30 text-green-200' : 'bg-green-100 text-green-800'} p-4 rounded-lg`}>
-        <p>Thank you for your feedback!</p>
-      </div>
-    );
-  }
-
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsSubmitting(true);
@@ -53,34 +40,33 @@ const FeedbackForm: React.FC = () => {
 
     try {
       // Verify environment variables are available
-      if (!process.env.NEXT_PUBLIC_SUPABASE_URL) {
-        throw new Error('Supabase URL is not configured');
+      if (!process.env.NEXT_PUBLIC_SUPABASE_URL || !process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY) {
+        throw new Error('Database configuration is incomplete');
       }
 
-      if (!process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY) {
-        throw new Error('Supabase Anon Key is not configured');
-      }
-
-      console.log('Attempting to connect to:', process.env.NEXT_PUBLIC_SUPABASE_URL);
-
-      const { error: supabaseError, data } = await supabase
+      const { error: supabaseError } = await supabase
         .from('feedback')
         .insert([{
           feedback,
-          email: email || null, // Handle empty email gracefully
+          email: email || null,
           created_at: new Date().toISOString()
         }]);
 
-      console.log('Response:', data);
-
       if (supabaseError) {
-        console.error('Supabase error details:', supabaseError);
         throw new Error(supabaseError.message || 'Unknown database error');
       }
 
       setSubmitted(true);
       setFeedback('');
       setEmail('');
+      
+      // Auto close after successful submission
+      setTimeout(() => {
+        setIsOpen(false);
+        // Reset submitted state after the form is closed
+        setTimeout(() => setSubmitted(false), 300);
+      }, 3000);
+      
     } catch (err: any) {
       console.error('Error submitting feedback:', err);
       setError(`Failed to submit feedback: ${err.message || 'Unknown error'}`);
@@ -89,83 +75,113 @@ const FeedbackForm: React.FC = () => {
     setIsSubmitting(false);
   };
 
+  if (!isOpen) {
+    return (
+      <button
+        onClick={() => setIsOpen(true)}
+        className={`${
+          isDarkMode ? 'bg-blue-600 hover:bg-blue-700' : 'bg-blue-500 hover:bg-blue-600'
+        } text-white font-medium p-3 rounded-full shadow-lg hover:shadow-xl transition-all duration-300 hover-lift`}
+        aria-label="Open feedback form"
+      >
+        <Send size={20} />
+      </button>
+    );
+  }
+
   return (
-    <form onSubmit={handleSubmit} className={`${isDarkMode ? 'bg-gray-800' : 'bg-white'} p-3 rounded-lg shadow-sm text-sm`}>
-      <h3 className={`font-medium mb-2 ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>Quick Feedback</h3>
+    <div className={`${isDarkMode ? 'bg-gray-800 border border-gray-700' : 'bg-white border border-gray-200'} rounded-xl shadow-xl p-4 w-80 transition-all duration-300 card-hover`}>
+      <div className="flex justify-between items-center mb-3">
+        <h3 className={`font-bold ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>Share Your Feedback</h3>
+        <button
+          onClick={() => setIsOpen(false)}
+          className={`p-1 rounded-full ${isDarkMode ? 'hover:bg-gray-700' : 'hover:bg-gray-100'} transition-colors`}
+          aria-label="Close feedback form"
+        >
+          <X size={18} className={isDarkMode ? 'text-gray-400' : 'text-gray-600'} />
+        </button>
+      </div>
 
       {connectionStatus === 'error' && (
-        <div className={`${isDarkMode ? 'bg-yellow-900/30' : 'bg-yellow-100'} p-3 rounded-lg mb-4`}>
-          <p className={isDarkMode ? 'text-yellow-200' : 'text-yellow-800'}>
-            Warning: Cannot connect to database. Please check your configuration.
-          </p>
+        <div className={`${isDarkMode ? 'bg-yellow-900/30 text-yellow-200' : 'bg-yellow-50 text-yellow-800'} p-3 rounded-lg mb-4 flex items-start gap-2`}>
+          <AlertTriangle size={16} className="mt-0.5 flex-shrink-0" />
+          <p className="text-sm">Unable to connect to database. Your feedback might not be saved.</p>
         </div>
       )}
 
       {error && (
-        <div className={`${isDarkMode ? 'bg-red-900/30' : 'bg-red-100'} p-3 rounded-lg mb-4`}>
-          <p className={isDarkMode ? 'text-red-200' : 'text-red-800'}>{error}</p>
+        <div className={`${isDarkMode ? 'bg-red-900/30 text-red-200' : 'bg-red-50 text-red-800'} p-3 rounded-lg mb-4 flex items-start gap-2`}>
+          <AlertTriangle size={16} className="mt-0.5 flex-shrink-0" />
+          <p className="text-sm">{error}</p>
         </div>
       )}
 
-      <div className="mb-4">
-        <label htmlFor="feedback" className={`block font-medium mb-2 ${isDarkMode ? 'text-gray-200' : 'text-gray-700'}`}>
-          Your Feedback
-        </label>
-        <textarea
-          id="feedback"
-          value={feedback}
-          onChange={(e) => setFeedback(e.target.value)}
-          className={`w-full p-2 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500 
-          ${isDarkMode
-              ? 'bg-gray-700 border-gray-600 text-white'
-              : 'border-gray-300 text-gray-900'}`}
-          rows={3}
-          required
-        />
-      </div>
+      {submitted ? (
+        <div className={`${isDarkMode ? 'bg-green-900/30 text-green-200' : 'bg-green-50 text-green-800'} p-4 rounded-lg flex items-center gap-3`}>
+          <CheckCircle className="flex-shrink-0" />
+          <div>
+            <p className="font-medium">Thank you for your feedback!</p>
+            <p className="text-sm opacity-90">We appreciate your input.</p>
+          </div>
+        </div>
+      ) : (
+        <form onSubmit={handleSubmit} className="space-y-4">
+          <div>
+            <label htmlFor="feedback" className={`block text-sm font-medium mb-1.5 ${isDarkMode ? 'text-gray-200' : 'text-gray-700'}`}>
+              What do you think about our calculator?
+            </label>
+            <textarea
+              id="feedback"
+              value={feedback}
+              onChange={(e) => setFeedback(e.target.value)}
+              className={`form-input text-sm ${isDarkMode ? 'bg-gray-700 border-gray-600' : 'bg-gray-50 border-gray-300'}`}
+              placeholder="Share your thoughts, suggestions, or report issues..."
+              rows={3}
+              required
+            />
+          </div>
 
-      <div className="mb-4">
-        <label htmlFor="email" className={`block font-medium mb-2 ${isDarkMode ? 'text-gray-200' : 'text-gray-700'}`}>
-          Email (optional)
-        </label>
-        <input
-          id="email"
-          type="email"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-          className={`w-full p-2 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500 
-          ${isDarkMode
-              ? 'bg-gray-700 border-gray-600 text-white'
-              : 'border-gray-300 text-gray-900'}`}
-        />
-        <p className={`text-xs mt-1 ${isDarkMode ? 'text-gray-400' : 'text-gray-500'}`}>
-          We'll only use this to follow up on your feedback if needed.
-        </p>
-      </div>
+          <div>
+            <label htmlFor="email" className={`block text-sm font-medium mb-1.5 ${isDarkMode ? 'text-gray-200' : 'text-gray-700'}`}>
+              Email (optional)
+            </label>
+            <input
+              id="email"
+              type="email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              className={`form-input text-sm ${isDarkMode ? 'bg-gray-700 border-gray-600' : 'bg-gray-50 border-gray-300'}`}
+              placeholder="you@example.com"
+            />
+            <p className={`text-xs mt-1 ${isDarkMode ? 'text-gray-400' : 'text-gray-500'}`}>
+              Only if you'd like us to follow up with you
+            </p>
+          </div>
 
-      {/* <div className="mb-4 text-sm">
-        <p className={isDarkMode ? 'text-gray-400' : 'text-gray-500'}>
-          Database connection status: {' '}
-          <span className={
-            connectionStatus === 'ok' 
-              ? (isDarkMode ? 'text-green-400' : 'text-green-600')
-              : connectionStatus === 'error'
-                ? (isDarkMode ? 'text-red-400' : 'text-red-600')
-                : (isDarkMode ? 'text-gray-400' : 'text-gray-500')
-          }>
-            {connectionStatus === 'ok' ? 'Connected' : connectionStatus === 'error' ? 'Error' : 'Checking...'}
-          </span>
-        </p>
-      </div> */}
-
-      <button
-        type="submit"
-        disabled={isSubmitting || connectionStatus === 'error'}
-        className={`bg-blue-500 hover:bg-blue-600 text-white font-medium py-2 px-4 rounded focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50`}
-      >
-        {isSubmitting ? 'Submitting...' : 'Submit Feedback'}
-      </button>
-    </form>
+          <div className="flex gap-3">
+            <button
+              type="button"
+              onClick={() => setIsOpen(false)}
+              className={`flex-1 py-2 px-4 border rounded-lg text-sm font-medium transition-colors 
+                ${isDarkMode 
+                  ? 'border-gray-600 hover:bg-gray-700 text-gray-300' 
+                  : 'border-gray-300 hover:bg-gray-100 text-gray-700'}`}
+            >
+              Cancel
+            </button>
+            <button
+              type="submit"
+              disabled={isSubmitting || connectionStatus === 'error' || !feedback.trim()}
+              className={`flex-1 bg-blue-500 hover:bg-blue-600 text-white font-medium py-2 px-4 rounded-lg transition-colors text-sm flex items-center justify-center gap-1.5
+                ${(isSubmitting || connectionStatus === 'error' || !feedback.trim()) ? 'opacity-50 cursor-not-allowed' : ''}`}
+            >
+              {isSubmitting ? 'Sending...' : 'Send'}
+              {!isSubmitting && <Send size={14} />}
+            </button>
+          </div>
+        </form>
+      )}
+    </div>
   );
 };
 
