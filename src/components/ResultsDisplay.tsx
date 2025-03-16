@@ -144,13 +144,14 @@ const ResultsDisplay: React.FC = () => {
         label: investmentType === 'savings' // [!code ++]
           ? 'Savings Account Growth' // [!code ++]
           : investmentType === 'custom' // [!code ++]
-          ? `Custom Investment (${useCalculatorStore.getState().customRate}%)` // [!code ++]
-          : 'Stock Market Growth', // [!code ++]
+            ? `Custom Investment (${useCalculatorStore.getState().customRate}%)` // [!code ++]
+            : 'Stock Market Growth', // [!code ++]
         data: result.yearlyBreakdown.map(item => item.opportunityCost),
         borderColor: 'rgb(34, 197, 94)',
         backgroundColor: 'rgba(34, 197, 94, 0.5)',
         borderWidth: 3,
       },
+
       {
         label: 'True Growth After Inflation',
         data: result.yearlyBreakdown.map(item => item.combined),
@@ -228,6 +229,11 @@ const ResultsDisplay: React.FC = () => {
         <div className="h-60 mt-6">
           <Line options={chartOptions} data={inflationChartData} />
         </div>
+        {investmentType === 'stockMarket' && (
+          <p className={`text-xs mt-2 ${isDarkMode ? 'text-gray-400' : 'text-gray-500'} italic`}>
+            * Historical returns based on {countryCode === 'US' ? 'S&P 500' : 'S&P/TSX'} index performance
+          </p>
+        )}
 
         {investmentType === 'none' && (
           <div className={`p-5 rounded-lg ${isDarkMode ? 'bg-blue-900/30' : 'bg-blue-50'} shadow-md text-center mt-6`}>
