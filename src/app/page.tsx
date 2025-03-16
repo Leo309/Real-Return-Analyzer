@@ -76,7 +76,7 @@ export default function Home() {
             <div className={`mb-10 ${darkMode ? 'text-white' : 'text-gray-900'} text-center`}>
               <h2 className="text-4xl font-bold mb-3">Calculate Your Financial Future</h2>
               <p className={`text-xl max-w-3xl mx-auto ${darkMode ? 'text-gray-300' : 'text-gray-600'}`}>
-                Discover how inflation and investments shape your wealth's future <br />
+                Discover how inflation and investments shape your wealth&apos;s future <br />
                 See what your money could become in 10, 20, or 30 years!
               </p>
             </div>
@@ -103,7 +103,7 @@ export default function Home() {
                       Inflation Impact
                     </h3>
                     <p className={`${darkMode ? 'text-gray-300' : 'text-gray-600'}`}>
-                      See how inflation erodes your money's purchasing power over time, with historical data customized to your country.
+                      See how inflation erodes your money&apos; purchasing power over time, with historical data customized to your country.
                     </p>
                   </div>
 
