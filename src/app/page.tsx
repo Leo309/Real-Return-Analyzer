@@ -76,7 +76,8 @@ export default function Home() {
             <div className={`mb-10 ${darkMode ? 'text-white' : 'text-gray-900'} text-center`}>
               <h2 className="text-4xl font-bold mb-3">Calculate Your Financial Future</h2>
               <p className={`text-xl max-w-3xl mx-auto ${darkMode ? 'text-gray-300' : 'text-gray-600'}`}>
-                Understand how your money transforms over time with our powerful investment calculator
+                Discover how inflation and investments shape your wealth's future <br />
+                See what your money could become in 10, 20, or 30 years!
               </p>
             </div>
 

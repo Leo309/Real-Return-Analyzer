@@ -33,28 +33,33 @@ export default function TermsOfUse() {
           </div>
         </div>
       </header>
-      
+
       <main className="max-w-5xl mx-auto py-8 px-4 sm:px-6 lg:px-8">
         <div className={`${darkMode ? 'bg-gray-800 text-gray-200' : 'bg-white text-gray-800'} p-6 rounded-lg shadow`}>
           <h2 className="text-2xl font-bold mb-4">Terms of Use</h2>
           <p className="mb-4"><strong>Last Updated: March 14, 2025</strong></p>
-          
+
           <h3 className="text-xl font-semibold mt-6 mb-3">1. Introduction</h3>
           <p className="mb-4">
             By using the Investment Time Machine provided by SKYNEX GLOBAL COMMERCE & TECH INC., you agree to these Terms of Use. Please read them carefully.
           </p>
-          
+
           <h3 className="text-xl font-semibold mt-6 mb-3">2. Educational Purpose Only</h3>
           <p className="mb-4">
             The Investment Time Machine is an educational tool designed to illustrate the potential effects of inflation and investment strategies on money over time. The calculations are based on historical data and general assumptions. The information provided is for educational purposes only and does not constitute financial advice.
           </p>
-          
-          <h3 className="text-xl font-semibold mt-6 mb-3">3. No Warranties</h3>
-          <p className="mb-4">
-            We make no representations or warranties about the accuracy, reliability, or availability of the service. The service is provided "as is" without any guarantees.
-          </p>
-          
-          <h3 className="text-xl font-semibold mt-6 mb-3">4. Contact Us</h3>
+
+          <h3 className="text-xl font-semibold mt-6 mb-3">3. Data Sources</h3>
+          <div className="mb-4 prose prose-gray dark:prose-invert">
+            <p>Our calculations utilize the following historical market data:</p>
+            <ul>
+              <li>United States: S&P 500 Index returns</li>
+              <li>Canada: S&P/TSX Composite Index returns</li>
+            </ul>
+            <p>Inflation data is sourced from official government statistics of each country.</p>
+          </div>
+
+          <h3 className="text-xl font-semibold mt-6 mb-3">4. Support</h3>
           <p className="mb-4">
             If you have any questions about these Terms, please contact us at:
             <br />
@@ -64,7 +69,7 @@ export default function TermsOfUse() {
           </p>
         </div>
       </main>
-      
+
       <footer className={`${darkMode ? 'bg-gray-800 border-t border-gray-700' : 'bg-white border-t border-gray-200'} mt-auto py-6`}>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex flex-col md:flex-row justify-between items-center">
