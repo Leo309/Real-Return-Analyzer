@@ -24,7 +24,7 @@ interface CalculatorState {
   startYear: number;
   endYear: number;
   investmentType: InvestmentType;
-  customRate: number | null;
+  customRate: number;
   result: CalculationResult | null;
   isCalculating: boolean;
   
@@ -45,7 +45,7 @@ const useCalculatorStore = create<CalculatorState>((set, get) => ({
   startYear: 2020,
   endYear: 2024,
   investmentType: 'none',
-  customRate: null,
+  customRate: 0,
   result: null,
   isCalculating: false,
 
