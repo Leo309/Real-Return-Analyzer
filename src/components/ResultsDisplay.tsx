@@ -8,7 +8,8 @@ import {
   LineElement,
   Title,
   Tooltip,
-  Legend
+  Legend,
+  TooltipItem
 } from 'chart.js';
 import useCalculatorStore from '@/store/calculatorStore';
 import { countries } from '@/data/countries';
@@ -101,7 +102,7 @@ const ResultsDisplay: React.FC = () => {
         borderColor: isDarkMode ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.1)',
         borderWidth: 1,
         callbacks: {
-          label: function (context: any) {
+          label: function (context: TooltipItem<'line'>) {
             return context.dataset.label + ': ' + formatCurrency(context.parsed.y);
           }
         }
@@ -141,11 +142,11 @@ const ResultsDisplay: React.FC = () => {
         borderDash: [5, 5],
       },
       {
-        label: investmentType === 'savings' // [!code ++]
-          ? 'Savings Account Growth' // [!code ++]
-          : investmentType === 'custom' // [!code ++]
-            ? `Custom Investment (${useCalculatorStore.getState().customRate}%)` // [!code ++]
-            : 'Stock Market Growth', // [!code ++]
+        label: investmentType === 'savings'
+          ? 'Savings Account Growth'
+          : investmentType === 'custom'
+            ? `Custom Investment (${useCalculatorStore.getState().customRate}%)`
+            : 'Stock Market Growth',
         data: result.yearlyBreakdown.map(item => item.opportunityCost),
         borderColor: 'rgb(34, 197, 94)',
         backgroundColor: 'rgba(34, 197, 94, 0.5)',
@@ -220,7 +221,7 @@ const ResultsDisplay: React.FC = () => {
               </h4>
             </div>
             <p className={`mt-1 ${isDarkMode ? 'text-red-200' : 'text-red-700'}`}>
-              That's equivalent to {Math.round((amount - result.inflationAdjustedValue) / (countryCode === 'US' ? 5 : 6))} premium coffees
+              That&apos;s equivalent to {Math.round((amount - result.inflationAdjustedValue) / (countryCode === 'US' ? 5 : 6))} premium coffees
               or {Math.round((amount - result.inflationAdjustedValue) / (countryCode === 'US' ? 20 : 25))} hours of work.
             </p>
           </div>

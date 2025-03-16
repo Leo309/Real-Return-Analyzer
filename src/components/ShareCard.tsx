@@ -10,7 +10,6 @@ import {
 import html2canvas from 'html2canvas';
 import useCalculatorStore from '@/store/calculatorStore';
 import { countries } from '@/data/countries';
-import Image from 'next/image';
 
 const ShareCard: React.FC = () => {
   const [copied, setCopied] = useState(false);
@@ -147,8 +146,6 @@ const ShareCard: React.FC = () => {
       bg: 'bg-[#ea4335] hover:bg-[#d33828]'
     }
   ];
-
-  const logoUrl = isDarkMode ? '/logo-dark.png' : '/logo-light.png';
 
   return (
     <div className={`p-6 rounded-2xl ${isDarkMode ? 'bg-gray-800' : 'bg-white'} shadow-xl border ${isDarkMode ? 'border-gray-700' : 'border-gray-200'} transition-all duration-300 hover:shadow-2xl`}>

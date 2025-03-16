@@ -1,6 +1,6 @@
 import { create } from 'zustand';
 import { Decimal } from 'decimal.js';
-import { countries, CountryData } from '@/data/countries';
+import { countries } from '@/data/countries';
 
 export type InvestmentType = 'savings' | 'stockMarket' | 'none' | 'custom';
 
@@ -78,7 +78,7 @@ const useCalculatorStore = create<CalculatorState>((set, get) => ({
       }
 
       // Initialize calculation variables
-      let currentNominal = new Decimal(amount);
+      const currentNominal = new Decimal(amount);
       let currentInflationAdjusted = new Decimal(amount);
       let currentOpportunityCost = new Decimal(amount);
       let currentCombined = new Decimal(amount);

@@ -33,17 +33,17 @@ export default function PrivacyPolicy() {
           </div>
         </div>
       </header>
-      
+
       <main className="max-w-5xl mx-auto py-8 px-4 sm:px-6 lg:px-8">
         <div className={`${darkMode ? 'bg-gray-800 text-gray-200' : 'bg-white text-gray-800'} p-6 rounded-lg shadow`}>
           <h2 className="text-2xl font-bold mb-4">Privacy Policy</h2>
           <p className="mb-4"><strong>Last Updated: March 14, 2025</strong></p>
-          
+
           <h3 className="text-xl font-semibold mt-6 mb-3">1. Introduction</h3>
           <p className="mb-4">
-            This Privacy Policy explains how SKYNEX GLOBAL COMMERCE & TECH INC. ("we", "our", or "us") collects, uses, and protects your information when you use our Investment Time Machine service.
+            This Privacy Policy explains how SKYNEX GLOBAL COMMERCE & TECH INC. (&ldquo;we&rdquo;, &ldquo;our&rdquo;, or &ldquo;us&rdquo;) collects, uses, and protects your information when you use our Investment Time Machine service.
           </p>
-          
+
           <h3 className="text-xl font-semibold mt-6 mb-3">2. Information We Collect</h3>
           <p className="mb-2">We may collect the following information:</p>
           <ul className="list-disc ml-6 mb-4">
@@ -52,7 +52,7 @@ export default function PrivacyPolicy() {
             <li>Feedback you submit through our forms</li>
             <li>Basic usage data and analytics</li>
           </ul>
-          
+
           <h3 className="text-xl font-semibold mt-6 mb-3">3. How We Use Your Information</h3>
           <p className="mb-2">We use this information to:</p>
           <ul className="list-disc ml-6 mb-4">
@@ -60,7 +60,7 @@ export default function PrivacyPolicy() {
             <li>Respond to your inquiries</li>
             <li>Monitor and analyze usage patterns</li>
           </ul>
-          
+
           <h3 className="text-xl font-semibold mt-6 mb-3">4. Contact Us</h3>
           <p className="mb-4">
             If you have any questions about this Privacy Policy, please contact us at:
@@ -71,7 +71,7 @@ export default function PrivacyPolicy() {
           </p>
         </div>
       </main>
-      
+
       <footer className={`${darkMode ? 'bg-gray-800 border-t border-gray-700' : 'bg-white border-t border-gray-200'} mt-auto py-6`}>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex flex-col md:flex-row justify-between items-center">

@@ -67,9 +67,10 @@ const FeedbackForm: React.FC<{ darkMode?: boolean }> = ({ darkMode }) => {
         setTimeout(() => setSubmitted(false), 300);
       }, 3000);
       
-    } catch (err: any) {
+    } catch (err: unknown) {
       console.error('Error submitting feedback:', err);
-      setError(`Failed to submit feedback: ${err.message || 'Unknown error'}`);
+      const errorMessage = err instanceof Error ? err.message : 'Unknown error';
+      setError(`Failed to submit feedback: ${errorMessage}`);
     }
 
     setIsSubmitting(false);
@@ -154,7 +155,7 @@ const FeedbackForm: React.FC<{ darkMode?: boolean }> = ({ darkMode }) => {
               placeholder="you@example.com"
             />
             <p className={`text-xs mt-1 ${isDarkMode ? 'text-gray-400' : 'text-gray-500'}`}>
-              Only if you'd like us to follow up with you
+              Only if you&apos;d like us to follow up with you
             </p>
           </div>
 

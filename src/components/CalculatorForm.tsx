@@ -2,7 +2,7 @@ import React from 'react';
 import { useEffect, useState } from 'react';
 import { countries, getAvailableYears } from '@/data/countries';
 import useCalculatorStore from '@/store/calculatorStore';
-import { Sun, Moon, TrendingUp, DollarSign, BarChart2, Wand2, Flag } from 'lucide-react';
+import { Wand2 } from 'lucide-react';
 
 // Add darkMode prop to component interface
 interface CalculatorFormProps {
