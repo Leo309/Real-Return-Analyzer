@@ -37,7 +37,6 @@ const CalculatorForm: React.FC<CalculatorFormProps> = ({ darkMode = false }) => 
   }, [investmentType, customRate]);
 
   const availableYears = getAvailableYears();
-  // const countryOptions = Object.values(countries);
 
   // Use the passed darkMode prop directly
   const isDarkMode = darkMode;
