@@ -43,7 +43,7 @@ const ResultsDisplay: React.FC = () => {
   };
 
   const formatPercentage = (value: number) => {
-    return (value >= 0 ? '+' : '') + value.toFixed(2) + '%';
+    return value.toFixed(2) + '%'; // 移除自动添加的+号
   };
 
   // Calculate changes
@@ -201,7 +201,7 @@ const ResultsDisplay: React.FC = () => {
             <p className={`mt-2 text-sm font-medium ${inflationImpact < 0
               ? (isDarkMode ? 'text-red-300' : 'text-red-600')
               : (isDarkMode ? 'text-green-300' : 'text-green-600')}`}>
-              {formatPercentage(inflationImpact)} change in purchasing power
+              {`${inflationImpact >= 0 ? '+' : ''}${formatPercentage(inflationImpact)}`} change in purchasing power
             </p>
           </div>
         </div>
@@ -261,7 +261,7 @@ const ResultsDisplay: React.FC = () => {
                 </div>
               </div>
               <p className={`mt-2 text-sm font-medium ${isDarkMode ? 'text-green-300' : 'text-green-600'}`}>
-                {formatPercentage(opportunityCostImpact)} nominal growth
+                {`${opportunityCostImpact >= 0 ? '+' : ''}${formatPercentage(opportunityCostImpact)}`} nominal growth
               </p>
             </div>
 
@@ -286,10 +286,11 @@ const ResultsDisplay: React.FC = () => {
                     : <TrendingUp size={24} className={isDarkMode ? 'text-purple-300' : 'text-purple-600'} />}
                 </div>
               </div>
-              <p className={`mt-2 text-sm font-medium ${realInvestmentImpact < 0
-                ? (isDarkMode ? 'text-red-300' : 'text-red-600')
-                : (isDarkMode ? 'text-purple-300' : 'text-purple-600')}`}>
-                {formatPercentage(realInvestmentImpact)} real growth
+              <p className={`mt-2 text-sm font-medium ${realInvestmentImpact >= 0
+                ? (isDarkMode ? 'text-purple-300' : 'text-purple-600')
+                : (isDarkMode ? 'text-red-300' : 'text-red-600')
+                }`}>
+                {`${realInvestmentImpact >= 0 ? '+' : ''}${formatPercentage(realInvestmentImpact)}`} real growth
               </p>
             </div>
           </div>
@@ -305,7 +306,7 @@ const ResultsDisplay: React.FC = () => {
                   ${formatCurrency(result.combinedValue)} after inflation`
                 : `By investing in ${investmentType === 'savings' ? 'a savings account' : 'the stock market'}: 
                   ${formatCurrency(amount)} ➔ ${formatCurrency(result.combinedValue)} 
-                  (${formatPercentage(realInvestmentImpact)})`}
+                  (${`${realInvestmentImpact >= 0 ? '+' : ''}${formatPercentage(realInvestmentImpact)}`})`}
             </p>
           </div>
         </div>
