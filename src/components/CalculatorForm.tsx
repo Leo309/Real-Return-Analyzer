@@ -26,6 +26,16 @@ const CalculatorForm: React.FC<CalculatorFormProps> = ({ darkMode = false }) => 
     calculate
   } = useCalculatorStore();
 
+  // Add local state to handle the input value
+  const [customRateInput, setCustomRateInput] = useState('');
+
+  // Update the local input when investment type changes
+  useEffect(() => {
+    if (investmentType === 'custom') {
+      setCustomRateInput(customRate ? customRate.toString() : '');
+    }
+  }, [investmentType, customRate]);
+
   const availableYears = getAvailableYears();
   const countryOptions = Object.values(countries);
 
@@ -35,6 +45,14 @@ const CalculatorForm: React.FC<CalculatorFormProps> = ({ darkMode = false }) => 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     calculate();
+  };
+
+  // Handle custom rate change
+  const handleCustomRateChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    // Update the input field directly with the raw value
+    setCustomRateInput(e.target.value);
+    // Update the store with the numeric value
+    setCustomRate(Number(e.target.value));
   };
 
   return (
@@ -232,8 +250,8 @@ const CalculatorForm: React.FC<CalculatorFormProps> = ({ darkMode = false }) => 
               min="0"
               max="50"
               step="0.1"
-              value={customRate ?? ''}
-              onChange={(e) => setCustomRate(Number(e.target.value))}
+              value={customRateInput}
+              onChange={handleCustomRateChange}
               className={`w-full p-2 border rounded focus:outline-none focus:ring-2 focus:ring-purple-500
                 ${isDarkMode
                   ? 'bg-gray-700 border-gray-600 text-white placeholder-gray-400'

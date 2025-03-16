@@ -141,7 +141,11 @@ const ResultsDisplay: React.FC = () => {
         borderDash: [5, 5],
       },
       {
-        label: investmentType === 'savings' ? 'Savings Account Growth' : 'Stock Market Growth',
+        label: investmentType === 'savings' // [!code ++]
+          ? 'Savings Account Growth' // [!code ++]
+          : investmentType === 'custom' // [!code ++]
+          ? `Custom Investment (${useCalculatorStore.getState().customRate}%)` // [!code ++]
+          : 'Stock Market Growth', // [!code ++]
         data: result.yearlyBreakdown.map(item => item.opportunityCost),
         borderColor: 'rgb(34, 197, 94)',
         backgroundColor: 'rgba(34, 197, 94, 0.5)',
@@ -250,7 +254,11 @@ const ResultsDisplay: React.FC = () => {
               <div className="flex items-center justify-between">
                 <div>
                   <p className={`text-sm ${isDarkMode ? 'text-gray-300' : 'text-gray-600'}`}>
-                    {investmentType === 'savings' ? 'With Savings Interest' : 'With Stock Returns'}
+                    {investmentType === 'savings'
+                      ? 'With Savings Interest'
+                      : investmentType === 'custom'
+                        ? `Custom Investment (${useCalculatorStore.getState().customRate}%)`
+                        : 'With Stock Returns'}
                   </p>
                   <p className={`text-3xl font-bold ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
                     {formatCurrency(result.opportunityCostValue)}
