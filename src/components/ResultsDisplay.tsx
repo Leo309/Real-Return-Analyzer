@@ -31,9 +31,11 @@ const ResultsDisplay: React.FC = () => {
   const countryData = countries[countryCode];
   const isDarkMode = document.documentElement.classList.contains('dark');
 
-  if (!result) {
+  if (!result || amount === null) {
     return null;
   }
+  const validAmount = amount;
+
 
   const formatCurrency = (value: number) => {
     return new Intl.NumberFormat('en-US', {
@@ -48,12 +50,12 @@ const ResultsDisplay: React.FC = () => {
   };
 
   // Calculate changes
-  const inflationImpact = ((result.inflationAdjustedValue - amount) / amount) * 100;
+  const inflationImpact = ((result.inflationAdjustedValue - validAmount) / validAmount) * 100;
   const opportunityCostImpact = investmentType !== 'none'
-    ? ((result.opportunityCostValue - amount) / amount) * 100
+    ? ((result.opportunityCostValue - validAmount) / validAmount) * 100
     : 0;
   const realInvestmentImpact = investmentType !== 'none'
-    ? ((result.combinedValue - amount) / amount) * 100
+    ? ((result.combinedValue - validAmount) / validAmount) * 100
     : 0;
 
   // Prepare inflation chart data

@@ -68,13 +68,16 @@ const useCalculatorStore = create<CalculatorState>((set, get) => ({
       investmentType,
       customRate
     } = state;
-
+    if (!amount || amount <= 0) {
+      console.error('Invalid amount value');
+      return;
+    }
     set({ isCalculating: true, result: null });
 
     try {
       const countryData = countries[countryCode];
-      if (!countryData || !amount) {
-        throw new Error('Invalid calculation parameters');
+      if (!countryData) {
+        throw new Error('Invalid country selection');
       }
 
       // Initialize calculation variables
