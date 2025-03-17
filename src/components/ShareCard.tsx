@@ -80,7 +80,7 @@ const ShareCard: React.FC = () => {
     setIsGeneratingImage(true);
     try {
       const canvas = await html2canvas(visualRef.current, {
-        backgroundColor: isDarkMode ? '#0f172a' : '#f9fafb', // 改回backgroundColor
+        background: isDarkMode ? '#0f172a' : '#f9fafb', 
         scale: 2,
         useCORS: true,
         logging: true,
