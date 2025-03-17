@@ -319,7 +319,7 @@ const ResultsDisplay: React.FC = () => {
             </div>
           </div>
 
-          {investmentType !== 'none' && investmentChartData && (
+          {investmentChartData && (
             <div className="h-60 mt-6">
               <Line options={chartOptions} data={investmentChartData} />
             </div>
