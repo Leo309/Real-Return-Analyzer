@@ -16,7 +16,7 @@ import useCalculatorStore from '@/store/calculatorStore';
 import { countries } from '@/data/countries';
 import { TrendingDown, TrendingUp, DollarSign } from 'lucide-react';
 import ShareCard from '@/components/ShareCard';
-
+import type { ChartData } from 'chart.js';
 ChartJS.register(
   CategoryScale,
   LinearScale,
@@ -139,7 +139,7 @@ const ResultsDisplay: React.FC = () => {
 
 
   // Investment comparison chart data (only if investment type is not none)
-  const investmentChartData = investmentType !== 'none' ? {
+  const investmentChartData: ChartData<"line"> | undefined = investmentType !== 'none' ? {
     labels,
     datasets: [
       {
@@ -170,7 +170,7 @@ const ResultsDisplay: React.FC = () => {
         borderWidth: 3,
       },
     ]
-  } : null;
+  } : undefined;
 
   return (
     <div className="flex flex-col gap-6">
@@ -319,9 +319,11 @@ const ResultsDisplay: React.FC = () => {
             </div>
           </div>
 
-          <div className="h-60 mt-6">
-            <Line options={chartOptions} data={investmentChartData} />
-          </div>
+          {investmentType !== 'none' && investmentChartData && (
+            <div className="h-60 mt-6">
+              <Line options={chartOptions} data={investmentChartData} />
+            </div>
+          )}
 
           <div className={`p-5 rounded-lg ${isDarkMode ? 'bg-purple-900/30' : 'bg-purple-50'} shadow-md text-center mt-6`}>
             <p className={`text-lg font-medium ${isDarkMode ? 'text-purple-200' : 'text-purple-800'}`}>
