@@ -24,7 +24,7 @@ interface CalculatorState {
   startYear: number;
   endYear: number;
   investmentType: InvestmentType;
-  customRate: number;
+  customRate: number | null;
   result: CalculationResult | null;
   isCalculating: boolean;
   
