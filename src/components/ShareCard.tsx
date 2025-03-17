@@ -80,12 +80,11 @@ const ShareCard: React.FC = () => {
     setIsGeneratingImage(true);
     try {
       const canvas = await html2canvas(visualRef.current, {
-        backgroundColor: isDarkMode ? '#0f172a' : '#f9fafb',
+        background: isDarkMode ? '#0f172a' : '#f9fafb', 
         scale: 2,
         useCORS: true,
         logging: true,
         ignoreElements: (element) => {
-          // 排除所有可能包含渐变背景的元素
           return element.classList?.contains('bg-gradient-to-br');
         }
       });
