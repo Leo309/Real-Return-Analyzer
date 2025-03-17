@@ -9,7 +9,8 @@ import {
   Title,
   Tooltip,
   Legend,
-  TooltipItem
+  TooltipItem,
+  type ChartOptions
 } from 'chart.js';
 import useCalculatorStore from '@/store/calculatorStore';
 import { countries } from '@/data/countries';
@@ -82,21 +83,19 @@ const ResultsDisplay: React.FC = () => {
     ]
   };
 
-  const chartOptions = {
+  const chartOptions: ChartOptions<"line"> = {
     responsive: true,
     maintainAspectRatio: false,
     plugins: {
       legend: {
-        position: 'top' as const,
+        position: 'top',
         labels: {
           color: isDarkMode ? '#FFFFFF' : '#000000',
           boxWidth: 15,
           padding: 15
         }
       },
-      title: {
-        display: false
-      },
+      title: { display: false },
       tooltip: {
         backgroundColor: isDarkMode ? 'rgba(50, 50, 50, 0.8)' : 'rgba(255, 255, 255, 0.8)',
         titleColor: isDarkMode ? '#FFFFFF' : '#000000',
@@ -104,14 +103,15 @@ const ResultsDisplay: React.FC = () => {
         borderColor: isDarkMode ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.1)',
         borderWidth: 1,
         callbacks: {
-          label: function (context: TooltipItem<'line'>) {
-            return context.dataset.label + ': ' + formatCurrency(context.parsed.y);
+          label: (context: TooltipItem<"line">) => {
+            return `${context.dataset.label}: ${formatCurrency(context.parsed.y)}`;
           }
         }
       }
     },
     scales: {
       x: {
+        type: 'category',
         ticks: {
           color: isDarkMode ? '#CCCCCC' : '#666666'
         },
@@ -120,9 +120,14 @@ const ResultsDisplay: React.FC = () => {
         }
       },
       y: {
+        type: 'linear',
         ticks: {
           color: isDarkMode ? '#CCCCCC' : '#666666',
-          callback: (value: number) => formatCurrency(value)
+          callback: (value: string | number) => {
+            // 确保数值类型处理
+            const numericValue = Number(value);
+            return formatCurrency(numericValue);
+          }
         },
         grid: {
           color: isDarkMode ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.1)'
@@ -130,6 +135,8 @@ const ResultsDisplay: React.FC = () => {
       }
     }
   };
+
+
 
   // Investment comparison chart data (only if investment type is not none)
   const investmentChartData = investmentType !== 'none' ? {
