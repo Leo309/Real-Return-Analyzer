@@ -22,7 +22,7 @@ const ShareCard: React.FC = () => {
   const countryData = countries[countryCode];
   const isDarkMode = document.documentElement.classList.contains('dark');
 
-  if (!result) return null;
+  if (!result || amount === null) return null;
 
   // 货币格式化
   const formatCurrency = (value: number) => {
@@ -34,18 +34,18 @@ const ShareCard: React.FC = () => {
   };
 
   // 计算百分比变化
-  const percentageChange = ((result.inflationAdjustedValue - amount) / amount) * 100;
+  const percentageChange = ((result.inflationAdjustedValue - amount!) / amount!) * 100;
   const formattedPercentage = percentageChange.toFixed(2) + '%';
 
   // 计算投资价值变化
   const investmentGrowth = investmentType !== 'none'
-    ? ((result.combinedValue - amount) / amount * 100)
+    ? ((result.combinedValue - amount!) / amount! * 100)
     : 0;
   const formattedInvestmentGrowth = investmentGrowth.toFixed(1) + '%';
 
   // 生成分享文本
   const getShareText = () => {
-    let baseText = `I calculated that ${formatCurrency(amount)} in ${startYear} is worth ${formatCurrency(result.inflationAdjustedValue)} in ${endYear} (${formattedPercentage}).`;
+    let baseText = `I calculated that ${formatCurrency(amount!)} in ${startYear} is worth ${formatCurrency(result.inflationAdjustedValue)} in ${endYear} (${formattedPercentage}).`;
 
     if (investmentType !== 'none') {
       const store = useCalculatorStore.getState();
@@ -76,7 +76,7 @@ const ShareCard: React.FC = () => {
   // 生成分享图片
   const generateShareImage = async () => {
     if (!visualRef.current) return;
-    
+
     setIsGeneratingImage(true);
     try {
       const canvas = await html2canvas(visualRef.current, {
@@ -89,7 +89,7 @@ const ShareCard: React.FC = () => {
           return element.classList?.contains('bg-gradient-to-br');
         }
       });
-  
+
       const link = document.createElement('a');
       link.download = `investment-result-${Date.now()}.png`;
       link.href = canvas.toDataURL('image/png', 1.0);
@@ -160,8 +160,8 @@ const ShareCard: React.FC = () => {
         <button
           onClick={() => setActiveTab('text')}
           className={`flex-1 py-3 text-sm font-medium ${activeTab === 'text'
-              ? 'border-b-2 border-blue-500 text-blue-500'
-              : 'text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300'
+            ? 'border-b-2 border-blue-500 text-blue-500'
+            : 'text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300'
             }`}
         >
           Text Summary
@@ -169,8 +169,8 @@ const ShareCard: React.FC = () => {
         <button
           onClick={() => setActiveTab('visual')}
           className={`flex-1 py-3 text-sm font-medium ${activeTab === 'visual'
-              ? 'border-b-2 border-blue-500 text-blue-500'
-              : 'text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300'
+            ? 'border-b-2 border-blue-500 text-blue-500'
+            : 'text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300'
             }`}
         >
           Visual Card
@@ -183,31 +183,29 @@ const ShareCard: React.FC = () => {
         </div>
       )}
 
-{activeTab === 'visual' && (
-  <div className="group relative" id="share-card">
-    <div
-      ref={visualRef}
-      className={`p-6 rounded-xl overflow-hidden ${
-        isDarkMode
-          ? 'bg-gradient-to-br from-gray-800 to-gray-900'
-          : 'bg-gradient-to-br from-blue-50 to-purple-50'
-      } shadow-lg`}
-    >
-      {/* 移除了Logo区域 */}
-      <div className={`text-center mb-6 ${
-        isDarkMode 
-          ? 'bg-blue-600/20 text-blue-300' 
-          : 'bg-blue-100 text-blue-600'
-      } py-2 rounded-full font-medium text-sm`}>
-        Investment Time Machine
-      </div>
+      {activeTab === 'visual' && (
+        <div className="group relative" id="share-card">
+          <div
+            ref={visualRef}
+            className={`p-6 rounded-xl overflow-hidden ${isDarkMode
+                ? 'bg-gradient-to-br from-gray-800 to-gray-900'
+                : 'bg-gradient-to-br from-blue-50 to-purple-50'
+              } shadow-lg`}
+          >
+            {/* 移除了Logo区域 */}
+            <div className={`text-center mb-6 ${isDarkMode
+                ? 'bg-blue-600/20 text-blue-300'
+                : 'bg-blue-100 text-blue-600'
+              } py-2 rounded-full font-medium text-sm`}>
+              Investment Time Machine
+            </div>
 
 
             <div className={`p-6 rounded-xl ${isDarkMode ? 'bg-gray-700/50' : 'bg-white/80'} backdrop-blur-sm shadow-md mb-5`}>
               <h4 className={`text-lg font-semibold mb-4 text-center ${isDarkMode ? 'text-gray-100' : 'text-gray-800'}`}>
                 Financial Value Over Time
               </h4>
-              
+
               <div className="space-y-6">
                 <div className="flex justify-between items-center">
                   <div>
@@ -215,18 +213,18 @@ const ShareCard: React.FC = () => {
                       {startYear} Value
                     </p>
                     <p className={`text-2xl font-bold ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
-                      {formatCurrency(amount)}
+                      {formatCurrency(amount!)}
                     </p>
                   </div>
-                  
-                  <div className={`p-2 rounded-full ${percentageChange >= 0 
-                      ? (isDarkMode ? 'bg-green-500/20 text-green-400' : 'bg-green-100 text-green-600')
-                      : (isDarkMode ? 'bg-red-500/20 text-red-400' : 'bg-red-100 text-red-600')
+
+                  <div className={`p-2 rounded-full ${percentageChange >= 0
+                    ? (isDarkMode ? 'bg-green-500/20 text-green-400' : 'bg-green-100 text-green-600')
+                    : (isDarkMode ? 'bg-red-500/20 text-red-400' : 'bg-red-100 text-red-600')
                     } flex items-center`}>
                     <ArrowUpRight className="w-5 h-5 mr-1" />
                     <span className="font-bold">{formattedPercentage}</span>
                   </div>
-                  
+
                   <div className="text-right">
                     <p className={`text-sm ${isDarkMode ? 'text-gray-400' : 'text-gray-500'}`}>
                       {endYear} Value
@@ -236,7 +234,7 @@ const ShareCard: React.FC = () => {
                     </p>
                   </div>
                 </div>
-                
+
                 {investmentType !== 'none' && (
                   <>
                     <div className={`h-px w-full ${isDarkMode ? 'bg-gray-600' : 'bg-gray-200'}`}></div>
@@ -246,18 +244,18 @@ const ShareCard: React.FC = () => {
                           If Invested
                         </p>
                         <p className={`text-2xl font-bold ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
-                          {formatCurrency(amount)}
+                          {formatCurrency(amount!)}
                         </p>
                       </div>
-                      
-                      <div className={`p-2 rounded-full ${investmentGrowth >= 0 
-                          ? (isDarkMode ? 'bg-blue-500/20 text-blue-400' : 'bg-blue-100 text-blue-600')
-                          : (isDarkMode ? 'bg-red-500/20 text-red-400' : 'bg-red-100 text-red-600')
+
+                      <div className={`p-2 rounded-full ${investmentGrowth >= 0
+                        ? (isDarkMode ? 'bg-blue-500/20 text-blue-400' : 'bg-blue-100 text-blue-600')
+                        : (isDarkMode ? 'bg-red-500/20 text-red-400' : 'bg-red-100 text-red-600')
                         } flex items-center`}>
                         <TrendingUp className="w-5 h-5 mr-1" />
                         <span className="font-bold">{investmentGrowth >= 0 ? '+' : ''}{formattedInvestmentGrowth}</span>
                       </div>
-                      
+
                       <div className="text-right">
                         <p className={`text-sm ${isDarkMode ? 'text-gray-400' : 'text-gray-500'}`}>
                           Final Value
@@ -271,7 +269,7 @@ const ShareCard: React.FC = () => {
                 )}
               </div>
             </div>
-            
+
             <div className="flex justify-between items-center text-xs">
               <span className={`${isDarkMode ? 'text-gray-400' : 'text-gray-500'}`}>
                 {countryData?.name || 'Global'}
@@ -287,8 +285,8 @@ const ShareCard: React.FC = () => {
               onClick={generateShareImage}
               disabled={isGeneratingImage}
               className={`p-2 rounded-full backdrop-blur-sm transition-transform ${isDarkMode
-                  ? 'bg-gray-700/80 hover:bg-gray-600/90 text-white'
-                  : 'bg-white/80 hover:bg-white text-gray-800'
+                ? 'bg-gray-700/80 hover:bg-gray-600/90 text-white'
+                : 'bg-white/80 hover:bg-white text-gray-800'
                 } ${isGeneratingImage ? 'animate-pulse' : ''}`}
             >
               <DownloadCloud size={20} />
@@ -318,8 +316,8 @@ const ShareCard: React.FC = () => {
         <button
           onClick={copyToClipboard}
           className={`w-full flex items-center justify-center p-3 rounded-xl border transition-all duration-200 ${copied
-              ? 'border-green-500 bg-green-500/10'
-              : `${isDarkMode ? 'border-gray-700 hover:border-blue-500' : 'border-gray-200 hover:border-blue-400'}`
+            ? 'border-green-500 bg-green-500/10'
+            : `${isDarkMode ? 'border-gray-700 hover:border-blue-500' : 'border-gray-200 hover:border-blue-400'}`
             }`}
         >
           {copied ? (
