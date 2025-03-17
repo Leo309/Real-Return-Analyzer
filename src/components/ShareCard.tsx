@@ -10,7 +10,6 @@ import {
 import html2canvas from 'html2canvas';
 import useCalculatorStore from '@/store/calculatorStore';
 import { countries } from '@/data/countries';
-
 const ShareCard: React.FC = () => {
   const [copied, setCopied] = useState(false);
   const [activeTab, setActiveTab] = useState<'text' | 'visual'>('visual');
@@ -80,7 +79,7 @@ const ShareCard: React.FC = () => {
     setIsGeneratingImage(true);
     try {
       const canvas = await html2canvas(visualRef.current, {
-        background: isDarkMode ? '#0f172a' : '#f9fafb', 
+        backgroundColor: isDarkMode ? '#0f172a' : '#f9fafb', 
         scale: 2,
         useCORS: true,
         logging: true,
@@ -88,7 +87,7 @@ const ShareCard: React.FC = () => {
           return element.classList?.contains('bg-gradient-to-br');
         }
       });
-
+  
       const link = document.createElement('a');
       link.download = `investment-result-${Date.now()}.png`;
       link.href = canvas.toDataURL('image/png', 1.0);
