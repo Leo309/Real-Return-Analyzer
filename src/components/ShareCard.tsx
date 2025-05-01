@@ -9,7 +9,8 @@ import {
 } from "react-icons/fa6";
 import html2canvas from 'html2canvas';
 import useCalculatorStore from '@/store/calculatorStore';
-import { countries } from '@/data/countries';
+import { historicalData } from '@/data/historical';
+
 const ShareCard: React.FC = () => {
   const [copied, setCopied] = useState(false);
   const [activeTab, setActiveTab] = useState<'text' | 'visual'>('visual');
@@ -18,7 +19,7 @@ const ShareCard: React.FC = () => {
 
   // 从store获取数据
   const { result, amount, countryCode, startYear, endYear, investmentType } = useCalculatorStore();
-  const countryData = countries[countryCode];
+  const countryData = historicalData[countryCode];
   const isDarkMode = document.documentElement.classList.contains('dark');
 
   if (!result || amount === null) return null;
@@ -30,6 +31,18 @@ const ShareCard: React.FC = () => {
       currency: countryData.currency,
       maximumFractionDigits: 0,
     }).format(value);
+  };
+
+  // 获取投资类型名称
+  const getInvestmentTypeName = () => {
+    switch (investmentType) {
+      case 'cash': return 'a savings account';
+      case 'bonds': return 'government bonds';
+      case 'stocks': return 'the stock market';
+      case 'realEstate': return 'real estate';
+      case 'custom': return `a ${useCalculatorStore.getState().customRate}% annual return investment`;
+      default: return 'an investment';
+    }
   };
 
   // 计算百分比变化
@@ -47,16 +60,7 @@ const ShareCard: React.FC = () => {
     let baseText = `I calculated that ${formatCurrency(amount!)} in ${startYear} is worth ${formatCurrency(result.inflationAdjustedValue)} in ${endYear} (${formattedPercentage}).`;
 
     if (investmentType !== 'none') {
-      const store = useCalculatorStore.getState();
-      const investmentTypeText = investmentType === 'stockMarket'
-        ? 'the stock market'
-        : investmentType === 'savings'
-          ? 'a savings account'
-          : store.customRate
-            ? `a ${store.customRate}% annual return investment`
-            : `an investment`;
-
-      baseText += ` If invested in ${investmentTypeText}, it would be worth ${formatCurrency(result.combinedValue)} (${investmentGrowth >= 0 ? '+' : ''}${formattedInvestmentGrowth}) today.`;
+      baseText += ` If invested in ${getInvestmentTypeName()}, it would be worth ${formatCurrency(result.combinedValue)} (${investmentGrowth >= 0 ? '+' : ''}${formattedInvestmentGrowth}) today.`;
     }
 
     return baseText + " #FinancialWisdom #MoneyManagement";

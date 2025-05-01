@@ -1,22 +1,6 @@
 import { create } from 'zustand';
-import { Decimal } from 'decimal.js';
-import { countries } from '@/data/countries';
-
-export type InvestmentType = 'savings' | 'stockMarket' | 'none' | 'custom';
-
-interface CalculationResult {
-  nominalValue: number;
-  inflationAdjustedValue: number;
-  opportunityCostValue: number;
-  combinedValue: number;
-  yearlyBreakdown: {
-    year: number;
-    nominal: number;
-    inflationAdjusted: number;
-    opportunityCost: number;
-    combined: number;
-  }[];
-}
+import { calculateInflationAndInvestment, InvestmentType, CalculationResult } from '@/lib/calculatorUtils';
+import { historicalData, getLatestYear } from '@/data/historical';
 
 interface CalculatorState {
   amount: number | null;
@@ -39,17 +23,17 @@ interface CalculatorState {
 }
 
 const useCalculatorStore = create<CalculatorState>((set, get) => ({
-  // Initial state
+  // 初始状态
   amount: null,
   countryCode: 'US',
-  startYear: 2020,
-  endYear: 2024,
+  startYear: 2000,
+  endYear: getLatestYear(),
   investmentType: 'none',
   customRate: 0,
   result: null,
   isCalculating: false,
 
-  // State setters
+  // 状态设置器
   setAmount: (amount) => set({ amount: amount || 0 }),
   setCountryCode: (code) => set({ countryCode: code }),
   setStartYear: (year) => set({ startYear: year }),
@@ -57,7 +41,7 @@ const useCalculatorStore = create<CalculatorState>((set, get) => ({
   setInvestmentType: (type) => set({ investmentType: type }),
   setCustomRate: (rate) => set({ customRate: rate }),
 
-  // Core calculation logic
+  // 计算逻辑
   calculate: () => {
     const state = get();
     const {
@@ -68,83 +52,28 @@ const useCalculatorStore = create<CalculatorState>((set, get) => ({
       investmentType,
       customRate
     } = state;
+    
     if (!amount || amount <= 0) {
-      console.error('Invalid amount value');
+      console.error('无效的金额值');
       return;
     }
+    
     set({ isCalculating: true, result: null });
 
     try {
-      const countryData = countries[countryCode];
-      if (!countryData) {
-        throw new Error('Invalid country selection');
-      }
-
-      // Initialize calculation variables
-      const currentNominal = new Decimal(amount);
-      let currentInflationAdjusted = new Decimal(amount);
-      let currentOpportunityCost = new Decimal(amount);
-      let currentCombined = new Decimal(amount);
-      const yearlyBreakdown = [];
-
-      for (let year = startYear; year <= endYear; year++) {
-        if (!countryData.inflationRates[year]) continue;
-
-        // 1. Calculate inflation impact
-        const inflationRate = new Decimal(countryData.inflationRates[year]).dividedBy(100);
-        currentInflationAdjusted = currentInflationAdjusted.dividedBy(new Decimal(1).plus(inflationRate));
-
-        // 2. Calculate opportunity cost
-        if (investmentType === 'savings') {
-          const rate = new Decimal(countryData.savingsRates[year]).dividedBy(100);
-          currentOpportunityCost = currentOpportunityCost.times(rate.plus(1));
-        } else if (investmentType === 'stockMarket') {
-          const rate = new Decimal(countryData.stockMarketReturns[year]).dividedBy(100);
-          currentOpportunityCost = currentOpportunityCost.times(rate.plus(1));
-        } else if (investmentType === 'custom' && customRate !== null) {
-          const rate = new Decimal(customRate).dividedBy(100);
-          currentOpportunityCost = currentOpportunityCost.times(rate.plus(1));
-        }
-
-        // 3. Calculate combined value (investment growth + inflation)
-        if (investmentType !== 'none') {
-          let growthRate = new Decimal(0);
-          
-          if (investmentType === 'savings') {
-            growthRate = new Decimal(countryData.savingsRates[year]).dividedBy(100);
-          } else if (investmentType === 'stockMarket') {
-            growthRate = new Decimal(countryData.stockMarketReturns[year]).dividedBy(100);
-          } else if (investmentType === 'custom' && customRate !== null) {
-            growthRate = new Decimal(customRate).dividedBy(100);
-          }
-          
-          currentCombined = currentCombined
-            .times(growthRate.plus(1))
-            .dividedBy(inflationRate.plus(1));
-        }
-
-        // Record yearly breakdown
-        yearlyBreakdown.push({
-          year,
-          nominal: currentNominal.toNumber(),
-          inflationAdjusted: currentInflationAdjusted.toNumber(),
-          opportunityCost: currentOpportunityCost.toNumber(),
-          combined: currentCombined.toNumber()
-        });
-      }
-
-      // Final results
-      set({
-        result: {
-          nominalValue: currentNominal.toNumber(),
-          inflationAdjustedValue: currentInflationAdjusted.toNumber(),
-          opportunityCostValue: currentOpportunityCost.toNumber(),
-          combinedValue: currentCombined.toNumber(),
-          yearlyBreakdown
-        }
-      });
+      // 使用新的计算工具
+      const result = calculateInflationAndInvestment(
+        amount,
+        countryCode,
+        startYear,
+        endYear,
+        investmentType,
+        customRate
+      );
+      
+      set({ result });
     } catch (error) {
-      console.error('Calculation error:', error);
+      console.error('计算错误:', error);
       set({ result: null });
     } finally {
       set({ isCalculating: false });

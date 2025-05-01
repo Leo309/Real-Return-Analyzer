@@ -13,7 +13,7 @@ import {
   type ChartOptions
 } from 'chart.js';
 import useCalculatorStore from '@/store/calculatorStore';
-import { countries } from '@/data/countries';
+import { historicalData } from '@/data/historical';
 import { TrendingDown, TrendingUp, DollarSign } from 'lucide-react';
 import ShareCard from '@/components/ShareCard';
 import type { ChartData } from 'chart.js';
@@ -29,7 +29,7 @@ ChartJS.register(
 
 const ResultsDisplay: React.FC = () => {
   const { result, amount, countryCode, startYear, endYear, investmentType } = useCalculatorStore();
-  const countryData = countries[countryCode];
+  const countryData = historicalData[countryCode];
   const isDarkMode = document.documentElement.classList.contains('dark');
 
   if (!result || amount === null) {
@@ -136,7 +136,31 @@ const ResultsDisplay: React.FC = () => {
     }
   };
 
+  // 获取当前国家的股票市场名称
+  const getStockMarketName = () => {
+    switch (countryCode) {
+      case 'US': return 'S&P 500';
+      case 'CA': return 'S&P/TSX';
+      case 'UK': return 'FTSE 100';
+      case 'DE': return 'DAX';
+      case 'JP': return 'Nikkei 225';
+      case 'CN': return 'Shanghai Composite';
+      case 'AU': return 'S&P/ASX 200';
+      default: return countryData?.metadata?.stockMarketBenchmark || 'Stock Market';
+    }
+  };
 
+  // 获取投资类型名称
+  const getInvestmentTypeName = () => {
+    switch (investmentType) {
+      case 'cash': return 'Savings Account';
+      case 'bonds': return 'Government Bonds';
+      case 'stocks': return 'Stock Market';
+      case 'realEstate': return 'Real Estate';
+      case 'custom': return `Custom Investment (${useCalculatorStore.getState().customRate}%)`;
+      default: return 'Investment';
+    }
+  };
 
   // Investment comparison chart data (only if investment type is not none)
   const investmentChartData: ChartData<"line"> | undefined = investmentType !== 'none' ? {
@@ -151,11 +175,7 @@ const ResultsDisplay: React.FC = () => {
         borderDash: [5, 5],
       },
       {
-        label: investmentType === 'savings'
-          ? 'Savings Account Growth'
-          : investmentType === 'custom'
-            ? `Custom Investment (${useCalculatorStore.getState().customRate}%)`
-            : 'Stock Market Growth',
+        label: getInvestmentTypeName(),
         data: result.yearlyBreakdown.map(item => item.opportunityCost),
         borderColor: 'rgb(34, 197, 94)',
         backgroundColor: 'rgba(34, 197, 94, 0.5)',
@@ -239,9 +259,9 @@ const ResultsDisplay: React.FC = () => {
         <div className="h-60 mt-6">
           <Line options={chartOptions} data={inflationChartData} />
         </div>
-        {investmentType === 'stockMarket' && (
+        {investmentType === 'stocks' && (
           <p className={`text-xs mt-2 ${isDarkMode ? 'text-gray-400' : 'text-gray-500'} italic`}>
-            * Historical returns based on {countryCode === 'US' ? 'S&P 500' : 'S&P/TSX'} index performance
+            * Historical returns based on {getStockMarketName()} index performance
           </p>
         )}
 
@@ -258,11 +278,7 @@ const ResultsDisplay: React.FC = () => {
       {investmentType !== 'none' && (
         <div className={`p-6 rounded-lg ${isDarkMode ? 'bg-gray-700/50' : 'bg-gray-100'}`}>
           <h3 className={`text-lg font-semibold mb-4 ${isDarkMode ? 'text-white' : 'text-gray-800'}`}>
-            {investmentType === 'custom'
-              ? `Custom Investment (${useCalculatorStore.getState().customRate}%)`
-              : investmentType === 'savings'
-                ? 'Savings Account'
-                : 'Stock Market'} Performance
+            {getInvestmentTypeName()} Performance
           </h3>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
@@ -270,11 +286,7 @@ const ResultsDisplay: React.FC = () => {
               <div className="flex items-center justify-between">
                 <div>
                   <p className={`text-sm ${isDarkMode ? 'text-gray-300' : 'text-gray-600'}`}>
-                    {investmentType === 'savings'
-                      ? 'With Savings Interest'
-                      : investmentType === 'custom'
-                        ? `Custom Investment (${useCalculatorStore.getState().customRate}%)`
-                        : 'With Stock Returns'}
+                    {`With ${getInvestmentTypeName()} Returns`}
                   </p>
                   <p className={`text-3xl font-bold ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
                     {formatCurrency(result.opportunityCostValue)}
@@ -330,7 +342,7 @@ const ResultsDisplay: React.FC = () => {
               {investmentType === 'custom'
                 ? `With ${useCalculatorStore.getState().customRate}% annual returns: ${formatCurrency(amount)} ➔ 
                   ${formatCurrency(result.combinedValue)} after inflation`
-                : `By investing in ${investmentType === 'savings' ? 'a savings account' : 'the stock market'}: 
+                : `By investing in ${getInvestmentTypeName()}: 
                   ${formatCurrency(amount)} ➔ ${formatCurrency(result.combinedValue)} 
                   (${`${realInvestmentImpact >= 0 ? '+' : ''}${formatPercentage(realInvestmentImpact)}`})`}
             </p>
