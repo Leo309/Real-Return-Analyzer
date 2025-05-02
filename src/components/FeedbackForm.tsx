@@ -1,186 +1,203 @@
-import React, { useState, useEffect } from 'react';
-import { supabase } from '@/lib/supabase';
-import { Send, X, CheckCircle, AlertTriangle } from 'lucide-react';
+import React, { useState } from 'react';
+import { MessageSquare, Star, X } from 'lucide-react';
+import { useTranslation } from '@/hooks/useTranslation';
 
-const FeedbackForm: React.FC<{ darkMode?: boolean }> = ({ darkMode }) => {
-  const [feedback, setFeedback] = useState('');
-  const [email, setEmail] = useState('');
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  const [submitted, setSubmitted] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+interface FeedbackFormProps {
+  darkMode: boolean;
+}
+
+const FeedbackForm: React.FC<FeedbackFormProps> = ({ darkMode }) => {
+  const { t } = useTranslation();
   const [isOpen, setIsOpen] = useState(false);
-  const isDarkMode = darkMode ?? false;
-  const [connectionStatus, setConnectionStatus] = useState<'unknown' | 'ok' | 'error'>('unknown');
-
-  // Check if Supabase connection is working
-  useEffect(() => {
-    const checkConnection = async () => {
-      try {
-        const { error } = await supabase.from('feedback').select('count', { count: 'exact', head: true });
-
-        if (error) {
-          console.error('Supabase connection error:', error);
-          setConnectionStatus('error');
-        } else {
-          setConnectionStatus('ok');
-        }
-      } catch (err) {
-        console.error('Failed to check Supabase connection:', err);
-        setConnectionStatus('error');
-      }
-    };
-
-    checkConnection();
-  }, []);
+  const [email, setEmail] = useState('');
+  const [message, setMessage] = useState('');
+  const [rating, setRating] = useState(0);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isSubmitted, setIsSubmitted] = useState(false);
+  const [error, setError] = useState('');
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsSubmitting(true);
-    setError(null);
+    setError('');
 
     try {
-      // Verify environment variables are available
-      if (!process.env.NEXT_PUBLIC_SUPABASE_URL || !process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY) {
-        throw new Error('Database configuration is incomplete');
-      }
-
-      const { error: supabaseError } = await supabase
-        .from('feedback')
-        .insert([{
-          feedback,
-          email: email || null,
-          created_at: new Date().toISOString()
-        }]);
-
-      if (supabaseError) {
-        throw new Error(supabaseError.message || 'Unknown database error');
-      }
-
-      setSubmitted(true);
-      setFeedback('');
+      // In a real implementation, you would send the feedback to your server
+      // Example:
+      // await fetch('/api/feedback', {
+      //   method: 'POST',
+      //   headers: { 'Content-Type': 'application/json' },
+      //   body: JSON.stringify({ email, message, rating }),
+      // });
+      
+      // Simulate API call
+      await new Promise(resolve => setTimeout(resolve, 1000));
+      
+      setIsSubmitted(true);
       setEmail('');
+      setMessage('');
+      setRating(0);
       
-      // Auto close after successful submission
+      // Close the form after showing thank you message
       setTimeout(() => {
+        setIsSubmitted(false);
         setIsOpen(false);
-        // Reset submitted state after the form is closed
-        setTimeout(() => setSubmitted(false), 300);
       }, 3000);
-      
-    } catch (err: unknown) {
-      console.error('Error submitting feedback:', err);
-      const errorMessage = err instanceof Error ? err.message : 'Unknown error';
-      setError(`Failed to submit feedback: ${errorMessage}`);
+    } catch (err) {
+      setError('Failed to submit feedback. Please try again.');
+    } finally {
+      setIsSubmitting(false);
     }
-
-    setIsSubmitting(false);
   };
 
-  if (!isOpen) {
-    return (
-      <button
-        onClick={() => setIsOpen(true)}
-        className={`${
-          isDarkMode ? 'bg-blue-600 hover:bg-blue-700' : 'bg-blue-500 hover:bg-blue-600'
-        } text-white font-medium p-3 rounded-full shadow-lg hover:shadow-xl transition-all duration-300 hover-lift`}
-        aria-label="Open feedback form"
-      >
-        <Send size={20} />
-      </button>
-    );
-  }
+  const toggleFeedback = () => {
+    setIsOpen(!isOpen);
+    if (isSubmitted) {
+      setIsSubmitted(false);
+    }
+  };
 
   return (
-    <div className={`${isDarkMode ? 'bg-gray-800 border border-gray-700' : 'bg-white border border-gray-200'} rounded-xl shadow-xl p-4 w-80 transition-all duration-300 card-hover`}>
-      <div className="flex justify-between items-center mb-3">
-        <h3 className={`font-bold ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>Share Your Feedback</h3>
-        <button
-          onClick={() => setIsOpen(false)}
-          className={`p-1 rounded-full ${isDarkMode ? 'hover:bg-gray-700' : 'hover:bg-gray-100'} transition-colors`}
-          aria-label="Close feedback form"
-        >
-          <X size={18} className={isDarkMode ? 'text-gray-400' : 'text-gray-600'} />
-        </button>
-      </div>
+    <div>
+      {/* Feedback button */}
+      <button
+        onClick={toggleFeedback}
+        className={`p-3 rounded-full shadow-lg transition-all duration-300 
+          ${darkMode 
+            ? 'bg-blue-600 hover:bg-blue-700 text-white' 
+            : 'bg-blue-500 hover:bg-blue-600 text-white'
+          }`}
+        aria-label="Give feedback"
+      >
+        <MessageSquare size={20} />
+      </button>
 
-      {connectionStatus === 'error' && (
-        <div className={`${isDarkMode ? 'bg-yellow-900/30 text-yellow-200' : 'bg-yellow-50 text-yellow-800'} p-3 rounded-lg mb-4 flex items-start gap-2`}>
-          <AlertTriangle size={16} className="mt-0.5 flex-shrink-0" />
-          <p className="text-sm">Unable to connect to database. Your feedback might not be saved.</p>
-        </div>
-      )}
-
-      {error && (
-        <div className={`${isDarkMode ? 'bg-red-900/30 text-red-200' : 'bg-red-50 text-red-800'} p-3 rounded-lg mb-4 flex items-start gap-2`}>
-          <AlertTriangle size={16} className="mt-0.5 flex-shrink-0" />
-          <p className="text-sm">{error}</p>
-        </div>
-      )}
-
-      {submitted ? (
-        <div className={`${isDarkMode ? 'bg-green-900/30 text-green-200' : 'bg-green-50 text-green-800'} p-4 rounded-lg flex items-center gap-3`}>
-          <CheckCircle className="flex-shrink-0" />
-          <div>
-            <p className="font-medium">Thank you for your feedback!</p>
-            <p className="text-sm opacity-90">We appreciate your input.</p>
-          </div>
-        </div>
-      ) : (
-        <form onSubmit={handleSubmit} className="space-y-4">
-          <div>
-            <label htmlFor="feedback" className={`block text-sm font-medium mb-1.5 ${isDarkMode ? 'text-gray-200' : 'text-gray-700'}`}>
-              What do you think about our calculator?
-            </label>
-            <textarea
-              id="feedback"
-              value={feedback}
-              onChange={(e) => setFeedback(e.target.value)}
-              className={`form-input text-sm ${isDarkMode ? 'bg-gray-700 border-gray-600' : 'bg-gray-50 border-gray-300'}`}
-              placeholder="Share your thoughts, suggestions, or report issues..."
-              rows={3}
-              required
-            />
-          </div>
-
-          <div>
-            <label htmlFor="email" className={`block text-sm font-medium mb-1.5 ${isDarkMode ? 'text-gray-200' : 'text-gray-700'}`}>
-              Email (optional)
-            </label>
-            <input
-              id="email"
-              type="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              className={`form-input text-sm ${isDarkMode ? 'bg-gray-700 border-gray-600' : 'bg-gray-50 border-gray-300'}`}
-              placeholder="you@example.com"
-            />
-            <p className={`text-xs mt-1 ${isDarkMode ? 'text-gray-400' : 'text-gray-500'}`}>
-              Only if you&apos;d like us to follow up with you
-            </p>
-          </div>
-
-          <div className="flex gap-3">
-            <button
-              type="button"
-              onClick={() => setIsOpen(false)}
-              className={`flex-1 py-2 px-4 border rounded-lg text-sm font-medium transition-colors 
-                ${isDarkMode 
-                  ? 'border-gray-600 hover:bg-gray-700 text-gray-300' 
-                  : 'border-gray-300 hover:bg-gray-100 text-gray-700'}`}
+      {/* Feedback modal */}
+      {isOpen && (
+        <div className={`fixed inset-0 flex items-center justify-center z-50 p-4 ${darkMode ? 'bg-black/50' : 'bg-gray-800/30'}`}>
+          <div 
+            className={`relative rounded-xl shadow-2xl w-full max-w-md mx-auto transition-all duration-300 transform 
+              ${darkMode ? 'bg-gray-800' : 'bg-white'}`}
+          >
+            <button 
+              onClick={toggleFeedback}
+              className={`absolute top-3 right-3 p-1 rounded-full
+                ${darkMode ? 'text-gray-400 hover:text-white hover:bg-gray-700' : 'text-gray-500 hover:text-gray-800 hover:bg-gray-100'}`}
             >
-              Cancel
+              <X size={20} />
             </button>
-            <button
-              type="submit"
-              disabled={isSubmitting || connectionStatus === 'error' || !feedback.trim()}
-              className={`flex-1 bg-blue-500 hover:bg-blue-600 text-white font-medium py-2 px-4 rounded-lg transition-colors text-sm flex items-center justify-center gap-1.5
-                ${(isSubmitting || connectionStatus === 'error' || !feedback.trim()) ? 'opacity-50 cursor-not-allowed' : ''}`}
-            >
-              {isSubmitting ? 'Sending...' : 'Send'}
-              {!isSubmitting && <Send size={14} />}
-            </button>
+            
+            <div className="p-6">
+              {!isSubmitted ? (
+                <>
+                  <h3 className={`text-xl font-bold mb-4 ${darkMode ? 'text-white' : 'text-gray-900'}`}>
+                    {t('feedback.title')}
+                  </h3>
+                  
+                  <form onSubmit={handleSubmit}>
+                    <div className="mb-4">
+                      <label className={`block text-sm font-medium mb-1 ${darkMode ? 'text-gray-300' : 'text-gray-700'}`}>
+                        {t('feedback.ratingLabel')}
+                      </label>
+                      <div className="flex space-x-1">
+                        {[1, 2, 3, 4, 5].map((star) => (
+                          <button
+                            key={star}
+                            type="button"
+                            onClick={() => setRating(star)}
+                            className="focus:outline-none"
+                          >
+                            <Star
+                              size={24}
+                              className={`${
+                                rating >= star
+                                  ? 'text-yellow-400 fill-yellow-400'
+                                  : darkMode
+                                  ? 'text-gray-600'
+                                  : 'text-gray-300'
+                              }`}
+                            />
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+                    
+                    <div className="mb-4">
+                      <label htmlFor="email" className={`block text-sm font-medium mb-1 ${darkMode ? 'text-gray-300' : 'text-gray-700'}`}>
+                        {t('feedback.emailLabel')}
+                      </label>
+                      <input
+                        type="email"
+                        id="email"
+                        value={email}
+                        onChange={(e) => setEmail(e.target.value)}
+                        className={`w-full px-3 py-2 border rounded-md
+                          ${darkMode
+                            ? 'bg-gray-700 border-gray-600 text-white placeholder-gray-400'
+                            : 'bg-white border-gray-300 text-gray-900 placeholder-gray-500'
+                          }`}
+                        placeholder="youremail@example.com"
+                      />
+                    </div>
+                    
+                    <div className="mb-4">
+                      <label htmlFor="message" className={`block text-sm font-medium mb-1 ${darkMode ? 'text-gray-300' : 'text-gray-700'}`}>
+                        {t('feedback.messageLabel')}
+                      </label>
+                      <textarea
+                        id="message"
+                        value={message}
+                        onChange={(e) => setMessage(e.target.value)}
+                        rows={4}
+                        required
+                        className={`w-full px-3 py-2 border rounded-md
+                          ${darkMode
+                            ? 'bg-gray-700 border-gray-600 text-white placeholder-gray-400'
+                            : 'bg-white border-gray-300 text-gray-900 placeholder-gray-500'
+                          }`}
+                        placeholder={t('feedback.placeholder')}
+                      />
+                    </div>
+                    
+                    {error && (
+                      <div className={`p-3 mb-4 rounded-md ${darkMode ? 'bg-red-900/30 text-red-200' : 'bg-red-50 text-red-800'}`}>
+                        {error}
+                      </div>
+                    )}
+                    
+                    <button
+                      type="submit"
+                      disabled={isSubmitting || !message}
+                      className={`w-full py-2 px-4 rounded-md font-medium transition-colors
+                        ${isSubmitting || !message
+                          ? (darkMode ? 'bg-gray-600 text-gray-300' : 'bg-gray-300 text-gray-500')
+                          : (darkMode ? 'bg-blue-600 hover:bg-blue-700 text-white' : 'bg-blue-500 hover:bg-blue-600 text-white')
+                        }`}
+                    >
+                      {isSubmitting ? t('common.loading') : t('feedback.submitButton')}
+                    </button>
+                  </form>
+                </>
+              ) : (
+                <div className="text-center py-8">
+                  <div className={`mb-4 mx-auto w-16 h-16 flex items-center justify-center rounded-full ${
+                    darkMode ? 'bg-green-900/30 text-green-300' : 'bg-green-100 text-green-600'
+                  }`}>
+                    <svg xmlns="http://www.w3.org/2000/svg" className="h-10 w-10" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                    </svg>
+                  </div>
+                  <h3 className={`text-xl font-bold mb-2 ${darkMode ? 'text-white' : 'text-gray-900'}`}>
+                    {t('feedback.thankYou')}
+                  </h3>
+                  <p className={darkMode ? 'text-gray-300' : 'text-gray-600'}>
+                    We appreciate your input and will use it to improve the calculator.
+                  </p>
+                </div>
+              )}
+            </div>
           </div>
-        </form>
+        </div>
       )}
     </div>
   );

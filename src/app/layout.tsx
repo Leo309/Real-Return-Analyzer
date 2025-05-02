@@ -13,11 +13,13 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Investment Time Machine | SKYNEX DIGITAL",
-  description: "Calculate how inflation and investments affect your money over time. Powered by SKYNEX GLOBAL COMMERCE & TECH INC.",
+  title: "Investment Time Machine | Historical Returns & Inflation Calculator",
+  description: "See how inflation erodes your money's value and how different investments like stocks, bonds, and real estate can combat it. Visualize your financial future with historical data.",
+  keywords: "investment calculator, inflation calculator, stock returns, bond returns, real estate investment, historical returns, financial planning, investment time machine",
+  
   openGraph: {
-    title: "Investment Time Machine | SKYNEX DIGITAL",
-    description: "Calculate how inflation and investments affect your money over time. Powered by SKYNEX GLOBAL COMMERCE & TECH INC.",
+    title: "Investment Time Machine | Historical Returns & Inflation Calculator",
+    description: "See how inflation erodes your money's value and how different investments like stocks, bonds, and real estate can combat it. Visualize your financial future with historical data.",
     images: [
       {
         url: "/social-preview.png",
@@ -28,12 +30,39 @@ export const metadata: Metadata = {
     ],
     type: "website",
     locale: "en_US",
+    siteName: "Investment Time Machine",
   },
+  
   twitter: {
     card: "summary_large_image",
-    title: "Investment Time Machine | SKYNEX DIGITAL",
-    description: "Calculate how inflation and investments affect your money over time. Powered by SKYNEX GLOBAL COMMERCE & TECH INC.",
+    title: "Investment Time Machine | Historical Returns & Inflation Calculator",
+    description: "See how inflation erodes your money's value and how different investments like stocks, bonds, and real estate can combat it. Visualize your financial future with historical data.",
     images: ["/social-preview.png"],
+    creator: "@skynexdigital",
+  },
+  
+  authors: [{ name: "SKYNEX GLOBAL COMMERCE & TECH INC" }],
+  publisher: "SKYNEX GLOBAL COMMERCE & TECH INC",
+  
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+    },
+  },
+  
+  verification: {
+    google: "verification_token",  // Add your Google Search Console verification token
+  },
+  
+  alternates: {
+    canonical: "https://investment-calculator.com",
+    languages: {
+      'en': 'https://investment-calculator.com',
+      // Additional languages can be added later
+    },
   },
 };
 
@@ -44,6 +73,32 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
+      <head>
+        {/* Structured Data for Rich Results */}
+        <script 
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify({
+              "@context": "https://schema.org",
+              "@type": "WebApplication",
+              "name": "Investment Time Machine",
+              "description": "Calculate how inflation and investments affect your money over time with historical data.",
+              "applicationCategory": "FinanceApplication",
+              "operatingSystem": "Any",
+              "offers": {
+                "@type": "Offer",
+                "price": "0",
+                "priceCurrency": "USD"
+              },
+              "author": {
+                "@type": "Organization",
+                "name": "SKYNEX GLOBAL COMMERCE & TECH INC",
+                "url": "https://skynexdigital.com"
+              }
+            })
+          }}
+        />
+      </head>
       <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
         {children}
       </body>
