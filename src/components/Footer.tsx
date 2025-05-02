@@ -23,7 +23,7 @@ export default function Footer({ darkMode }: FooterProps) {
           <div className="md:col-span-5">
             <div className="mb-6">
               <Image 
-                src="/images/SKYNEX_500_WHITE.png" 
+                src="/SKYNEX_500_WHITE.png" 
                 alt="SKYNEX" 
                 width={160} 
                 height={48} 

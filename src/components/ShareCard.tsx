@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import Image from 'next/image';
 import { Share2, Copy, Check, Twitter, Facebook, Linkedin, Instagram } from 'lucide-react';
 import useCalculatorStore from '@/store/calculatorStore';
 import { historicalData } from '@/data/historical';
@@ -45,10 +46,10 @@ const ShareCard: React.FC = () => {
       }
     })();
     
-    return `I just used the Investment Time Machine to see how ${originalAmount} would change from ${startYear} to ${endYear} in ${countryData.name}. With ${investmentName}, it would be worth ${finalValue} (${changePercent}% change). Try it yourself at investment-calculator.com`;
+    return `I just used the Inflation Impact Calculator to see how ${originalAmount} would change from ${startYear} to ${endYear} in ${countryData.name}. With ${investmentName}, it would be worth ${finalValue} (${changePercent}% change). Try it yourself at inflation.skynexdigital.com`;
   };
   
-  const shareUrl = 'https://investment-calculator.com';
+  const shareUrl = 'https://inflation.skynexdigital.com';
   const shareText = getShareText();
   
   const handleCopyLink = async () => {
@@ -122,9 +123,19 @@ const ShareCard: React.FC = () => {
         
         {isExpanded && (
           <div className="mt-4 animate-fadeIn">
-            <div className={`p-3 rounded-md mb-3 text-sm
-              ${isDarkMode ? 'bg-gray-700 text-gray-300' : 'bg-gray-100 text-gray-700'}`}
-            >
+            <div className={`p-4 rounded-md mb-3 text-sm border ${isDarkMode ? 'bg-gray-700 text-gray-300 border-gray-600' : 'bg-gray-100 text-gray-700 border-gray-200'}`}>
+              <div className="flex items-center mb-3">
+                <div className="h-8 relative mr-2">
+                  <Image 
+                    src={isDarkMode ? "/SKYNEX_500_WHITE.png" : "/SKYNEX_500_BLUE.png"} 
+                    alt="SKYNEX" 
+                    width={100} 
+                    height={30} 
+                    className="w-auto h-full object-contain" 
+                  />
+                </div>
+                <span className={`text-xs ${isDarkMode ? 'text-gray-400' : 'text-gray-500'}`}>inflation.skynexdigital.com</span>
+              </div>
               {shareText}
             </div>
             

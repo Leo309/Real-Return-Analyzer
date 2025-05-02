@@ -50,7 +50,7 @@ export default function Header({ darkMode, toggleDarkMode, subsite, title }: Hea
           <Link href="https://skynexdigital.com" className="flex items-center space-x-2 relative z-10">
             <div className="h-12 relative">
               <Image 
-                src="/images/SKYNEX_500_BLUE.png" 
+                src="/SKYNEX_500_BLUE.png" 
                 alt="SKYNEX" 
                 width={160} 
                 height={48} 
@@ -58,7 +58,7 @@ export default function Header({ darkMode, toggleDarkMode, subsite, title }: Hea
                 priority
               />
               <Image 
-                src="/images/SKYNEX_500_WHITE.png" 
+                src="/SKYNEX_500_WHITE.png" 
                 alt="SKYNEX" 
                 width={160} 
                 height={48} 
