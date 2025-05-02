@@ -95,8 +95,6 @@ const en = {
   }
 };
 
-type TranslationDictionary = typeof en;
-
 export function useTranslation() {
   // Currently just returns English strings
   // Will be replaced with proper i18n implementation later
