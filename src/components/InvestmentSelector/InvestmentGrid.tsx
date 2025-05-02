@@ -4,6 +4,7 @@ import { ArrowLeft } from 'lucide-react';
 import useCalculatorStore from '@/store/calculatorStore';
 import { useTranslation } from '@/hooks/useTranslation';
 import { historicalData } from '@/data/historical';
+import { InvestmentType } from '@/lib/calculatorUtils';
 
 interface InvestmentGridProps {
   darkMode: boolean;
@@ -17,7 +18,7 @@ const InvestmentGrid: React.FC<InvestmentGridProps> = ({ darkMode }) => {
   const countryData = historicalData[countryCode];
   
   const handleSelectInvestment = (investmentType: string) => {
-    setInvestmentType(investmentType as 'stocks' | 'bonds' | 'realestate' | 'gold' | 'cash' | 'custom' | 'none');
+    setInvestmentType(investmentType as InvestmentType);
     setStep('calculator');
   };
   
