@@ -5,6 +5,10 @@
 
 
 @layer utilities {
+  .container-custom {
+    @apply container mx-auto px-4 sm:px-6 lg:px-8;
+  }
+
   .card {
     @apply bg-white dark:bg-gray-800 rounded-xl shadow-md p-5 transition-all duration-300;
   }
@@ -143,4 +147,16 @@ button:active {
 [role="button"]>span[role="img"] {
   font-size: 1.2em;
   vertical-align: text-bottom;
+}
+
+/* Enhance chart responsiveness */
+canvas.chartjs-render-monitor {
+  max-width: 100%;
+  height: auto !important;
+}
+
+/* Fix mobile overflow issues */
+.overflow-fix {
+  overflow-x: hidden;
+  max-width: 100vw;
 }

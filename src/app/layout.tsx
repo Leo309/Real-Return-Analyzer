@@ -13,12 +13,12 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Investment Time Machine | Historical Returns & Inflation Calculator",
+  title: "Inflation Impact Calculator | SKYNEX DIGITAL",
   description: "See how inflation erodes your money's value and how different investments like stocks, bonds, and real estate can combat it. Visualize your financial future with historical data.",
   keywords: "investment calculator, inflation calculator, stock returns, bond returns, real estate investment, historical returns, financial planning, investment time machine",
   
   openGraph: {
-    title: "Investment Time Machine | Historical Returns & Inflation Calculator",
+    title: "Inflation Impact Calculator | SKYNEX DIGITAL",
     description: "See how inflation erodes your money's value and how different investments like stocks, bonds, and real estate can combat it. Visualize your financial future with historical data.",
     images: [
       {
@@ -30,12 +30,12 @@ export const metadata: Metadata = {
     ],
     type: "website",
     locale: "en_US",
-    siteName: "Investment Time Machine",
+    siteName: "SKYNEX DIGITAL",
   },
   
   twitter: {
     card: "summary_large_image",
-    title: "Investment Time Machine | Historical Returns & Inflation Calculator",
+    title: "Inflation Impact Calculator | SKYNEX DIGITAL",
     description: "See how inflation erodes your money's value and how different investments like stocks, bonds, and real estate can combat it. Visualize your financial future with historical data.",
     images: ["/social-preview.png"],
     creator: "@skynexdigital",
@@ -58,9 +58,9 @@ export const metadata: Metadata = {
   },
   
   alternates: {
-    canonical: "https://investment-calculator.com",
+    canonical: "https://inflation.skynexdigital.com",
     languages: {
-      'en': 'https://investment-calculator.com',
+      'en': 'https://inflation.skynexdigital.com',
       // Additional languages can be added later
     },
   },
@@ -81,7 +81,7 @@ export default function RootLayout({
             __html: JSON.stringify({
               "@context": "https://schema.org",
               "@type": "WebApplication",
-              "name": "Investment Time Machine",
+              "name": "Inflation Impact Calculator",
               "description": "Calculate how inflation and investments affect your money over time with historical data.",
               "applicationCategory": "FinanceApplication",
               "operatingSystem": "Any",
@@ -99,7 +99,7 @@ export default function RootLayout({
           }}
         />
       </head>
-      <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
+      <body className={`${geistSans.variable} ${geistMono.variable} antialiased overflow-fix`}>
         {children}
       </body>
     </html>

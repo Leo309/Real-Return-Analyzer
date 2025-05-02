@@ -18,6 +18,7 @@ module.exports = {
         'card-bg': 'rgb(var(--background) / <alpha-value>)',
         'primary-foreground': 'white',
         accent: colors.gray[200],
+        'skynex-blue': '#3B82F6',
       },
     },
   },

@@ -119,6 +119,14 @@ const ResultsDisplay: React.FC = () => {
   const chartOptions: ChartOptions<"line"> = {
     responsive: true,
     maintainAspectRatio: false,
+    layout: {
+      padding: {
+        left: 10,
+        right: 10,
+        top: 20,
+        bottom: 10
+      }
+    },
     plugins: {
       legend: {
         position: 'top',
@@ -154,6 +162,9 @@ const ResultsDisplay: React.FC = () => {
       x: {
         type: 'category',
         ticks: {
+          autoSkip: true,
+          maxRotation: 0,
+          maxTicksLimit: 8,
           color: isDarkMode ? '#CCCCCC' : '#666666',
           font: {
             family: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
@@ -268,7 +279,7 @@ const ResultsDisplay: React.FC = () => {
   } : undefined;
 
   return (
-    <div className="flex flex-col gap-6">
+    <div className="flex flex-col gap-6 max-w-full overflow-hidden">
       <h2 className={`text-xl font-bold ${isDarkMode ? 'text-white' : 'text-gray-900'} mb-4`}>Results</h2>
 
       {/* Enhanced Animation Cards */}
@@ -380,7 +391,7 @@ const ResultsDisplay: React.FC = () => {
           </div>
         )}
 
-        <div className="h-72 mt-6 relative" ref={inflationChartRef}>
+        <div className="h-72 mt-6 relative w-full overflow-hidden" ref={inflationChartRef}>
           <Line 
             options={chartOptions} 
             data={inflationChartData} 
@@ -461,7 +472,7 @@ const ResultsDisplay: React.FC = () => {
           </div>
 
           {investmentChartData && (
-            <div className="h-72 mt-6 relative" ref={investmentChartRef}>
+            <div className="h-72 mt-6 relative w-full overflow-hidden" ref={investmentChartRef}>
               <Line 
                 options={chartOptions} 
                 data={investmentChartData} 
