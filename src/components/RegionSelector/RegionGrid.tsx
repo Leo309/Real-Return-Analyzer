@@ -2,7 +2,6 @@ import React from 'react';
 import RegionCard from './RegionCard';
 import useCalculatorStore from '@/store/calculatorStore';
 import { useTranslation } from '@/hooks/useTranslation';
-import { TrendingUp } from 'lucide-react';
 
 interface RegionGridProps {
   darkMode: boolean;

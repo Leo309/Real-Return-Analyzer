@@ -1,4 +1,4 @@
-import React, { useRef, useEffect } from 'react';
+import React, { useRef } from 'react';
 import { Line } from 'react-chartjs-2';
 import {
   Chart as ChartJS,
@@ -15,7 +15,7 @@ import {
 } from 'chart.js';
 import useCalculatorStore from '@/store/calculatorStore';
 import { historicalData } from '@/data/historical';
-import { TrendingDown, TrendingUp, DollarSign, Share2 } from 'lucide-react';
+import { TrendingDown, TrendingUp, DollarSign } from 'lucide-react';
 import ShareCard from '@/components/ShareCard';
 import { useTranslation } from '@/hooks/useTranslation';
 import type { ChartData } from 'chart.js';
@@ -35,7 +35,7 @@ ChartJS.register(
 const createGradientPlugin = (canvas: HTMLCanvasElement | null, isDarkMode: boolean) => {
   return {
     id: 'customCanvasBackgroundColor',
-    beforeDraw: (chart: any) => {
+    beforeDraw: (chart: ChartJS) => {
       if (canvas) {
         const ctx = chart.ctx;
         const gradient = ctx.createLinearGradient(0, 0, 0, chart.height);

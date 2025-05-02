@@ -117,7 +117,7 @@ export default function Home() {
         {renderContent()}
       </main>
 
-      <Footer darkMode={darkMode} />
+      <Footer />
     </div>
   );
 }

@@ -3,10 +3,8 @@ import Image from 'next/image';
 import { Share2, Copy, Check, Twitter, Facebook, Linkedin, Instagram } from 'lucide-react';
 import useCalculatorStore from '@/store/calculatorStore';
 import { historicalData } from '@/data/historical';
-import { useTranslation } from '@/hooks/useTranslation';
 
 const ShareCard: React.FC = () => {
-  const { t } = useTranslation();
   const { result, amount, countryCode, startYear, endYear, investmentType, customRate } = useCalculatorStore();
   const [isExpanded, setIsExpanded] = useState(false);
   const [copySuccess, setCopySuccess] = useState(false);

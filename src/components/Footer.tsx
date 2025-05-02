@@ -4,12 +4,9 @@ import Link from 'next/link';
 import Image from 'next/image';
 import siteConfig from '@/config/siteConfig';
 
-interface FooterProps {
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  darkMode?: boolean;
-}
+interface FooterProps {}
 
-export default function Footer({ darkMode }: FooterProps) {
+export default function Footer() {
   return (
     <footer className="relative bg-gray-900 text-white overflow-hidden">
       {/* Background elements */}
