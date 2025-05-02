@@ -78,7 +78,7 @@ const InvestmentGrid: React.FC<InvestmentGridProps> = ({ darkMode }) => {
               startYear={coverage.startYear}
               endYear={coverage.endYear}
               dataCompleteness={coverage.dataCompleteness}
-              averageReturn={coverage.averageReturn}
+              averageReturn={coverage.averageReturn ?? null}
             />
           ))}
           
