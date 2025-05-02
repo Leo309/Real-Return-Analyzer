@@ -9,11 +9,10 @@ import siteConfig from '@/config/siteConfig';
 interface HeaderProps {
   darkMode: boolean;
   toggleDarkMode: () => void;
-  subsite?: string;
   title: string;
 }
 
-export default function Header({ darkMode, toggleDarkMode, subsite, title }: HeaderProps) {
+export default function Header({ darkMode, toggleDarkMode, title }: HeaderProps) {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
 

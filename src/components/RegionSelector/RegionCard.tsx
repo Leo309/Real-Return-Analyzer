@@ -34,7 +34,6 @@ const RegionCard: React.FC<RegionCardProps> = ({
   const { t } = useTranslation();
   const country = countryInfo[countryCode] || { name: countryCode, flag: '🌍' };
   
-  const yearsRange = t('regionSelector.dataYearsLabel', { startYear, endYear });
   const totalYears = endYear - startYear + 1;
   
   // 确定数据完整度徽章的样式

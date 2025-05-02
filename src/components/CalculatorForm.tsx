@@ -1,10 +1,9 @@
 import React from 'react';
 import { useEffect, useState } from 'react';
 import useCalculatorStore from '@/store/calculatorStore';
-import { Wand2, HelpCircle, Info, ArrowRight } from 'lucide-react';
-import { historicalData, getAvailableYears, investmentTypes } from '@/data/historical';
+import { HelpCircle, ArrowRight } from 'lucide-react';
+import { historicalData } from '@/data/historical';
 import { useTranslation } from '@/hooks/useTranslation';
-import type { InvestmentType } from '@/lib/calculatorUtils';
 
 interface CalculatorFormProps {
   darkMode?: boolean;
@@ -58,7 +57,6 @@ const CalculatorForm: React.FC<CalculatorFormProps> = ({ darkMode = false }) => 
 
   // Get country data
   const countryData = historicalData[countryCode];
-  const countryName = countryData?.name || countryCode;
   const currencySymbol = countryData?.symbol || '$';
 
   return (

@@ -12,7 +12,7 @@ import { useTranslation } from '@/hooks/useTranslation';
 
 export default function Home() {
   const { t } = useTranslation();
-  const { currentStep, result, goBack } = useCalculatorStore();
+  const { currentStep, goBack } = useCalculatorStore();
   const [darkMode, setDarkMode] = useState(false);
 
   // Initialize dark mode based on user's system preference

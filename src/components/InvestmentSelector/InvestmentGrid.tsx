@@ -17,7 +17,7 @@ const InvestmentGrid: React.FC<InvestmentGridProps> = ({ darkMode }) => {
   const countryData = historicalData[countryCode];
   
   const handleSelectInvestment = (investmentType: string) => {
-    setInvestmentType(investmentType as any);
+    setInvestmentType(investmentType as 'stocks' | 'bonds' | 'realestate' | 'gold' | 'cash' | 'custom' | 'none');
     setStep('calculator');
   };
   
