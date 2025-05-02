@@ -43,7 +43,7 @@ const FeedbackForm: React.FC<FeedbackFormProps> = ({ darkMode }) => {
         setIsSubmitted(false);
         setIsOpen(false);
       }, 3000);
-    } catch (_) {
+    } catch {
       setError('Failed to submit feedback. Please try again.');
     } finally {
       setIsSubmitting(false);

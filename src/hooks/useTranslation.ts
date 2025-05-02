@@ -95,6 +95,8 @@ const en = {
   }
 };
 
+type TranslationDictionary = typeof en;
+
 export function useTranslation() {
   // Currently just returns English strings
   // Will be replaced with proper i18n implementation later
@@ -102,11 +104,11 @@ export function useTranslation() {
   const t = (key: string, replacements?: Record<string, string | number>) => {
     // Parse the key path (e.g., "regionSelector.title")
     const parts = key.split('.');
-    let value: any = en;
+    let value: unknown = en;
     
     for (const part of parts) {
       if (value && typeof value === 'object' && part in value) {
-        value = value[part];
+        value = (value as Record<string, unknown>)[part];
       } else {
         return key; // Return the key if translation not found
       }

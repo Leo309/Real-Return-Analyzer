@@ -5,7 +5,7 @@ import {
   CalculationResult, 
   getAverageInvestmentReturn 
 } from '@/lib/calculatorUtils';
-import { historicalData, getLatestYear, getEarliestYear } from '@/data/historical';
+import { historicalData, getLatestYear } from '@/data/historical';
 
 // New types for tracking data completeness
 export type DataCompleteness = 'full' | 'partial' | 'limited';

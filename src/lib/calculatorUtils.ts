@@ -1,5 +1,5 @@
 import { Decimal } from 'decimal.js';
-import { historicalData, HistoricalCountryData } from '@/data/historical';
+import { historicalData } from '@/data/historical';
 
 export type InvestmentType = 'cash' | 'bonds' | 'stocks' | 'realEstate' | 'none' | 'custom';
 
