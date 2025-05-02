@@ -2,7 +2,6 @@
 import React, { useState, useEffect } from 'react';
 import CalculatorForm from '@/components/CalculatorForm';
 import ResultsDisplay from '@/components/ResultsDisplay';
-import FeedbackForm from '@/components/FeedbackForm';
 import RegionSelector from '@/components/RegionSelector';
 import InvestmentSelector from '@/components/InvestmentSelector';
 import Header from '@/components/Header';
@@ -60,11 +59,13 @@ export default function Home() {
               <div className="flex items-center mb-4">
                 <button
                   onClick={goBack}
-                  className={`flex items-center text-sm ${
-                    darkMode ? 'text-gray-400 hover:text-gray-300' : 'text-gray-500 hover:text-gray-700'
+                  className={`flex items-center text-base py-2 px-3 rounded-lg transition-colors back-button ${
+                    darkMode 
+                      ? 'bg-gray-700 hover:bg-gray-600 text-gray-200 hover:text-white' 
+                      : 'bg-gray-100 hover:bg-gray-200 text-gray-700 hover:text-gray-900'
                   }`}
                 >
-                  <ArrowLeft size={16} className="mr-1" />
+                  <ArrowLeft size={20} className="mr-2" />
                   {t('calculator.backToInvestments')}
                 </button>
               </div>
@@ -80,11 +81,13 @@ export default function Home() {
               <div className="flex items-center mb-4">
                 <button
                   onClick={goBack}
-                  className={`flex items-center text-sm ${
-                    darkMode ? 'text-gray-400 hover:text-gray-300' : 'text-gray-500 hover:text-gray-700'
+                  className={`flex items-center text-base py-2 px-3 rounded-lg transition-colors back-button ${
+                    darkMode 
+                      ? 'bg-gray-700 hover:bg-gray-600 text-gray-200 hover:text-white' 
+                      : 'bg-gray-100 hover:bg-gray-200 text-gray-700 hover:text-gray-900'
                   }`}
                 >
-                  <ArrowLeft size={16} className="mr-1" />
+                  <ArrowLeft size={20} className="mr-2" />
                   {t('calculator.backToInvestments')}
                 </button>
               </div>
@@ -113,11 +116,6 @@ export default function Home() {
       <main className="flex-grow pt-28 pb-16 px-4">
         {renderContent()}
       </main>
-
-      {/* Feedback form placed at the bottom right of the page */}
-      <div className="fixed bottom-6 right-6 z-40">
-        <FeedbackForm darkMode={darkMode} />
-      </div>
 
       <Footer darkMode={darkMode} />
     </div>

@@ -155,6 +155,75 @@ canvas.chartjs-render-monitor {
   height: auto !important;
 }
 
+/* Title animations and effects */
+.animated-title {
+  background-size: 200% 200%;
+  animation: gradient-shift 4s ease infinite;
+  position: relative;
+  z-index: 10;
+  letter-spacing: -0.02em;
+}
+
+.title-icon {
+  transition: transform 0.3s ease;
+}
+
+.animated-title:hover .title-icon {
+  transform: translateY(-2px) rotate(5deg);
+}
+
+@keyframes gradient-shift {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+.title-glow {
+  position: relative;
+}
+
+.title-glow::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 100%;
+  height: 100%;
+  filter: blur(25px);
+  opacity: 0.15;
+  transition: opacity 0.3s ease;
+  z-index: -1;
+  background: inherit;
+}
+
+.title-glow:hover::after {
+  opacity: 0.3;
+}
+
+/* Back button animation */
+.back-button {
+  position: relative;
+  overflow: hidden;
+}
+
+.back-button::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: currentColor;
+  opacity: 0.1;
+  transform: translateX(-100%);
+  transition: transform 0.3s ease;
+}
+
+.back-button:hover::after {
+  transform: translateX(0);
+}
+
 /* Fix mobile overflow issues */
 .overflow-fix {
   overflow-x: hidden;
