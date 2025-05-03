@@ -25,7 +25,7 @@ export interface HistoricalCountryData {
   realEstateReturns?: Record<number, number>;
 }
 
-export type InvestmentCategory = 'cash' | 'bonds' | 'stocks' | 'realEstate' | 'custom';
+export type InvestmentCategory = 'cash' | 'bonds' | 'stocks' | 'realEstate' | 'custom' | 'none';
 
 export interface InvestmentTypeInfo {
   id: InvestmentCategory;
