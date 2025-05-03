@@ -13,13 +13,13 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Inflation Impact Calculator | SKYNEX DIGITAL",
-  description: "See how inflation erodes your money's value and how different investments like stocks, bonds, and real estate can combat it. Visualize your financial future with historical data.",
+  title: "Investment Calculator | SKYNEX DIGITAL",
+  description: "Calculate how investments perform over time. Compare stocks, bonds, and real estate returns while accounting for inflation. Visualize your financial future with historical data.",
   keywords: "investment calculator, inflation calculator, stock returns, bond returns, real estate investment, historical returns, financial planning, investment time machine",
   
   openGraph: {
-    title: "Inflation Impact Calculator | SKYNEX DIGITAL",
-    description: "See how inflation erodes your money's value and how different investments like stocks, bonds, and real estate can combat it. Visualize your financial future with historical data.",
+    title: "Investment Calculator | SKYNEX DIGITAL",
+    description: "Calculate how investments perform over time. Compare stocks, bonds, and real estate returns while accounting for inflation. Visualize your financial future with historical data.",
     images: [
       {
         url: "/social-preview.png",
@@ -35,8 +35,8 @@ export const metadata: Metadata = {
   
   twitter: {
     card: "summary_large_image",
-    title: "Inflation Impact Calculator | SKYNEX DIGITAL",
-    description: "See how inflation erodes your money's value and how different investments like stocks, bonds, and real estate can combat it. Visualize your financial future with historical data.",
+    title: "Investment Calculator | SKYNEX DIGITAL",
+    description: "Calculate how investments perform over time. Compare stocks, bonds, and real estate returns while accounting for inflation. Visualize your financial future with historical data.",
     images: ["/social-preview.png"],
     creator: "@skynexdigital",
   },
@@ -58,9 +58,9 @@ export const metadata: Metadata = {
   },
   
   alternates: {
-    canonical: "https://inflation.skynexdigital.com",
+    canonical: "https://investment.skynexdigital.com",
     languages: {
-      'en': 'https://inflation.skynexdigital.com',
+      'en': 'https://investment.skynexdigital.com',
       // Additional languages can be added later
     },
   },
@@ -81,8 +81,8 @@ export default function RootLayout({
             __html: JSON.stringify({
               "@context": "https://schema.org",
               "@type": "WebApplication",
-              "name": "Inflation Impact Calculator",
-              "description": "Calculate how inflation and investments affect your money over time with historical data.",
+              "name": "Investment Calculator",
+              "description": "Calculate how investments perform over time. Compare stocks, bonds, and real estate returns while accounting for inflation.",
               "applicationCategory": "FinanceApplication",
               "operatingSystem": "Any",
               "offers": {

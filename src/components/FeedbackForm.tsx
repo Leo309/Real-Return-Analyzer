@@ -22,16 +22,16 @@ const FeedbackForm: React.FC<FeedbackFormProps> = ({ darkMode }) => {
     setError('');
 
     try {
-      // In a real implementation, you would send the feedback to your server
-      // Example:
-      // await fetch('/api/feedback', {
-      //   method: 'POST',
-      //   headers: { 'Content-Type': 'application/json' },
-      //   body: JSON.stringify({ email, message, rating }),
-      // });
+      const response = await fetch('/api/feedback', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, message, rating }),
+      });
       
-      // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 1000));
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || 'Failed to submit feedback');
+      }
       
       setIsSubmitted(true);
       setEmail('');
@@ -43,8 +43,9 @@ const FeedbackForm: React.FC<FeedbackFormProps> = ({ darkMode }) => {
         setIsSubmitted(false);
         setIsOpen(false);
       }, 3000);
-    } catch {
-      setError('Failed to submit feedback. Please try again.');
+    } catch (err) {
+      console.error('Feedback submission error:', err);
+      setError(err instanceof Error ? err.message : 'Failed to submit feedback. Please try again.');
     } finally {
       setIsSubmitting(false);
     }
