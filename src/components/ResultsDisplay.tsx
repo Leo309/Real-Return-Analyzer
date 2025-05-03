@@ -2,7 +2,7 @@
 
 import React, { useRef, useEffect, useState } from 'react';
 import dynamic from 'next/dynamic';
-import type { ChartData, ChartOptions, TooltipItem } from 'chart.js';
+import type { ChartData, ChartOptions, TooltipItem, Chart as ChartType } from 'chart.js';
 
 // Dynamic import for Chart.js and Line component
 const Line = dynamic(
@@ -20,7 +20,7 @@ import type { ChartData } from 'chart.js';
 const createGradientPlugin = (container: HTMLDivElement | null, isDarkMode: boolean) => {
   return {
     id: 'customCanvasBackgroundColor',
-    beforeDraw: (chart: any) => {
+    beforeDraw: (chart: ChartType) => {
       try {
         const canvas = chart.canvas;
         if (canvas && chart.ctx) {
@@ -90,7 +90,7 @@ const ResultsDisplay: React.FC = () => {
   // Create gradient plugin with current state
   const [gradientPlugin, setGradientPlugin] = useState<{
     id: string;
-    beforeDraw: (chart: any) => void;
+    beforeDraw: (chart: ChartType) => void;
   } | null>(null);
   
   useEffect(() => {

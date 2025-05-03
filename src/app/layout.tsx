@@ -106,11 +106,11 @@ export default function RootLayout({
               window.onload = function() {
                 if (typeof HTMLCanvasElement !== 'undefined' && HTMLCanvasElement.prototype) {
                   // Store the original method
-                  window._originalGetContext = HTMLCanvasElement.prototype.getContext;
+                  (window as any)._originalGetContext = HTMLCanvasElement.prototype.getContext;
                   
                   // Create a patched version
                   HTMLCanvasElement.prototype.getContext = function(type, options) {
-                    const ctx = window._originalGetContext.call(this, type, options);
+                    const ctx = (window as any)._originalGetContext.call(this, type, options);
                     if (type === '2d' && ctx) {
                       // Fix for empty or undefined dimensions
                       if (!this.style.width) this.style.width = '100%';
