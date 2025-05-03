@@ -15,14 +15,13 @@ import type { ChartData, ChartOptions, TooltipItem, Chart as ChartType } from 'c
 // Dynamic import for Chart.js and Line component
 const Line = dynamic(
   () => import('react-chartjs-2').then(mod => mod.Line),
-  { ssr: false }
+  { ssr: false, loading: () => <div className="h-full w-full flex items-center justify-center p-4 bg-gray-100 dark:bg-gray-800 rounded-lg"><p>Loading chart...</p></div> }
 );
 import useCalculatorStore from '@/store/calculatorStore';
 import { historicalData } from '@/data/historical';
 import { TrendingDown, TrendingUp, DollarSign } from 'lucide-react';
 import ShareCard from '@/components/ShareCard';
 import { useTranslation } from '@/hooks/useTranslation';
-import type { ChartData } from 'chart.js';
 
 // Create gradient plugin function that's more compatible with server-side rendering
 const createGradientPlugin = (container: HTMLDivElement | null, isDarkMode: boolean) => {
@@ -31,35 +30,37 @@ const createGradientPlugin = (container: HTMLDivElement | null, isDarkMode: bool
     beforeDraw: (chart: ChartType) => {
       try {
         const canvas = chart.canvas;
-        if (canvas && chart.ctx) {
-          const ctx = chart.ctx;
-          // Make sure all dimensions are available
-          if (typeof chart.height !== 'number' || typeof chart.width !== 'number') {
-            return;
+        if (!canvas || !chart.ctx) {
+          return;
+        }
+        
+        const ctx = chart.ctx;
+        // Make sure all dimensions are available
+        if (typeof chart.height !== 'number' || typeof chart.width !== 'number' || chart.width <= 0 || chart.height <= 0) {
+          return;
+        }
+        
+        // Create gradient safely
+        try {
+          const gradient = ctx.createLinearGradient(0, 0, 0, chart.height);
+          if (isDarkMode) {
+            gradient.addColorStop(0, 'rgba(34, 197, 94, 0.1)');  // Green at top
+            gradient.addColorStop(1, 'rgba(59, 130, 246, 0.02)'); // Blue at bottom
+          } else {
+            gradient.addColorStop(0, 'rgba(34, 197, 94, 0.1)');  // Green at top
+            gradient.addColorStop(1, 'rgba(59, 130, 246, 0.05)'); // Blue at bottom
           }
-          
-          // Create gradient safely
-          try {
-            const gradient = ctx.createLinearGradient(0, 0, 0, chart.height);
-            if (isDarkMode) {
-              gradient.addColorStop(0, 'rgba(34, 197, 94, 0.1)');  // Green at top
-              gradient.addColorStop(1, 'rgba(59, 130, 246, 0.02)'); // Blue at bottom
-            } else {
-              gradient.addColorStop(0, 'rgba(34, 197, 94, 0.1)');  // Green at top
-              gradient.addColorStop(1, 'rgba(59, 130, 246, 0.05)'); // Blue at bottom
-            }
-            ctx.fillStyle = gradient;
-            ctx.fillRect(0, 0, chart.width, chart.height);
-          } catch (err) {
-            console.error('Error creating gradient:', err);
-            // Use a solid color as fallback
-            ctx.fillStyle = isDarkMode ? 'rgba(34, 197, 94, 0.05)' : 'rgba(34, 197, 94, 0.02)';
-            ctx.fillRect(0, 0, chart.width, chart.height);
-          }
+          ctx.fillStyle = gradient;
+          ctx.fillRect(0, 0, chart.width, chart.height);
+        } catch (err) {
+          console.error('Error creating gradient:', err);
+          // Use a solid color as fallback
+          ctx.fillStyle = isDarkMode ? 'rgba(34, 197, 94, 0.05)' : 'rgba(34, 197, 94, 0.02)';
+          ctx.fillRect(0, 0, chart.width, chart.height);
         }
       } catch (err) {
         console.error('Chart plugin error:', err);
-        // Just continue if there's an error
+        // Silent error - just continue if there's an error
       }
     }
   };
@@ -120,6 +121,7 @@ const ResultsDisplay: React.FC = () => {
       // Add _canvasGetContextPatched property to Window interface
       if (!window._canvasGetContextPatched && originalGetContext) {
         window._canvasGetContextPatched = true;
+        window._originalGetContext = originalGetContext;
         HTMLCanvasElement.prototype.getContext = function(type, options) {
           const context = originalGetContext.call(this, type, options) as CanvasRenderingContext2D | null;
           if (type === '2d' && context) {
@@ -132,22 +134,52 @@ const ResultsDisplay: React.FC = () => {
       }
 
       // Load and register Chart.js components
-      import('chart.js').then(({ Chart, CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend, Filler }) => {
-        Chart.register(
-          CategoryScale,
-          LinearScale,
-          PointElement,
-          LineElement,
-          Title,
-          Tooltip,
-          Legend,
-          Filler
-        );
+      const initChart = async () => {
+        try {
+          const { 
+            Chart, 
+            CategoryScale, 
+            LinearScale, 
+            PointElement, 
+            LineElement, 
+            Title, 
+            Tooltip, 
+            Legend, 
+            Filler 
+          } = await import('chart.js');
+          
+          Chart.register(
+            CategoryScale,
+            LinearScale,
+            PointElement,
+            LineElement,
+            Title,
+            Tooltip,
+            Legend,
+            Filler
+          );
 
-        // Set a global default animation duration that's more compatible
-        Chart.defaults.animation.duration = 800;
-      });
+          // Set a global default animation duration that's more compatible
+          Chart.defaults.animation.duration = 800;
+          
+          // Flag charts as initialized
+          setChartsLoaded(true);
+        } catch (error) {
+          console.error('Failed to initialize Chart.js:', error);
+          setChartError(true);
+        }
+      };
+      
+      initChart();
     }
+    
+    // Cleanup function to restore original getContext if needed
+    return () => {
+      if (typeof window !== 'undefined' && window._canvasGetContextPatched && window._originalGetContext) {
+        HTMLCanvasElement.prototype.getContext = window._originalGetContext;
+        window._canvasGetContextPatched = false;
+      }
+    };
   }, []);
   
   // Add additional effect to ensure charts render properly after the component mounts
@@ -520,19 +552,37 @@ const ResultsDisplay: React.FC = () => {
         <div className="h-72 mt-6 relative w-full overflow-hidden" ref={inflationChartRef}>
           {typeof window !== 'undefined' && (
             <>
-              <Line 
-                options={chartOptions} 
-                data={inflationChartData} 
-                plugins={gradientPlugin ? [gradientPlugin] : undefined}
-              />
+              {!chartError && (
+                <Line 
+                  options={chartOptions} 
+                  data={inflationChartData} 
+                  plugins={gradientPlugin ? [gradientPlugin] : undefined}
+                />
+              )}
               
               {/* Fallback when charts fail to load */}
               {(chartError || (chartsLoaded && !inflationChartRef.current?.querySelector('canvas'))) && (
-                <div className="absolute inset-0 flex items-center justify-center bg-opacity-90 bg-white dark:bg-gray-800 dark:bg-opacity-90">
+                <div className="absolute inset-0 flex items-center justify-center bg-opacity-90 bg-white dark:bg-gray-800 dark:bg-opacity-90 rounded-lg border dark:border-gray-700 border-gray-200">
                   <div className={`text-center p-4 ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>
-                    <p>Chart visualization showing how your {formatCurrency(amount)} in {startYear}</p>
-                    <p>decreased to {formatCurrency(result.inflationAdjustedValue)} in {endYear}</p>
-                    <p>due to inflation ({formatPercentage(inflationImpact)} change)</p>
+                    <p className="font-medium mb-2">Investment Value Over Time</p>
+                    <div className="flex flex-col gap-2">
+                      <div className="flex items-center justify-between border-b dark:border-gray-700 border-gray-200 pb-2">
+                        <span>Starting value ({startYear}):</span>
+                        <span className="font-bold">{formatCurrency(amount)}</span>
+                      </div>
+                      <div className="flex items-center justify-between border-b dark:border-gray-700 border-gray-200 pb-2">
+                        <span>Ending value ({endYear}):</span>
+                        <span className={`font-bold ${inflationImpact < 0 ? 'text-red-500' : 'text-green-500'}`}>
+                          {formatCurrency(result.inflationAdjustedValue)}
+                        </span>
+                      </div>
+                      <div className="flex items-center justify-between pt-1">
+                        <span>Percent change:</span>
+                        <span className={`font-bold ${inflationImpact < 0 ? 'text-red-500' : 'text-green-500'}`}>
+                          {formatPercentage(inflationImpact)}
+                        </span>
+                      </div>
+                    </div>
                   </div>
                 </div>
               )}
@@ -616,19 +666,43 @@ const ResultsDisplay: React.FC = () => {
             <div className="h-72 mt-6 relative w-full overflow-hidden" ref={investmentChartRef}>
               {typeof window !== 'undefined' && (
                 <>
-                  <Line 
-                    options={chartOptions} 
-                    data={investmentChartData} 
-                    plugins={gradientPlugin ? [gradientPlugin] : undefined}
-                  />
+                  {!chartError && (
+                    <Line 
+                      options={chartOptions} 
+                      data={investmentChartData} 
+                      plugins={gradientPlugin ? [gradientPlugin] : undefined}
+                    />
+                  )}
                   
                   {/* Fallback when charts fail to load */}
                   {(chartError || (chartsLoaded && !investmentChartRef.current?.querySelector('canvas'))) && (
-                    <div className="absolute inset-0 flex items-center justify-center bg-opacity-90 bg-white dark:bg-gray-800 dark:bg-opacity-90">
+                    <div className="absolute inset-0 flex items-center justify-center bg-opacity-90 bg-white dark:bg-gray-800 dark:bg-opacity-90 rounded-lg border dark:border-gray-700 border-gray-200">
                       <div className={`text-center p-4 ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>
-                        <p>Chart visualization showing how {formatCurrency(amount)} invested in {startYear}</p>
-                        <p>grew to {formatCurrency(result.combinedValue)} by {endYear}</p>
-                        <p>with {getInvestmentTypeName()} ({formatPercentage(realInvestmentImpact)} real growth)</p>
+                        <p className="font-medium mb-2">{getInvestmentTypeName()} Performance</p>
+                        <div className="flex flex-col gap-2">
+                          <div className="flex items-center justify-between border-b dark:border-gray-700 border-gray-200 pb-2">
+                            <span>Initial amount ({startYear}):</span>
+                            <span className="font-bold">{formatCurrency(amount)}</span>
+                          </div>
+                          <div className="flex items-center justify-between border-b dark:border-gray-700 border-gray-200 pb-2">
+                            <span>Investment return:</span>
+                            <span className="font-bold text-green-500">
+                              {formatCurrency(result.opportunityCostValue)}
+                            </span>
+                          </div>
+                          <div className="flex items-center justify-between border-b dark:border-gray-700 border-gray-200 pb-2">
+                            <span>After inflation ({endYear}):</span>
+                            <span className={`font-bold ${realInvestmentImpact < 0 ? 'text-red-500' : 'text-purple-500'}`}>
+                              {formatCurrency(result.combinedValue)}
+                            </span>
+                          </div>
+                          <div className="flex items-center justify-between pt-1">
+                            <span>Real growth:</span>
+                            <span className={`font-bold ${realInvestmentImpact < 0 ? 'text-red-500' : 'text-purple-500'}`}>
+                              {formatPercentage(realInvestmentImpact)}
+                            </span>
+                          </div>
+                        </div>
                       </div>
                     </div>
                   )}
