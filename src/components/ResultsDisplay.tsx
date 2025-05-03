@@ -1,66 +1,49 @@
-'use client'; // Add this line at the top
-
-// Extend Window interface to avoid using 'any'
-declare global {
-  interface Window {
-    _canvasGetContextPatched?: boolean;
-    _originalGetContext?: typeof HTMLCanvasElement.prototype.getContext;
-  }
-}
+'use client'; // Make sure we're using client-side rendering
 
 import React, { useRef, useEffect, useState } from 'react';
 import dynamic from 'next/dynamic';
 import type { ChartData, ChartOptions, TooltipItem, Chart as ChartType } from 'chart.js';
 
-// Dynamic import for Chart.js and Line component
+// Dynamically import Chart.js components with explicit SSR false flag
 const Line = dynamic(
   () => import('react-chartjs-2').then(mod => mod.Line),
   { ssr: false, loading: () => <div className="h-full w-full flex items-center justify-center p-4 bg-gray-100 dark:bg-gray-800 rounded-lg"><p>Loading chart...</p></div> }
 );
+
 import useCalculatorStore from '@/store/calculatorStore';
 import { historicalData } from '@/data/historical';
 import { TrendingDown, TrendingUp, DollarSign } from 'lucide-react';
 import ShareCard from '@/components/ShareCard';
 import { useTranslation } from '@/hooks/useTranslation';
 
-// Create gradient plugin function that's more compatible with server-side rendering
-const createGradientPlugin = (container: HTMLDivElement | null, isDarkMode: boolean) => {
+// Improved gradient plugin for better SSR compatibility
+const createGradientPlugin = (isDarkMode: boolean) => {
   return {
     id: 'customCanvasBackgroundColor',
     beforeDraw: (chart: ChartType) => {
       try {
-        const canvas = chart.canvas;
-        if (!canvas || !chart.ctx) {
-          return;
-        }
-        
         const ctx = chart.ctx;
-        // Make sure all dimensions are available
-        if (typeof chart.height !== 'number' || typeof chart.width !== 'number' || chart.width <= 0 || chart.height <= 0) {
+        if (!ctx || typeof chart.height !== 'number' || chart.height <= 0 || typeof chart.width !== 'number' || chart.width <= 0) {
           return;
         }
         
-        // Create gradient safely
-        try {
-          const gradient = ctx.createLinearGradient(0, 0, 0, chart.height);
-          if (isDarkMode) {
-            gradient.addColorStop(0, 'rgba(34, 197, 94, 0.1)');  // Green at top
-            gradient.addColorStop(1, 'rgba(59, 130, 246, 0.02)'); // Blue at bottom
-          } else {
-            gradient.addColorStop(0, 'rgba(34, 197, 94, 0.1)');  // Green at top
-            gradient.addColorStop(1, 'rgba(59, 130, 246, 0.05)'); // Blue at bottom
-          }
-          ctx.fillStyle = gradient;
-          ctx.fillRect(0, 0, chart.width, chart.height);
-        } catch (err) {
-          console.error('Error creating gradient:', err);
-          // Use a solid color as fallback
-          ctx.fillStyle = isDarkMode ? 'rgba(34, 197, 94, 0.05)' : 'rgba(34, 197, 94, 0.02)';
-          ctx.fillRect(0, 0, chart.width, chart.height);
+        const gradient = ctx.createLinearGradient(0, 0, 0, chart.height);
+        if (isDarkMode) {
+          gradient.addColorStop(0, 'rgba(34, 197, 94, 0.1)');
+          gradient.addColorStop(1, 'rgba(59, 130, 246, 0.02)');
+        } else {
+          gradient.addColorStop(0, 'rgba(34, 197, 94, 0.1)');
+          gradient.addColorStop(1, 'rgba(59, 130, 246, 0.05)');
         }
+        ctx.fillStyle = gradient;
+        ctx.fillRect(0, 0, chart.width, chart.height);
       } catch (err) {
         console.error('Chart plugin error:', err);
-        // Silent error - just continue if there's an error
+        // Use fallback solid color if gradient fails
+        if (chart.ctx) {
+          chart.ctx.fillStyle = isDarkMode ? 'rgba(34, 197, 94, 0.05)' : 'rgba(34, 197, 94, 0.02)';
+          chart.ctx.fillRect(0, 0, chart.width, chart.height);
+        }
       }
     }
   };
@@ -73,16 +56,19 @@ const ResultsDisplay: React.FC = () => {
   const { result, amount, countryCode, startYear, endYear, investmentType, customRate } = useCalculatorStore();
   const countryData = historicalData[countryCode];
   
-  // Move dark mode check to state with useEffect
+  // State for client-side rendering
+  const [isMounted, setIsMounted] = useState(false);
   const [isDarkMode, setIsDarkMode] = useState(false);
   const [chartsLoaded, setChartsLoaded] = useState(false);
   const [chartError, setChartError] = useState(false);
+  const [chartPluginsInitialized, setChartPluginsInitialized] = useState(false);
   
-  // Check dark mode on client side only
+  // Important: Only run on client-side
   useEffect(() => {
+    setIsMounted(true);
     setIsDarkMode(document.documentElement.classList.contains('dark'));
     
-    // Optional: Add listener for theme changes
+    // Listen for theme changes
     const observer = new MutationObserver((mutations) => {
       mutations.forEach((mutation) => {
         if (mutation.attributeName === 'class') {
@@ -92,134 +78,110 @@ const ResultsDisplay: React.FC = () => {
     });
     
     observer.observe(document.documentElement, { attributes: true });
-    
     return () => observer.disconnect();
   }, []);
   
-  // Create gradient plugin with current state
-  const [gradientPlugin, setGradientPlugin] = useState<{
-    id: string;
-    beforeDraw: (chart: ChartType) => void;
-  } | null>(null);
-  
+  // Initialize Chart.js only on client-side
   useEffect(() => {
-    // Delay plugin creation to ensure DOM is ready
-    const timer = setTimeout(() => {
-      if (inflationChartRef.current) {
-        setGradientPlugin(createGradientPlugin(inflationChartRef.current, isDarkMode));
-      }
-    }, 100);
+    if (typeof window === 'undefined' || chartPluginsInitialized) return;
     
-    return () => clearTimeout(timer);
-  }, [isDarkMode]);
-  
-  // Initialize Chart.js on client-side only
-  useEffect(() => {
-    if (typeof window !== 'undefined') {
-      // Fix for potential canvas rendering issues in some browsers/environments
-      const originalGetContext = HTMLCanvasElement.prototype.getContext;
-      // Add _canvasGetContextPatched property to Window interface
-      if (!window._canvasGetContextPatched && originalGetContext) {
-        window._canvasGetContextPatched = true;
-        window._originalGetContext = originalGetContext;
-        HTMLCanvasElement.prototype.getContext = function(type, options) {
-          const context = originalGetContext.call(this, type, options) as CanvasRenderingContext2D | null;
-          if (type === '2d' && context) {
-            // Ensure the canvas has valid dimensions
-            if (!this.style.width) this.style.width = '100%';
-            if (!this.style.height) this.style.height = '100%';
-          }
-          return context;
+    const initChartJs = async () => {
+      try {
+        const { 
+          Chart, 
+          CategoryScale, 
+          LinearScale, 
+          PointElement, 
+          LineElement, 
+          Title, 
+          Tooltip, 
+          Legend, 
+          Filler 
+        } = await import('chart.js');
+        
+        Chart.register(
+          CategoryScale,
+          LinearScale,
+          PointElement,
+          LineElement,
+          Title,
+          Tooltip,
+          Legend,
+          Filler
+        );
+        
+        // Set globally sensible defaults for Chart.js
+        Chart.defaults.animation = {
+          duration: 800,
+          easing: 'easeOutQuart'
         };
-      }
-
-      // Load and register Chart.js components
-      const initChart = async () => {
-        try {
-          const { 
-            Chart, 
-            CategoryScale, 
-            LinearScale, 
-            PointElement, 
-            LineElement, 
-            Title, 
-            Tooltip, 
-            Legend, 
-            Filler 
-          } = await import('chart.js');
+        
+        // Patch canvas if needed
+        if (typeof HTMLCanvasElement !== 'undefined' && 
+            typeof HTMLCanvasElement.prototype.getContext === 'function') {
+          const originalGetContext = HTMLCanvasElement.prototype.getContext;
           
-          Chart.register(
-            CategoryScale,
-            LinearScale,
-            PointElement,
-            LineElement,
-            Title,
-            Tooltip,
-            Legend,
-            Filler
-          );
-
-          // Set a global default animation duration that's more compatible
-          Chart.defaults.animation.duration = 800;
-          
-          // Flag charts as initialized
-          setChartsLoaded(true);
-        } catch (error) {
-          console.error('Failed to initialize Chart.js:', error);
-          setChartError(true);
+          HTMLCanvasElement.prototype.getContext = function(type, options) {
+            const context = originalGetContext.call(this, type, options);
+            if (type === '2d' && context) {
+              // Ensure canvas has proper dimensions
+              if (!this.style.width) this.style.width = '100%';
+              if (!this.style.height) this.style.height = '100%';
+            }
+            return context;
+          };
         }
-      };
-      
-      initChart();
-    }
-    
-    // Cleanup function to restore original getContext if needed
-    return () => {
-      if (typeof window !== 'undefined' && window._canvasGetContextPatched && window._originalGetContext) {
-        HTMLCanvasElement.prototype.getContext = window._originalGetContext;
-        window._canvasGetContextPatched = false;
+        
+        setChartPluginsInitialized(true);
+        setChartsLoaded(true);
+      } catch (error) {
+        console.error('Failed to initialize Chart.js:', error);
+        setChartError(true);
       }
     };
-  }, []);
+    
+    initChartJs();
+  }, [chartPluginsInitialized]);
   
-  // Add additional effect to ensure charts render properly after the component mounts
+  // Force a rerender when new results come in
   useEffect(() => {
-    if (typeof window !== 'undefined' && result) {
-      // Reset chart states on new results
-      setChartsLoaded(false);
-      setChartError(false);
-      
-      // Force a small delay to ensure DOM is fully ready
-      const timer = setTimeout(() => {
-        // Force a re-render by updating state
-        setIsDarkMode(prev => {
-          // This triggers a re-render without changing the actual value
-          setTimeout(() => {
-            setIsDarkMode(prev);
-            // Mark charts as attempted to load after a delay
-            setTimeout(() => setChartsLoaded(true), 1000);
-          }, 0);
-          return prev;
-        });
-      }, 200);
-      
-      return () => clearTimeout(timer);
-    }
-  }, [result]);
+    if (!isMounted || !result) return;
+    
+    // Reset states
+    setChartError(false);
+    
+    // Short delay to ensure DOM is ready
+    const timer = setTimeout(() => {
+      setChartsLoaded(true);
+    }, 300);
+    
+    return () => clearTimeout(timer);
+  }, [result, isMounted]);
   
-  // Handle chart load errors
+  // Handle chart errors
   useEffect(() => {
-    const handleError = () => {
-      setChartError(true);
+    if (!isMounted) return;
+    
+    const handleError = (event: ErrorEvent) => {
+      if (event.message && event.message.includes('chart')) {
+        setChartError(true);
+      }
     };
     
     window.addEventListener('error', handleError);
     return () => window.removeEventListener('error', handleError);
-  }, []);
+  }, [isMounted]);
 
+  // Early return conditions
   if (!result || amount === null) {
     return null;
   }
+  
+  // Don't render on server
+  if (!isMounted) {
+    return <div className="animate-pulse h-96 w-full bg-gray-200 dark:bg-gray-700 rounded-lg"></div>;
+  }
+  
   const validAmount = amount;
 
   const formatCurrency = (value: number) => {
@@ -339,8 +301,7 @@ const ResultsDisplay: React.FC = () => {
           color: isDarkMode ? '#CCCCCC' : '#666666',
           callback: (value: string | number) => {
             // Ensure numeric value handling
-            const numericValue = Number(value);
-            return formatCurrency(numericValue);
+            return formatCurrency(Number(value));
           },
           font: {
             family: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
@@ -435,6 +396,9 @@ const ResultsDisplay: React.FC = () => {
       },
     ]
   } : undefined;
+
+  // Create plugin instance
+  const gradientPlugin = createGradientPlugin(isDarkMode);
 
   return (
     <div className="flex flex-col gap-6 max-w-full overflow-hidden">
@@ -550,43 +514,39 @@ const ResultsDisplay: React.FC = () => {
         )}
 
         <div className="h-72 mt-6 relative w-full overflow-hidden" ref={inflationChartRef}>
-          {typeof window !== 'undefined' && (
-            <>
-              {!chartError && (
-                <Line 
-                  options={chartOptions} 
-                  data={inflationChartData} 
-                  plugins={gradientPlugin ? [gradientPlugin] : undefined}
-                />
-              )}
-              
-              {/* Fallback when charts fail to load */}
-              {(chartError || (chartsLoaded && !inflationChartRef.current?.querySelector('canvas'))) && (
-                <div className="absolute inset-0 flex items-center justify-center bg-opacity-90 bg-white dark:bg-gray-800 dark:bg-opacity-90 rounded-lg border dark:border-gray-700 border-gray-200">
-                  <div className={`text-center p-4 ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>
-                    <p className="font-medium mb-2">Investment Value Over Time</p>
-                    <div className="flex flex-col gap-2">
-                      <div className="flex items-center justify-between border-b dark:border-gray-700 border-gray-200 pb-2">
-                        <span>Starting value ({startYear}):</span>
-                        <span className="font-bold">{formatCurrency(amount)}</span>
-                      </div>
-                      <div className="flex items-center justify-between border-b dark:border-gray-700 border-gray-200 pb-2">
-                        <span>Ending value ({endYear}):</span>
-                        <span className={`font-bold ${inflationImpact < 0 ? 'text-red-500' : 'text-green-500'}`}>
-                          {formatCurrency(result.inflationAdjustedValue)}
-                        </span>
-                      </div>
-                      <div className="flex items-center justify-between pt-1">
-                        <span>Percent change:</span>
-                        <span className={`font-bold ${inflationImpact < 0 ? 'text-red-500' : 'text-green-500'}`}>
-                          {formatPercentage(inflationImpact)}
-                        </span>
-                      </div>
-                    </div>
+          {isMounted && chartPluginsInitialized && !chartError && (
+            <Line 
+              options={chartOptions} 
+              data={inflationChartData} 
+              plugins={[gradientPlugin]}
+            />
+          )}
+          
+          {/* Fallback when charts fail to load */}
+          {(chartError || !chartPluginsInitialized) && (
+            <div className="absolute inset-0 flex items-center justify-center bg-opacity-90 bg-white dark:bg-gray-800 dark:bg-opacity-90 rounded-lg border dark:border-gray-700 border-gray-200">
+              <div className={`text-center p-4 ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>
+                <p className="font-medium mb-2">Investment Value Over Time</p>
+                <div className="flex flex-col gap-2">
+                  <div className="flex items-center justify-between border-b dark:border-gray-700 border-gray-200 pb-2">
+                    <span>Starting value ({startYear}):</span>
+                    <span className="font-bold">{formatCurrency(amount)}</span>
+                  </div>
+                  <div className="flex items-center justify-between border-b dark:border-gray-700 border-gray-200 pb-2">
+                    <span>Ending value ({endYear}):</span>
+                    <span className={`font-bold ${inflationImpact < 0 ? 'text-red-500' : 'text-green-500'}`}>
+                      {formatCurrency(result.inflationAdjustedValue)}
+                    </span>
+                  </div>
+                  <div className="flex items-center justify-between pt-1">
+                    <span>Percent change:</span>
+                    <span className={`font-bold ${inflationImpact < 0 ? 'text-red-500' : 'text-green-500'}`}>
+                      {formatPercentage(inflationImpact)}
+                    </span>
                   </div>
                 </div>
-              )}
-            </>
+              </div>
+            </div>
           )}
         </div>
 
@@ -664,49 +624,45 @@ const ResultsDisplay: React.FC = () => {
 
           {investmentChartData && (
             <div className="h-72 mt-6 relative w-full overflow-hidden" ref={investmentChartRef}>
-              {typeof window !== 'undefined' && (
-                <>
-                  {!chartError && (
-                    <Line 
-                      options={chartOptions} 
-                      data={investmentChartData} 
-                      plugins={gradientPlugin ? [gradientPlugin] : undefined}
-                    />
-                  )}
-                  
-                  {/* Fallback when charts fail to load */}
-                  {(chartError || (chartsLoaded && !investmentChartRef.current?.querySelector('canvas'))) && (
-                    <div className="absolute inset-0 flex items-center justify-center bg-opacity-90 bg-white dark:bg-gray-800 dark:bg-opacity-90 rounded-lg border dark:border-gray-700 border-gray-200">
-                      <div className={`text-center p-4 ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>
-                        <p className="font-medium mb-2">{getInvestmentTypeName()} Performance</p>
-                        <div className="flex flex-col gap-2">
-                          <div className="flex items-center justify-between border-b dark:border-gray-700 border-gray-200 pb-2">
-                            <span>Initial amount ({startYear}):</span>
-                            <span className="font-bold">{formatCurrency(amount)}</span>
-                          </div>
-                          <div className="flex items-center justify-between border-b dark:border-gray-700 border-gray-200 pb-2">
-                            <span>Investment return:</span>
-                            <span className="font-bold text-green-500">
-                              {formatCurrency(result.opportunityCostValue)}
-                            </span>
-                          </div>
-                          <div className="flex items-center justify-between border-b dark:border-gray-700 border-gray-200 pb-2">
-                            <span>After inflation ({endYear}):</span>
-                            <span className={`font-bold ${realInvestmentImpact < 0 ? 'text-red-500' : 'text-purple-500'}`}>
-                              {formatCurrency(result.combinedValue)}
-                            </span>
-                          </div>
-                          <div className="flex items-center justify-between pt-1">
-                            <span>Real growth:</span>
-                            <span className={`font-bold ${realInvestmentImpact < 0 ? 'text-red-500' : 'text-purple-500'}`}>
-                              {formatPercentage(realInvestmentImpact)}
-                            </span>
-                          </div>
-                        </div>
+              {isMounted && chartPluginsInitialized && !chartError && (
+                <Line 
+                  options={chartOptions} 
+                  data={investmentChartData} 
+                  plugins={[gradientPlugin]}
+                />
+              )}
+              
+              {/* Fallback when charts fail to load */}
+              {(chartError || !chartPluginsInitialized) && (
+                <div className="absolute inset-0 flex items-center justify-center bg-opacity-90 bg-white dark:bg-gray-800 dark:bg-opacity-90 rounded-lg border dark:border-gray-700 border-gray-200">
+                  <div className={`text-center p-4 ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>
+                    <p className="font-medium mb-2">{getInvestmentTypeName()} Performance</p>
+                    <div className="flex flex-col gap-2">
+                      <div className="flex items-center justify-between border-b dark:border-gray-700 border-gray-200 pb-2">
+                        <span>Initial amount ({startYear}):</span>
+                        <span className="font-bold">{formatCurrency(amount)}</span>
+                      </div>
+                      <div className="flex items-center justify-between border-b dark:border-gray-700 border-gray-200 pb-2">
+                        <span>Investment return:</span>
+                        <span className="font-bold text-green-500">
+                          {formatCurrency(result.opportunityCostValue)}
+                        </span>
+                      </div>
+                      <div className="flex items-center justify-between border-b dark:border-gray-700 border-gray-200 pb-2">
+                        <span>After inflation ({endYear}):</span>
+                        <span className={`font-bold ${realInvestmentImpact < 0 ? 'text-red-500' : 'text-purple-500'}`}>
+                          {formatCurrency(result.combinedValue)}
+                        </span>
+                      </div>
+                      <div className="flex items-center justify-between pt-1">
+                        <span>Real growth:</span>
+                        <span className={`font-bold ${realInvestmentImpact < 0 ? 'text-red-500' : 'text-purple-500'}`}>
+                          {formatPercentage(realInvestmentImpact)}
+                        </span>
                       </div>
                     </div>
-                  )}
-                </>
+                  </div>
+                </div>
               )}
             </div>
           )}
