@@ -32,10 +32,11 @@ ChartJS.register(
 );
 
 // Add gradient plugin
-const createGradientPlugin = (canvas: HTMLCanvasElement | null, isDarkMode: boolean) => {
+const createGradientPlugin = (container: HTMLDivElement | null, isDarkMode: boolean) => {
   return {
     id: 'customCanvasBackgroundColor',
     beforeDraw: (chart: ChartJS) => {
+      const canvas = chart.canvas;
       if (canvas) {
         const ctx = chart.ctx;
         const gradient = ctx.createLinearGradient(0, 0, 0, chart.height);
@@ -55,8 +56,8 @@ const createGradientPlugin = (canvas: HTMLCanvasElement | null, isDarkMode: bool
 
 const ResultsDisplay: React.FC = () => {
   const { t } = useTranslation();
-  const inflationChartRef = useRef<HTMLCanvasElement | null>(null);
-  const investmentChartRef = useRef<HTMLCanvasElement | null>(null);
+  const inflationChartRef = useRef<HTMLDivElement | null>(null);
+  const investmentChartRef = useRef<HTMLDivElement | null>(null);
   const { result, amount, countryCode, startYear, endYear, investmentType, customRate } = useCalculatorStore();
   const countryData = historicalData[countryCode];
   const isDarkMode = document.documentElement.classList.contains('dark');
