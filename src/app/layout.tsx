@@ -105,12 +105,16 @@ export default function RootLayout({
               // Pre-initialize chart.js context setup for Vercel
               window.onload = function() {
                 if (typeof HTMLCanvasElement !== 'undefined' && HTMLCanvasElement.prototype) {
+                  // Define window extension to avoid TypeScript errors
+                  interface CustomWindow { _originalGetContext?: any; }
+                  declare global { interface Window extends CustomWindow {} }
+                  
                   // Store the original method
-                  (window as any)._originalGetContext = HTMLCanvasElement.prototype.getContext;
+                  window._originalGetContext = HTMLCanvasElement.prototype.getContext;
                   
                   // Create a patched version
                   HTMLCanvasElement.prototype.getContext = function(type, options) {
-                    const ctx = (window as any)._originalGetContext.call(this, type, options);
+                    const ctx = window._originalGetContext.call(this, type, options);
                     if (type === '2d' && ctx) {
                       // Fix for empty or undefined dimensions
                       if (!this.style.width) this.style.width = '100%';

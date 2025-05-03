@@ -1,5 +1,15 @@
 'use client'; // Add this line at the top
 
+// Extend Window interface to avoid using 'any'
+interface CustomWindow extends Window {
+  _canvasGetContextPatched?: boolean;
+  _originalGetContext?: typeof HTMLCanvasElement.prototype.getContext;
+}
+
+declare global {
+  interface Window extends CustomWindow {}
+}
+
 import React, { useRef, useEffect, useState } from 'react';
 import dynamic from 'next/dynamic';
 import type { ChartData, ChartOptions, TooltipItem, Chart as ChartType } from 'chart.js';
@@ -110,10 +120,10 @@ const ResultsDisplay: React.FC = () => {
       // Fix for potential canvas rendering issues in some browsers/environments
       const originalGetContext = HTMLCanvasElement.prototype.getContext;
       // Add _canvasGetContextPatched property to Window interface
-      if (!(window as any)._canvasGetContextPatched && originalGetContext) {
-        (window as any)._canvasGetContextPatched = true;
+      if (!window._canvasGetContextPatched && originalGetContext) {
+        window._canvasGetContextPatched = true;
         HTMLCanvasElement.prototype.getContext = function(type, options) {
-          const context = originalGetContext.call(this, type, options);
+          const context = originalGetContext.call(this, type, options) as CanvasRenderingContext2D | null;
           if (type === '2d' && context) {
             // Ensure the canvas has valid dimensions
             if (!this.style.width) this.style.width = '100%';
