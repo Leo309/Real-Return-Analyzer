@@ -1,4 +1,6 @@
-import React, { useRef } from 'react';
+'use client'; // Add this line at the top
+
+import React, { useRef, useEffect, useState } from 'react';
 import { Line } from 'react-chartjs-2';
 import {
   Chart as ChartJS,
@@ -20,6 +22,7 @@ import ShareCard from '@/components/ShareCard';
 import { useTranslation } from '@/hooks/useTranslation';
 import type { ChartData } from 'chart.js';
 
+// Register Chart.js components
 ChartJS.register(
   CategoryScale,
   LinearScale,
@@ -31,7 +34,7 @@ ChartJS.register(
   Filler
 );
 
-// Add gradient plugin
+// Create gradient plugin function
 const createGradientPlugin = (container: HTMLDivElement | null, isDarkMode: boolean) => {
   return {
     id: 'customCanvasBackgroundColor',
@@ -60,9 +63,34 @@ const ResultsDisplay: React.FC = () => {
   const investmentChartRef = useRef<HTMLDivElement | null>(null);
   const { result, amount, countryCode, startYear, endYear, investmentType, customRate } = useCalculatorStore();
   const countryData = historicalData[countryCode];
-  const isDarkMode = document.documentElement.classList.contains('dark');
-
-  const gradientPlugin = createGradientPlugin(inflationChartRef.current, isDarkMode);
+  
+  // Move dark mode check to state with useEffect
+  const [isDarkMode, setIsDarkMode] = useState(false);
+  
+  // Check dark mode on client side only
+  useEffect(() => {
+    setIsDarkMode(document.documentElement.classList.contains('dark'));
+    
+    // Optional: Add listener for theme changes
+    const observer = new MutationObserver((mutations) => {
+      mutations.forEach((mutation) => {
+        if (mutation.attributeName === 'class') {
+          setIsDarkMode(document.documentElement.classList.contains('dark'));
+        }
+      });
+    });
+    
+    observer.observe(document.documentElement, { attributes: true });
+    
+    return () => observer.disconnect();
+  }, []);
+  
+  // Create gradient plugin with current state
+  const [gradientPlugin, setGradientPlugin] = useState(null);
+  
+  useEffect(() => {
+    setGradientPlugin(createGradientPlugin(inflationChartRef.current, isDarkMode));
+  }, [isDarkMode]);
 
   if (!result || amount === null) {
     return null;
@@ -397,11 +425,13 @@ const ResultsDisplay: React.FC = () => {
         )}
 
         <div className="h-72 mt-6 relative w-full overflow-hidden" ref={inflationChartRef}>
-          <Line 
-            options={chartOptions} 
-            data={inflationChartData} 
-            plugins={[gradientPlugin]}
-          />
+          {typeof window !== 'undefined' && gradientPlugin && (
+            <Line 
+              options={chartOptions} 
+              data={inflationChartData} 
+              plugins={[gradientPlugin]}
+            />
+          )}
         </div>
 
         {investmentType === 'stocks' && (
@@ -478,11 +508,13 @@ const ResultsDisplay: React.FC = () => {
 
           {investmentChartData && (
             <div className="h-72 mt-6 relative w-full overflow-hidden" ref={investmentChartRef}>
-              <Line 
-                options={chartOptions} 
-                data={investmentChartData} 
-                plugins={[gradientPlugin]} 
-              />
+              {typeof window !== 'undefined' && gradientPlugin && (
+                <Line 
+                  options={chartOptions} 
+                  data={investmentChartData} 
+                  plugins={[gradientPlugin]} 
+                />
+              )}
             </div>
           )}
 
