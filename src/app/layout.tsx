@@ -98,6 +98,31 @@ export default function RootLayout({
             })
           }}
         />
+        {/* Fix for Chart.js on Vercel */}
+        <script 
+          dangerouslySetInnerHTML={{
+            __html: `
+              // Pre-initialize chart.js context setup for Vercel
+              window.onload = function() {
+                if (typeof HTMLCanvasElement !== 'undefined' && HTMLCanvasElement.prototype) {
+                  // Store the original method
+                  window._originalGetContext = HTMLCanvasElement.prototype.getContext;
+                  
+                  // Create a patched version
+                  HTMLCanvasElement.prototype.getContext = function(type, options) {
+                    const ctx = window._originalGetContext.call(this, type, options);
+                    if (type === '2d' && ctx) {
+                      // Fix for empty or undefined dimensions
+                      if (!this.style.width) this.style.width = '100%';
+                      if (!this.style.height) this.style.height = '100%';
+                    }
+                    return ctx;
+                  };
+                }
+              };
+            `
+          }}
+        />
       </head>
       <body className={`${geistSans.variable} ${geistMono.variable} antialiased overflow-fix`}>
         {children}

@@ -1,20 +1,14 @@
 'use client'; // Add this line at the top
 
 import React, { useRef, useEffect, useState } from 'react';
-import { Line } from 'react-chartjs-2';
-import {
-  Chart as ChartJS,
-  CategoryScale,
-  LinearScale,
-  PointElement,
-  LineElement,
-  Title,
-  Tooltip,
-  Legend,
-  Filler,
-  TooltipItem,
-  type ChartOptions
-} from 'chart.js';
+import dynamic from 'next/dynamic';
+import type { ChartData, ChartOptions, TooltipItem } from 'chart.js';
+
+// Dynamic import for Chart.js and Line component
+const Line = dynamic(
+  () => import('react-chartjs-2').then(mod => mod.Line),
+  { ssr: false }
+);
 import useCalculatorStore from '@/store/calculatorStore';
 import { historicalData } from '@/data/historical';
 import { TrendingDown, TrendingUp, DollarSign } from 'lucide-react';
@@ -22,36 +16,42 @@ import ShareCard from '@/components/ShareCard';
 import { useTranslation } from '@/hooks/useTranslation';
 import type { ChartData } from 'chart.js';
 
-// Register Chart.js components
-ChartJS.register(
-  CategoryScale,
-  LinearScale,
-  PointElement,
-  LineElement,
-  Title,
-  Tooltip,
-  Legend,
-  Filler
-);
-
-// Create gradient plugin function
+// Create gradient plugin function that's more compatible with server-side rendering
 const createGradientPlugin = (container: HTMLDivElement | null, isDarkMode: boolean) => {
   return {
     id: 'customCanvasBackgroundColor',
-    beforeDraw: (chart: ChartJS) => {
-      const canvas = chart.canvas;
-      if (canvas) {
-        const ctx = chart.ctx;
-        const gradient = ctx.createLinearGradient(0, 0, 0, chart.height);
-        if (isDarkMode) {
-          gradient.addColorStop(0, 'rgba(34, 197, 94, 0.1)');  // Green at top
-          gradient.addColorStop(1, 'rgba(59, 130, 246, 0.02)'); // Blue at bottom
-        } else {
-          gradient.addColorStop(0, 'rgba(34, 197, 94, 0.1)');  // Green at top
-          gradient.addColorStop(1, 'rgba(59, 130, 246, 0.05)'); // Blue at bottom
+    beforeDraw: (chart: any) => {
+      try {
+        const canvas = chart.canvas;
+        if (canvas && chart.ctx) {
+          const ctx = chart.ctx;
+          // Make sure all dimensions are available
+          if (typeof chart.height !== 'number' || typeof chart.width !== 'number') {
+            return;
+          }
+          
+          // Create gradient safely
+          try {
+            const gradient = ctx.createLinearGradient(0, 0, 0, chart.height);
+            if (isDarkMode) {
+              gradient.addColorStop(0, 'rgba(34, 197, 94, 0.1)');  // Green at top
+              gradient.addColorStop(1, 'rgba(59, 130, 246, 0.02)'); // Blue at bottom
+            } else {
+              gradient.addColorStop(0, 'rgba(34, 197, 94, 0.1)');  // Green at top
+              gradient.addColorStop(1, 'rgba(59, 130, 246, 0.05)'); // Blue at bottom
+            }
+            ctx.fillStyle = gradient;
+            ctx.fillRect(0, 0, chart.width, chart.height);
+          } catch (err) {
+            console.error('Error creating gradient:', err);
+            // Use a solid color as fallback
+            ctx.fillStyle = isDarkMode ? 'rgba(34, 197, 94, 0.05)' : 'rgba(34, 197, 94, 0.02)';
+            ctx.fillRect(0, 0, chart.width, chart.height);
+          }
         }
-        ctx.fillStyle = gradient;
-        ctx.fillRect(0, 0, chart.width, chart.height);
+      } catch (err) {
+        console.error('Chart plugin error:', err);
+        // Just continue if there's an error
       }
     }
   };
@@ -66,6 +66,8 @@ const ResultsDisplay: React.FC = () => {
   
   // Move dark mode check to state with useEffect
   const [isDarkMode, setIsDarkMode] = useState(false);
+  const [chartsLoaded, setChartsLoaded] = useState(false);
+  const [chartError, setChartError] = useState(false);
   
   // Check dark mode on client side only
   useEffect(() => {
@@ -88,12 +90,92 @@ const ResultsDisplay: React.FC = () => {
   // Create gradient plugin with current state
   const [gradientPlugin, setGradientPlugin] = useState<{
     id: string;
-    beforeDraw: (chart: ChartJS) => void;
+    beforeDraw: (chart: any) => void;
   } | null>(null);
   
   useEffect(() => {
-    setGradientPlugin(createGradientPlugin(inflationChartRef.current, isDarkMode));
+    // Delay plugin creation to ensure DOM is ready
+    const timer = setTimeout(() => {
+      if (inflationChartRef.current) {
+        setGradientPlugin(createGradientPlugin(inflationChartRef.current, isDarkMode));
+      }
+    }, 100);
+    
+    return () => clearTimeout(timer);
   }, [isDarkMode]);
+  
+  // Initialize Chart.js on client-side only
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      // Fix for potential canvas rendering issues in some browsers/environments
+      const originalGetContext = HTMLCanvasElement.prototype.getContext;
+      // Add _canvasGetContextPatched property to Window interface
+      if (!(window as any)._canvasGetContextPatched && originalGetContext) {
+        (window as any)._canvasGetContextPatched = true;
+        HTMLCanvasElement.prototype.getContext = function(type, options) {
+          const context = originalGetContext.call(this, type, options);
+          if (type === '2d' && context) {
+            // Ensure the canvas has valid dimensions
+            if (!this.style.width) this.style.width = '100%';
+            if (!this.style.height) this.style.height = '100%';
+          }
+          return context;
+        };
+      }
+
+      // Load and register Chart.js components
+      import('chart.js').then(({ Chart, CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend, Filler }) => {
+        Chart.register(
+          CategoryScale,
+          LinearScale,
+          PointElement,
+          LineElement,
+          Title,
+          Tooltip,
+          Legend,
+          Filler
+        );
+
+        // Set a global default animation duration that's more compatible
+        Chart.defaults.animation.duration = 800;
+      });
+    }
+  }, []);
+  
+  // Add additional effect to ensure charts render properly after the component mounts
+  useEffect(() => {
+    if (typeof window !== 'undefined' && result) {
+      // Reset chart states on new results
+      setChartsLoaded(false);
+      setChartError(false);
+      
+      // Force a small delay to ensure DOM is fully ready
+      const timer = setTimeout(() => {
+        // Force a re-render by updating state
+        setIsDarkMode(prev => {
+          // This triggers a re-render without changing the actual value
+          setTimeout(() => {
+            setIsDarkMode(prev);
+            // Mark charts as attempted to load after a delay
+            setTimeout(() => setChartsLoaded(true), 1000);
+          }, 0);
+          return prev;
+        });
+      }, 200);
+      
+      return () => clearTimeout(timer);
+    }
+  }, [result]);
+  
+  // Handle chart load errors
+  useEffect(() => {
+    const handleError = () => {
+      setChartError(true);
+    };
+    
+    window.addEventListener('error', handleError);
+    return () => window.removeEventListener('error', handleError);
+  }, []);
 
   if (!result || amount === null) {
     return null;
@@ -428,12 +510,25 @@ const ResultsDisplay: React.FC = () => {
         )}
 
         <div className="h-72 mt-6 relative w-full overflow-hidden" ref={inflationChartRef}>
-          {typeof window !== 'undefined' && gradientPlugin && (
-            <Line 
-              options={chartOptions} 
-              data={inflationChartData} 
-              plugins={[gradientPlugin]}
-            />
+          {typeof window !== 'undefined' && (
+            <>
+              <Line 
+                options={chartOptions} 
+                data={inflationChartData} 
+                plugins={gradientPlugin ? [gradientPlugin] : undefined}
+              />
+              
+              {/* Fallback when charts fail to load */}
+              {(chartError || (chartsLoaded && !inflationChartRef.current?.querySelector('canvas'))) && (
+                <div className="absolute inset-0 flex items-center justify-center bg-opacity-90 bg-white dark:bg-gray-800 dark:bg-opacity-90">
+                  <div className={`text-center p-4 ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>
+                    <p>Chart visualization showing how your {formatCurrency(amount)} in {startYear}</p>
+                    <p>decreased to {formatCurrency(result.inflationAdjustedValue)} in {endYear}</p>
+                    <p>due to inflation ({formatPercentage(inflationImpact)} change)</p>
+                  </div>
+                </div>
+              )}
+            </>
           )}
         </div>
 
@@ -511,12 +606,25 @@ const ResultsDisplay: React.FC = () => {
 
           {investmentChartData && (
             <div className="h-72 mt-6 relative w-full overflow-hidden" ref={investmentChartRef}>
-              {typeof window !== 'undefined' && gradientPlugin && (
-                <Line 
-                  options={chartOptions} 
-                  data={investmentChartData} 
-                  plugins={[gradientPlugin]} 
-                />
+              {typeof window !== 'undefined' && (
+                <>
+                  <Line 
+                    options={chartOptions} 
+                    data={investmentChartData} 
+                    plugins={gradientPlugin ? [gradientPlugin] : undefined}
+                  />
+                  
+                  {/* Fallback when charts fail to load */}
+                  {(chartError || (chartsLoaded && !investmentChartRef.current?.querySelector('canvas'))) && (
+                    <div className="absolute inset-0 flex items-center justify-center bg-opacity-90 bg-white dark:bg-gray-800 dark:bg-opacity-90">
+                      <div className={`text-center p-4 ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>
+                        <p>Chart visualization showing how {formatCurrency(amount)} invested in {startYear}</p>
+                        <p>grew to {formatCurrency(result.combinedValue)} by {endYear}</p>
+                        <p>with {getInvestmentTypeName()} ({formatPercentage(realInvestmentImpact)} real growth)</p>
+                      </div>
+                    </div>
+                  )}
+                </>
               )}
             </div>
           )}
