@@ -86,7 +86,10 @@ const ResultsDisplay: React.FC = () => {
   }, []);
   
   // Create gradient plugin with current state
-  const [gradientPlugin, setGradientPlugin] = useState(null);
+  const [gradientPlugin, setGradientPlugin] = useState<{
+    id: string;
+    beforeDraw: (chart: ChartJS) => void;
+  } | null>(null);
   
   useEffect(() => {
     setGradientPlugin(createGradientPlugin(inflationChartRef.current, isDarkMode));
