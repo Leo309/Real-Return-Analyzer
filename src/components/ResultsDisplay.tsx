@@ -173,9 +173,7 @@ const ResultsDisplay: React.FC = () => {
         },
         grid: {
           color: isDarkMode ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.05)',
-          border: {
-            display: false
-          }
+          drawBorder: false
         }
       },
       y: {
@@ -195,9 +193,7 @@ const ResultsDisplay: React.FC = () => {
         },
         grid: {
           color: isDarkMode ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.05)',
-          border: {
-            display: false
-          }
+          drawBorder: false
         }
       }
     },
