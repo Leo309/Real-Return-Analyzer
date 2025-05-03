@@ -1,13 +1,11 @@
 'use client'; // Add this line at the top
 
 // Extend Window interface to avoid using 'any'
-interface CustomWindow extends Window {
-  _canvasGetContextPatched?: boolean;
-  _originalGetContext?: typeof HTMLCanvasElement.prototype.getContext;
-}
-
 declare global {
-  interface Window extends CustomWindow {}
+  interface Window {
+    _canvasGetContextPatched?: boolean;
+    _originalGetContext?: typeof HTMLCanvasElement.prototype.getContext;
+  }
 }
 
 import React, { useRef, useEffect, useState } from 'react';

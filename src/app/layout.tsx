@@ -106,15 +106,22 @@ export default function RootLayout({
               window.onload = function() {
                 if (typeof HTMLCanvasElement !== 'undefined' && HTMLCanvasElement.prototype) {
                   // Define window extension to avoid TypeScript errors
-                  interface CustomWindow { _originalGetContext?: any; }
-                  declare global { interface Window extends CustomWindow {} }
-                  
-                  // Store the original method
-                  window._originalGetContext = HTMLCanvasElement.prototype.getContext;
+                  if (typeof window !== 'undefined') {
+                    // TypeScript definition approach that avoids empty interface errors
+                    Object.defineProperty(window, '_originalGetContext', {
+                      value: HTMLCanvasElement.prototype.getContext,
+                      writable: true,
+                      configurable: true
+                    });
+                  }
                   
                   // Create a patched version
                   HTMLCanvasElement.prototype.getContext = function(type, options) {
-                    const ctx = window._originalGetContext.call(this, type, options);
+                    // Get the proper function from the stored property
+                    const originalFunction = window._originalGetContext;
+                    // TypeScript workaround - assert function
+                    const originalGetter = originalFunction as typeof HTMLCanvasElement.prototype.getContext;
+                    const ctx = originalGetter.call(this, type, options);
                     if (type === '2d' && ctx) {
                       // Fix for empty or undefined dimensions
                       if (!this.style.width) this.style.width = '100%';
