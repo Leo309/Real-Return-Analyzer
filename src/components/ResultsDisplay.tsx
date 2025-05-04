@@ -2,11 +2,10 @@
 
 import React, { useRef, useEffect, useState } from 'react';
 import dynamic from 'next/dynamic';
-// Use ChartJS types without 'as' keyword to avoid syntax errors in some builds
-let ChartType;
+// Use ChartJS types to avoid 'as' keyword syntax errors in some builds
 import type { ChartData, ChartOptions, TooltipItem, Chart } from 'chart.js';
-// Assign the type to avoid 'as' syntax
-ChartType = Chart;
+// Create a type alias instead of using 'as' keyword
+type ChartType = Chart;
 
 // Dynamically import Chart.js components with explicit SSR false flag and error handling
 const Line = dynamic(
