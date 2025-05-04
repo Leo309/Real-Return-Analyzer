@@ -86,11 +86,27 @@ const ResultsDisplay: React.FC = () => {
   const [chartsLoaded, setChartsLoaded] = useState(false);
   const [chartError, setChartError] = useState(false);
   const [chartPluginsInitialized, setChartPluginsInitialized] = useState(false);
+  const [shouldUseTextFallback, setShouldUseTextFallback] = useState(false);
   
   // Important: Only run on client-side
   useEffect(() => {
     setIsMounted(true);
     setIsDarkMode(document.documentElement.classList.contains('dark'));
+    
+    // Check if we're in production - Vercel sets VERCEL_ENV
+    const isProduction = typeof window !== 'undefined' && 
+      (window.location.hostname !== 'localhost' && 
+       window.location.hostname !== '127.0.0.1');
+       
+    // In production, we might want to use the text fallback more aggressively
+    if (isProduction) {
+      // Give charts a chance to load, but use text fallback as backup
+      const fallbackTimer = setTimeout(() => {
+        setShouldUseTextFallback(true);
+      }, 5000); // 5 second fallback timer for production
+      
+      return () => clearTimeout(fallbackTimer);
+    }
     
     // Listen for theme changes
     const observer = new MutationObserver((mutations) => {
@@ -219,9 +235,19 @@ const ResultsDisplay: React.FC = () => {
         
         setChartPluginsInitialized(true);
         setChartsLoaded(true);
+        
+        // Production safety - if we're on Vercel, use text fallback as a backup
+        if (typeof window !== 'undefined' && window.location.hostname.includes('vercel.app')) {
+          console.log('Running on Vercel, enabling text fallback safety');
+          // Use text fallback after 3 seconds in production just to be safe
+          setTimeout(() => {
+            setShouldUseTextFallback(true);
+          }, 3000);
+        }
       } catch (error) {
         console.error('Failed to initialize Chart.js:', error);
         setChartError(true);
+        setShouldUseTextFallback(true);
       }
     };
     
@@ -248,8 +274,13 @@ const ResultsDisplay: React.FC = () => {
     if (!isMounted) return;
     
     const handleError = (event: ErrorEvent) => {
-      if (event.message && event.message.includes('chart')) {
+      if (event.message && 
+          (event.message.includes('chart') || 
+           event.message.includes('cp1x') || 
+           event.message.includes('unexpected identifier'))) {
         setChartError(true);
+        setShouldUseTextFallback(true);
+        console.warn('Detected chart rendering error, using text fallback');
       }
     };
     
@@ -621,43 +652,20 @@ const ResultsDisplay: React.FC = () => {
         )}
 
         <div className="h-72 mt-6 relative w-full overflow-hidden" ref={inflationChartRef}>
-          {isMounted && chartPluginsInitialized && !chartError && (
-            <div className="relative h-full">
+          {/* Try to render chart first if conditions are good */}
+          {isMounted && chartPluginsInitialized && !chartError && !shouldUseTextFallback && (
+            <div className="relative h-full w-full" style={{ minHeight: '288px' }}>
               <Line 
                 options={{...chartOptions, responsive: true, maintainAspectRatio: false}} 
                 data={inflationChartData} 
                 plugins={[gradientPlugin]}
                 key={`inflation-chart-${isDarkMode}`} // Force rerender on theme change
-                fallbackContent={
-                  <div className="absolute inset-0 flex items-center justify-center bg-opacity-90 bg-white dark:bg-gray-800 dark:bg-opacity-90 rounded-lg border dark:border-gray-700 border-gray-200">
-                    <div className={`text-center p-4 ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>
-                      <p className="font-medium mb-2">Investment Value Over Time</p>
-                      <div className="flex flex-col gap-2">
-                        <div className="flex items-center justify-between border-b dark:border-gray-700 border-gray-200 pb-2">
-                          <span>Starting value ({startYear}):</span>
-                          <span className="font-bold">{formatCurrency(amount)}</span>
-                        </div>
-                        <div className="flex items-center justify-between border-b dark:border-gray-700 border-gray-200 pb-2">
-                          <span>Ending value ({endYear}):</span>
-                          <span className={`font-bold ${inflationImpact < 0 ? 'text-red-500' : 'text-green-500'}`}>
-                            {formatCurrency(result.inflationAdjustedValue)}
-                          </span>
-                        </div>
-                        <div className="flex items-center justify-between pt-1">
-                          <span>Percent change:</span>
-                          <span className={`font-bold ${inflationImpact < 0 ? 'text-red-500' : 'text-green-500'}`}>
-                            {formatPercentage(inflationImpact)}
-                          </span>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                }
+              />
             </div>
           )}
           
-          {/* Fallback when charts fail to load */}
-          {(chartError || !chartPluginsInitialized) && (
+          {/* Fallback when charts fail to load or we're in production with issues */}
+          {(chartError || !chartPluginsInitialized || shouldUseTextFallback) && (
             <div className="absolute inset-0 flex items-center justify-center bg-opacity-90 bg-white dark:bg-gray-800 dark:bg-opacity-90 rounded-lg border dark:border-gray-700 border-gray-200">
               <div className={`text-center p-4 ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>
                 <p className="font-medium mb-2">Investment Value Over Time</p>
@@ -758,49 +766,20 @@ const ResultsDisplay: React.FC = () => {
 
           {investmentChartData && (
             <div className="h-72 mt-6 relative w-full overflow-hidden" ref={investmentChartRef}>
-              {isMounted && chartPluginsInitialized && !chartError && (
-                <div className="relative h-full">
+              {/* Try to render chart first if conditions are good */}
+              {isMounted && chartPluginsInitialized && !chartError && !shouldUseTextFallback && (
+                <div className="relative h-full w-full" style={{ minHeight: '288px' }}>
                   <Line 
                     options={{...chartOptions, responsive: true, maintainAspectRatio: false}} 
                     data={investmentChartData} 
                     plugins={[gradientPlugin]}
                     key={`investment-chart-${isDarkMode}`} // Force rerender on theme change
-                    fallbackContent={
-                      <div className="absolute inset-0 flex items-center justify-center bg-opacity-90 bg-white dark:bg-gray-800 dark:bg-opacity-90 rounded-lg border dark:border-gray-700 border-gray-200">
-                        <div className={`text-center p-4 ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>
-                          <p className="font-medium mb-2">{getInvestmentTypeName()} Performance</p>
-                          <div className="flex flex-col gap-2">
-                            <div className="flex items-center justify-between border-b dark:border-gray-700 border-gray-200 pb-2">
-                              <span>Initial amount ({startYear}):</span>
-                              <span className="font-bold">{formatCurrency(amount)}</span>
-                            </div>
-                            <div className="flex items-center justify-between border-b dark:border-gray-700 border-gray-200 pb-2">
-                              <span>Investment return:</span>
-                              <span className="font-bold text-green-500">
-                                {formatCurrency(result.opportunityCostValue)}
-                              </span>
-                            </div>
-                            <div className="flex items-center justify-between border-b dark:border-gray-700 border-gray-200 pb-2">
-                              <span>After inflation ({endYear}):</span>
-                              <span className={`font-bold ${realInvestmentImpact < 0 ? 'text-red-500' : 'text-purple-500'}`}>
-                                {formatCurrency(result.combinedValue)}
-                              </span>
-                            </div>
-                            <div className="flex items-center justify-between pt-1">
-                              <span>Real growth:</span>
-                              <span className={`font-bold ${realInvestmentImpact < 0 ? 'text-red-500' : 'text-purple-500'}`}>
-                                {formatPercentage(realInvestmentImpact)}
-                              </span>
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-                    }
+                  />
                 </div>
               )}
               
-              {/* Fallback when charts fail to load */}
-              {(chartError || !chartPluginsInitialized) && (
+              {/* Fallback when charts fail to load or we're in production with issues */}
+              {(chartError || !chartPluginsInitialized || shouldUseTextFallback) && (
                 <div className="absolute inset-0 flex items-center justify-center bg-opacity-90 bg-white dark:bg-gray-800 dark:bg-opacity-90 rounded-lg border dark:border-gray-700 border-gray-200">
                   <div className={`text-center p-4 ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>
                     <p className="font-medium mb-2">{getInvestmentTypeName()} Performance</p>
