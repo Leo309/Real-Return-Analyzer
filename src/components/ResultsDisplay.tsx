@@ -246,26 +246,49 @@ const ResultsDisplay: React.FC = () => {
   
   const labels = filteredBreakdown.map(item => item.year.toString());
 
+  // This additional function explicitly ensures all data points are valid numbers
+  const validateDataPoints = (data) => {
+    if (!Array.isArray(data)) return [];
+    
+    // Create a new array with guaranteed valid points
+    const validData = [];
+    
+    for (let i = 0; i < data.length; i++) {
+      const value = data[i];
+      if (value !== undefined && value !== null && typeof value === 'number' && !isNaN(value)) {
+        // Create a complete point object with all required properties
+        validData.push(value);
+      } else {
+        // Fill in gaps with null to maintain array indexing
+        // Chart.js handles null better than undefined
+        validData.push(null);
+      }
+    }
+    
+    return validData;
+  };
+  
+  // Apply validation to chart data
   const inflationChartData = {
     labels,
     datasets: [
       {
         label: t('calculator.originalAmount'),
-        data: filteredBreakdown.map(() => amount),
+        data: validateDataPoints(filteredBreakdown.map(() => amount)),
         borderColor: isDarkMode ? 'rgb(100, 116, 139)' : 'rgb(75, 85, 99)',
         backgroundColor: isDarkMode ? 'rgba(100, 116, 139, 0.5)' : 'rgba(75, 85, 99, 0.5)',
         borderWidth: 2,
         borderDash: [5, 5],
-        tension: 0.2, // Reduced tension
+        tension: 0.1, // Further reduced tension
       },
       {
         label: t('calculator.trueValueToday'),
-        data: filteredBreakdown.map(item => item.inflationAdjusted),
+        data: validateDataPoints(filteredBreakdown.map(item => item.inflationAdjusted)),
         borderColor: isDarkMode ? 'rgb(248, 113, 113)' : 'rgb(239, 68, 68)',
         backgroundColor: isDarkMode ? 'rgba(248, 113, 113, 0.5)' : 'rgba(239, 68, 68, 0.5)',
         borderWidth: 3,
         fill: true,
-        tension: 0.2, // Reduced tension
+        tension: 0.1, // Further reduced tension
       },
     ]
   };
@@ -401,44 +424,36 @@ const ResultsDisplay: React.FC = () => {
     }
   };
 
-  // Investment comparison chart data (only if investment type is not none) - with null checking
+  // Investment comparison chart data with improved validation
   const investmentChartData: ChartData<"line"> | undefined = investmentType !== 'none' ? {
     labels,
     datasets: [
       {
         label: t('calculator.originalAmount'),
-        data: filteredBreakdown.map(() => amount),
+        data: validateDataPoints(filteredBreakdown.map(() => amount)),
         borderColor: isDarkMode ? 'rgb(100, 116, 139)' : 'rgb(75, 85, 99)',
         backgroundColor: isDarkMode ? 'rgba(100, 116, 139, 0.5)' : 'rgba(75, 85, 99, 0.5)',
         borderWidth: 2,
         borderDash: [5, 5],
-        tension: 0.2, // Reduced tension
+        tension: 0.1, // Lower tension
       },
       {
         label: getInvestmentTypeName(),
-        data: filteredBreakdown.map(item => {
-          return item && typeof item.opportunityCost === 'number' && !isNaN(item.opportunityCost) 
-            ? item.opportunityCost 
-            : null;
-        }),
+        data: validateDataPoints(filteredBreakdown.map(item => item.opportunityCost)),
         borderColor: isDarkMode ? 'rgb(74, 222, 128)' : 'rgb(34, 197, 94)',
         backgroundColor: isDarkMode ? 'rgba(74, 222, 128, 0.5)' : 'rgba(34, 197, 94, 0.5)',
         borderWidth: 3,
         fill: false,
-        tension: 0.2, // Reduced tension
+        tension: 0.1, // Lower tension
       },
       {
         label: t('calculator.realGrowthAfterInflation'),
-        data: filteredBreakdown.map(item => {
-          return item && typeof item.combined === 'number' && !isNaN(item.combined) 
-            ? item.combined 
-            : null;
-        }),
+        data: validateDataPoints(filteredBreakdown.map(item => item.combined)),
         borderColor: isDarkMode ? 'rgb(192, 132, 252)' : 'rgb(168, 85, 247)',
         backgroundColor: isDarkMode ? 'rgba(192, 132, 252, 0.5)' : 'rgba(168, 85, 247, 0.5)',
         borderWidth: 3,
         fill: true,
-        tension: 0.2, // Reduced tension
+        tension: 0.1, // Lower tension
       },
     ]
   } : undefined;
@@ -561,11 +576,14 @@ const ResultsDisplay: React.FC = () => {
 
         <div className="h-72 mt-6 relative w-full overflow-hidden" ref={inflationChartRef}>
           {isMounted && chartPluginsInitialized && !chartError && (
-            <Line 
-              options={chartOptions} 
-              data={inflationChartData} 
-              plugins={[gradientPlugin]}
-            />
+            <div className="relative h-full">
+              <Line 
+                options={{...chartOptions, responsive: true, maintainAspectRatio: false}} 
+                data={inflationChartData} 
+                plugins={[gradientPlugin]}
+                key={`inflation-chart-${isDarkMode}`} // Force rerender on theme change
+              />
+            </div>
           )}
           
           {/* Fallback when charts fail to load */}
@@ -671,11 +689,14 @@ const ResultsDisplay: React.FC = () => {
           {investmentChartData && (
             <div className="h-72 mt-6 relative w-full overflow-hidden" ref={investmentChartRef}>
               {isMounted && chartPluginsInitialized && !chartError && (
-                <Line 
-                  options={chartOptions} 
-                  data={investmentChartData} 
-                  plugins={[gradientPlugin]}
-                />
+                <div className="relative h-full">
+                  <Line 
+                    options={{...chartOptions, responsive: true, maintainAspectRatio: false}} 
+                    data={investmentChartData} 
+                    plugins={[gradientPlugin]}
+                    key={`investment-chart-${isDarkMode}`} // Force rerender on theme change
+                  />
+                </div>
               )}
               
               {/* Fallback when charts fail to load */}
