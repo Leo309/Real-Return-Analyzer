@@ -2,11 +2,21 @@
 
 import React, { useRef, useEffect, useState } from 'react';
 import dynamic from 'next/dynamic';
-import type { ChartData, ChartOptions, TooltipItem, Chart as ChartType } from 'chart.js';
+// Use ChartJS types without 'as' keyword to avoid syntax errors in some builds
+let ChartType;
+import type { ChartData, ChartOptions, TooltipItem, Chart } from 'chart.js';
+// Assign the type to avoid 'as' syntax
+ChartType = Chart;
 
-// Dynamically import Chart.js components with explicit SSR false flag
+// Dynamically import Chart.js components with explicit SSR false flag and error handling
 const Line = dynamic(
-  () => import('react-chartjs-2').then(mod => mod.Line),
+  () => import('react-chartjs-2')
+    .then(mod => mod.Line)
+    .catch(err => {
+      console.error('Failed to load Line chart:', err);
+      // Return a minimal placeholder component
+      return () => <div className="h-full w-full flex items-center justify-center p-4 bg-gray-100 dark:bg-gray-800 rounded-lg"><p>Chart unavailable</p></div>;
+    }),
   { ssr: false, loading: () => <div className="h-full w-full flex items-center justify-center p-4 bg-gray-100 dark:bg-gray-800 rounded-lg"><p>Loading chart...</p></div> }
 );
 
@@ -101,6 +111,17 @@ const ResultsDisplay: React.FC = () => {
     
     const initChartJs = async () => {
       try {
+        // Set a timeout to catch potential loading issues
+        const timeoutPromise = new Promise((_, reject) => {
+          setTimeout(() => reject(new Error('Chart.js initialization timed out')), 5000);
+        });
+        
+        // Race the import against the timeout
+        const chartImport = await Promise.race([
+          import('chart.js'),
+          timeoutPromise
+        ]);
+        
         const { 
           Chart, 
           CategoryScale, 
@@ -111,7 +132,12 @@ const ResultsDisplay: React.FC = () => {
           Tooltip, 
           Legend, 
           Filler 
-        } = await import('chart.js');
+        } = chartImport;
+        
+        // Verify essential components are available
+        if (!Chart || !CategoryScale || !LineElement) {
+          throw new Error('Chart.js components missing');
+        }
         
         Chart.register(
           CategoryScale,
@@ -129,20 +155,44 @@ const ResultsDisplay: React.FC = () => {
           duration: 800,
           easing: 'easeOutQuart'
         };
+        
+        // Set additional safe defaults for production
+        Chart.defaults.elements = Chart.defaults.elements || {};
+        Chart.defaults.elements.line = Chart.defaults.elements.line || {};
+        Chart.defaults.elements.line.tension = 0; // Use straight lines by default
 
-        // Prevent control point errors in bezier curves
+        // Prevent control point errors in bezier curves more robustly
         try {
-          // @ts-ignore - accessing private properties
-          const LineElement = Chart.elements?.Line;
+          // @ts-ignore - accessing Chart.js internals
+          const elements = Chart.registry?.elements || {};
+          const LineElement = elements.line || Chart.elements?.line || Chart.elements?.Line;
+          
           if (LineElement?.prototype) {
             const originalUpdateControlPoints = LineElement.prototype.updateControlPoints;
             
             LineElement.prototype.updateControlPoints = function() {
               try {
+                // Ensure 'this' has necessary properties before attempting calculation
+                if (!this || this.cp1x === undefined || this.cp1y === undefined ||
+                    this.cp2x === undefined || this.cp2y === undefined) {
+                  // Initialize control points with safe defaults if undefined
+                  this.cp1x = this.x;
+                  this.cp1y = this.y;
+                  this.cp2x = this.x;
+                  this.cp2y = this.y;
+                  return;
+                }
+                
                 return originalUpdateControlPoints.apply(this, arguments);
               } catch (err) {
-                console.warn('Skipping control points calculation due to error');
-                // Just skip control point calculation if it fails
+                console.warn('Safely handling control points calculation error:', err);
+                // Set safe defaults for control points
+                if (this) {
+                  this.cp1x = this.x || 0;
+                  this.cp1y = this.y || 0;
+                  this.cp2x = this.x || 0;
+                  this.cp2y = this.y || 0;
+                }
                 return;
               }
             };
@@ -279,7 +329,7 @@ const ResultsDisplay: React.FC = () => {
         backgroundColor: isDarkMode ? 'rgba(100, 116, 139, 0.5)' : 'rgba(75, 85, 99, 0.5)',
         borderWidth: 2,
         borderDash: [5, 5],
-        tension: 0.1, // Further reduced tension
+        tension: 0, // Use straight lines for stability
       },
       {
         label: t('calculator.trueValueToday'),
@@ -288,12 +338,13 @@ const ResultsDisplay: React.FC = () => {
         backgroundColor: isDarkMode ? 'rgba(248, 113, 113, 0.5)' : 'rgba(239, 68, 68, 0.5)',
         borderWidth: 3,
         fill: true,
-        tension: 0.1, // Further reduced tension
+        tension: 0, // Use straight lines for stability
       },
     ]
   };
 
   const chartOptions: ChartOptions<"line"> = {
+    // Disable bezier curves in production to prevent control point errors
     responsive: true,
     maintainAspectRatio: false,
     layout: {
@@ -382,13 +433,8 @@ const ResultsDisplay: React.FC = () => {
       intersect: false,
     },
     animations: {
-      tension: {
-        duration: 1000,
-        easing: 'easeInOutCubic',
-        from: 0.8,
-        to: 0.4,
-        loop: false
-      }
+      // Disable animations that could cause issues with control points
+      tension: false
     },
     elements: {
       point: {
@@ -435,7 +481,7 @@ const ResultsDisplay: React.FC = () => {
         backgroundColor: isDarkMode ? 'rgba(100, 116, 139, 0.5)' : 'rgba(75, 85, 99, 0.5)',
         borderWidth: 2,
         borderDash: [5, 5],
-        tension: 0.1, // Lower tension
+        tension: 0, // Use straight lines for stability
       },
       {
         label: getInvestmentTypeName(),
@@ -444,7 +490,7 @@ const ResultsDisplay: React.FC = () => {
         backgroundColor: isDarkMode ? 'rgba(74, 222, 128, 0.5)' : 'rgba(34, 197, 94, 0.5)',
         borderWidth: 3,
         fill: false,
-        tension: 0.1, // Lower tension
+        tension: 0, // Use straight lines for stability
       },
       {
         label: t('calculator.realGrowthAfterInflation'),
@@ -453,7 +499,7 @@ const ResultsDisplay: React.FC = () => {
         backgroundColor: isDarkMode ? 'rgba(192, 132, 252, 0.5)' : 'rgba(168, 85, 247, 0.5)',
         borderWidth: 3,
         fill: true,
-        tension: 0.1, // Lower tension
+        tension: 0, // Use straight lines for stability
       },
     ]
   } : undefined;
@@ -582,7 +628,31 @@ const ResultsDisplay: React.FC = () => {
                 data={inflationChartData} 
                 plugins={[gradientPlugin]}
                 key={`inflation-chart-${isDarkMode}`} // Force rerender on theme change
-              />
+                fallbackContent={
+                  <div className="absolute inset-0 flex items-center justify-center bg-opacity-90 bg-white dark:bg-gray-800 dark:bg-opacity-90 rounded-lg border dark:border-gray-700 border-gray-200">
+                    <div className={`text-center p-4 ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>
+                      <p className="font-medium mb-2">Investment Value Over Time</p>
+                      <div className="flex flex-col gap-2">
+                        <div className="flex items-center justify-between border-b dark:border-gray-700 border-gray-200 pb-2">
+                          <span>Starting value ({startYear}):</span>
+                          <span className="font-bold">{formatCurrency(amount)}</span>
+                        </div>
+                        <div className="flex items-center justify-between border-b dark:border-gray-700 border-gray-200 pb-2">
+                          <span>Ending value ({endYear}):</span>
+                          <span className={`font-bold ${inflationImpact < 0 ? 'text-red-500' : 'text-green-500'}`}>
+                            {formatCurrency(result.inflationAdjustedValue)}
+                          </span>
+                        </div>
+                        <div className="flex items-center justify-between pt-1">
+                          <span>Percent change:</span>
+                          <span className={`font-bold ${inflationImpact < 0 ? 'text-red-500' : 'text-green-500'}`}>
+                            {formatPercentage(inflationImpact)}
+                          </span>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                }
             </div>
           )}
           
@@ -695,7 +765,37 @@ const ResultsDisplay: React.FC = () => {
                     data={investmentChartData} 
                     plugins={[gradientPlugin]}
                     key={`investment-chart-${isDarkMode}`} // Force rerender on theme change
-                  />
+                    fallbackContent={
+                      <div className="absolute inset-0 flex items-center justify-center bg-opacity-90 bg-white dark:bg-gray-800 dark:bg-opacity-90 rounded-lg border dark:border-gray-700 border-gray-200">
+                        <div className={`text-center p-4 ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>
+                          <p className="font-medium mb-2">{getInvestmentTypeName()} Performance</p>
+                          <div className="flex flex-col gap-2">
+                            <div className="flex items-center justify-between border-b dark:border-gray-700 border-gray-200 pb-2">
+                              <span>Initial amount ({startYear}):</span>
+                              <span className="font-bold">{formatCurrency(amount)}</span>
+                            </div>
+                            <div className="flex items-center justify-between border-b dark:border-gray-700 border-gray-200 pb-2">
+                              <span>Investment return:</span>
+                              <span className="font-bold text-green-500">
+                                {formatCurrency(result.opportunityCostValue)}
+                              </span>
+                            </div>
+                            <div className="flex items-center justify-between border-b dark:border-gray-700 border-gray-200 pb-2">
+                              <span>After inflation ({endYear}):</span>
+                              <span className={`font-bold ${realInvestmentImpact < 0 ? 'text-red-500' : 'text-purple-500'}`}>
+                                {formatCurrency(result.combinedValue)}
+                              </span>
+                            </div>
+                            <div className="flex items-center justify-between pt-1">
+                              <span>Real growth:</span>
+                              <span className={`font-bold ${realInvestmentImpact < 0 ? 'text-red-500' : 'text-purple-500'}`}>
+                                {formatPercentage(realInvestmentImpact)}
+                              </span>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    }
                 </div>
               )}
               
