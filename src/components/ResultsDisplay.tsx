@@ -22,12 +22,18 @@ const createGradientPlugin = (isDarkMode: boolean) => {
     id: 'customCanvasBackgroundColor',
     beforeDraw: (chart: ChartType) => {
       try {
-        const ctx = chart.ctx;
-        if (!ctx || typeof chart.height !== 'number' || chart.height <= 0 || typeof chart.width !== 'number' || chart.width <= 0) {
-          return;
-        }
+        if (!chart || !chart.ctx) return;
         
-        const gradient = ctx.createLinearGradient(0, 0, 0, chart.height);
+        const { ctx, chartArea } = chart;
+        if (!chartArea) return;
+        
+        const { top, bottom, left, right } = chartArea;
+        const height = bottom - top;
+        const width = right - left;
+        
+        if (height <= 0 || width <= 0) return;
+        
+        const gradient = ctx.createLinearGradient(0, top, 0, bottom);
         if (isDarkMode) {
           gradient.addColorStop(0, 'rgba(34, 197, 94, 0.1)');
           gradient.addColorStop(1, 'rgba(59, 130, 246, 0.02)');
@@ -35,14 +41,22 @@ const createGradientPlugin = (isDarkMode: boolean) => {
           gradient.addColorStop(0, 'rgba(34, 197, 94, 0.1)');
           gradient.addColorStop(1, 'rgba(59, 130, 246, 0.05)');
         }
+        
         ctx.fillStyle = gradient;
-        ctx.fillRect(0, 0, chart.width, chart.height);
+        ctx.fillRect(left, top, width, height);
       } catch (err) {
         console.error('Chart plugin error:', err);
         // Use fallback solid color if gradient fails
-        if (chart.ctx) {
+        if (chart?.ctx) {
           chart.ctx.fillStyle = isDarkMode ? 'rgba(34, 197, 94, 0.05)' : 'rgba(34, 197, 94, 0.02)';
-          chart.ctx.fillRect(0, 0, chart.width, chart.height);
+          try {
+            const { top, bottom, left, right } = chart.chartArea || {};
+            if (top !== undefined && bottom !== undefined && left !== undefined && right !== undefined) {
+              chart.ctx.fillRect(left, top, right - left, bottom - top);
+            }
+          } catch (e) {
+            // Silently fail
+          }
         }
       }
     }
@@ -115,6 +129,27 @@ const ResultsDisplay: React.FC = () => {
           duration: 800,
           easing: 'easeOutQuart'
         };
+
+        // Prevent control point errors in bezier curves
+        try {
+          // @ts-ignore - accessing private properties
+          const LineElement = Chart.elements?.Line;
+          if (LineElement?.prototype) {
+            const originalUpdateControlPoints = LineElement.prototype.updateControlPoints;
+            
+            LineElement.prototype.updateControlPoints = function() {
+              try {
+                return originalUpdateControlPoints.apply(this, arguments);
+              } catch (err) {
+                console.warn('Skipping control points calculation due to error');
+                // Just skip control point calculation if it fails
+                return;
+              }
+            };
+          }
+        } catch (err) {
+          console.warn('Could not patch control points handling', err);
+        }
         
         // Patch canvas if needed
         if (typeof HTMLCanvasElement !== 'undefined' && 
@@ -145,15 +180,15 @@ const ResultsDisplay: React.FC = () => {
   
   // Force a rerender when new results come in
   useEffect(() => {
-    if (!isMounted || !result) return;
+    if (!isMounted || !result || !result.yearlyBreakdown?.length) return;
     
     // Reset states
     setChartError(false);
     
-    // Short delay to ensure DOM is ready
+    // Longer delay to ensure DOM and Chart.js are fully ready
     const timer = setTimeout(() => {
       setChartsLoaded(true);
-    }, 300);
+    }, 500);
     
     return () => clearTimeout(timer);
   }, [result, isMounted]);
@@ -205,29 +240,32 @@ const ResultsDisplay: React.FC = () => {
     ? ((result.combinedValue - validAmount) / validAmount) * 100
     : 0;
 
-  // Prepare inflation chart data
-  const labels = result.yearlyBreakdown.map(item => item.year.toString());
+  // Prepare inflation chart data - with null checking
+  const filteredBreakdown = result.yearlyBreakdown.filter(item => 
+    item && typeof item.inflationAdjusted === 'number' && !isNaN(item.inflationAdjusted));
+  
+  const labels = filteredBreakdown.map(item => item.year.toString());
 
   const inflationChartData = {
     labels,
     datasets: [
       {
         label: t('calculator.originalAmount'),
-        data: result.yearlyBreakdown.map(() => amount),
+        data: filteredBreakdown.map(() => amount),
         borderColor: isDarkMode ? 'rgb(100, 116, 139)' : 'rgb(75, 85, 99)',
         backgroundColor: isDarkMode ? 'rgba(100, 116, 139, 0.5)' : 'rgba(75, 85, 99, 0.5)',
         borderWidth: 2,
         borderDash: [5, 5],
-        tension: 0.4,
+        tension: 0.2, // Reduced tension
       },
       {
         label: t('calculator.trueValueToday'),
-        data: result.yearlyBreakdown.map(item => item.inflationAdjusted),
+        data: filteredBreakdown.map(item => item.inflationAdjusted),
         borderColor: isDarkMode ? 'rgb(248, 113, 113)' : 'rgb(239, 68, 68)',
         backgroundColor: isDarkMode ? 'rgba(248, 113, 113, 0.5)' : 'rgba(239, 68, 68, 0.5)',
         borderWidth: 3,
         fill: true,
-        tension: 0.4,
+        tension: 0.2, // Reduced tension
       },
     ]
   };
@@ -363,36 +401,44 @@ const ResultsDisplay: React.FC = () => {
     }
   };
 
-  // Investment comparison chart data (only if investment type is not none)
+  // Investment comparison chart data (only if investment type is not none) - with null checking
   const investmentChartData: ChartData<"line"> | undefined = investmentType !== 'none' ? {
     labels,
     datasets: [
       {
         label: t('calculator.originalAmount'),
-        data: result.yearlyBreakdown.map(() => amount),
+        data: filteredBreakdown.map(() => amount),
         borderColor: isDarkMode ? 'rgb(100, 116, 139)' : 'rgb(75, 85, 99)',
         backgroundColor: isDarkMode ? 'rgba(100, 116, 139, 0.5)' : 'rgba(75, 85, 99, 0.5)',
         borderWidth: 2,
         borderDash: [5, 5],
-        tension: 0.4,
+        tension: 0.2, // Reduced tension
       },
       {
         label: getInvestmentTypeName(),
-        data: result.yearlyBreakdown.map(item => item.opportunityCost),
+        data: filteredBreakdown.map(item => {
+          return item && typeof item.opportunityCost === 'number' && !isNaN(item.opportunityCost) 
+            ? item.opportunityCost 
+            : null;
+        }),
         borderColor: isDarkMode ? 'rgb(74, 222, 128)' : 'rgb(34, 197, 94)',
         backgroundColor: isDarkMode ? 'rgba(74, 222, 128, 0.5)' : 'rgba(34, 197, 94, 0.5)',
         borderWidth: 3,
         fill: false,
-        tension: 0.4,
+        tension: 0.2, // Reduced tension
       },
       {
         label: t('calculator.realGrowthAfterInflation'),
-        data: result.yearlyBreakdown.map(item => item.combined),
+        data: filteredBreakdown.map(item => {
+          return item && typeof item.combined === 'number' && !isNaN(item.combined) 
+            ? item.combined 
+            : null;
+        }),
         borderColor: isDarkMode ? 'rgb(192, 132, 252)' : 'rgb(168, 85, 247)',
         backgroundColor: isDarkMode ? 'rgba(192, 132, 252, 0.5)' : 'rgba(168, 85, 247, 0.5)',
         borderWidth: 3,
         fill: true,
-        tension: 0.4,
+        tension: 0.2, // Reduced tension
       },
     ]
   } : undefined;
