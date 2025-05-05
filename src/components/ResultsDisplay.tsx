@@ -7,47 +7,16 @@ import type { ChartData, ChartOptions, TooltipItem, Chart } from 'chart.js';
 // Create a type alias instead of using 'as' keyword
 type ChartType = Chart;
 
-// Constants for chart stability
-const CHART_LOAD_TIMEOUT = 10000; // 10 seconds timeout for chart loading
-const CHART_RETRY_ATTEMPTS = 3; // Number of retries for chart initialization
-
-// Import chart patches to fix rendering issues
-import { applyAllPatchesWithRetry } from '@/lib/chart-patches';
-
-// Dynamically import Chart.js components with enhanced error handling and retry logic
+// Dynamically import Chart.js components with explicit SSR false flag and error handling
 const Line = dynamic(
-  () => {
-    let attempts = 0;
-    const loadChart = () => {
-      attempts++;
-      return import('react-chartjs-2')
-        .then(mod => mod.Line)
-        .catch(err => {
-          console.error(`Failed to load Line chart (attempt ${attempts}/${CHART_RETRY_ATTEMPTS}):`, err);
-          if (attempts < CHART_RETRY_ATTEMPTS) {
-            console.log(`Retrying chart load, attempt ${attempts + 1}...`);
-            return loadChart();
-          }
-          // Return a functional placeholder component when all retries fail
-          return () => <div className="h-full w-full flex items-center justify-center p-4 bg-gray-100 dark:bg-gray-800 rounded-lg">
-            <div className="text-center">
-              <p className="mb-2 font-medium">Chart unavailable</p>
-              <p className="text-sm text-gray-500 dark:text-gray-400">Please refresh the page to try again</p>
-            </div>
-          </div>;
-        });
-    };
-    return loadChart();
-  },
-  { 
-    ssr: false, 
-    loading: () => <div className="h-full w-full flex items-center justify-center p-4 bg-gray-100 dark:bg-gray-800 rounded-lg">
-      <div className="flex flex-col items-center">
-        <div className="w-10 h-10 border-4 border-gray-300 dark:border-gray-600 border-t-blue-500 dark:border-t-blue-400 rounded-full animate-spin mb-2"></div>
-        <p>Loading chart...</p>
-      </div>
-    </div> 
-  }
+  () => import('react-chartjs-2')
+    .then(mod => mod.Line)
+    .catch(err => {
+      console.error('Failed to load Line chart:', err);
+      // Return a minimal placeholder component
+      return () => <div className="h-full w-full flex items-center justify-center p-4 bg-gray-100 dark:bg-gray-800 rounded-lg"><p>Chart unavailable</p></div>;
+    }),
+  { ssr: false, loading: () => <div className="h-full w-full flex items-center justify-center p-4 bg-gray-100 dark:bg-gray-800 rounded-lg"><p>Loading chart...</p></div> }
 );
 
 import useCalculatorStore from '@/store/calculatorStore';
@@ -116,16 +85,16 @@ const ResultsDisplay: React.FC = () => {
   const [chartsLoaded, setChartsLoaded] = useState(false);
   const [chartError, setChartError] = useState(false);
   const [chartPluginsInitialized, setChartPluginsInitialized] = useState(false);
-  const [shouldUseTextFallback, setShouldUseTextFallback] = useState(false);
+  
+  // IMPORTANT: Remove the fallback timer that was causing charts to disappear
+  // const [shouldUseTextFallback, setShouldUseTextFallback] = useState(false);
   
   // Important: Only run on client-side
   useEffect(() => {
     setIsMounted(true);
     setIsDarkMode(document.documentElement.classList.contains('dark'));
     
-    // Disable the automatic fallback to text mode
-    // We want to show charts whenever possible
-    setShouldUseTextFallback(false);
+    // REMOVE the fallback timer logic that was causing the charts to disappear
     
     // Listen for theme changes
     const observer = new MutationObserver((mutations) => {
@@ -140,32 +109,14 @@ const ResultsDisplay: React.FC = () => {
     return () => observer.disconnect();
   }, []);
   
-  // Initialize Chart.js only on client-side with enhanced reliability
+  // Initialize Chart.js only on client-side
   useEffect(() => {
     if (typeof window === 'undefined' || chartPluginsInitialized) return;
     
-    let retryCount = 0;
-    const maxRetries = 3;
-    
     const initChartJs = async () => {
       try {
-        // Apply all our custom patches with enhanced retry mechanism
-        const patchResult = await applyAllPatchesWithRetry();
-        
-        if (!patchResult) {
-          console.warn('Chart patches could not be applied properly, proceeding anyway');
-        }
-        
-        // Set a timeout to catch potential loading issues
-        const timeoutPromise = new Promise((_, reject) => {
-          setTimeout(() => reject(new Error('Chart.js initialization timed out')), CHART_LOAD_TIMEOUT);
-        });
-        
-        // Race the import against the timeout
-        const chartImport = await Promise.race([
-          import('chart.js'),
-          timeoutPromise
-        ]);
+        // Import Chart.js modules
+        const chartImport = await import('chart.js');
         
         const { 
           Chart, 
@@ -184,65 +135,90 @@ const ResultsDisplay: React.FC = () => {
           throw new Error('Chart.js components missing');
         }
         
-        // Use try-catch for registration to prevent silent failures
+        Chart.register(
+          CategoryScale,
+          LinearScale,
+          PointElement,
+          LineElement,
+          Title,
+          Tooltip,
+          Legend,
+          Filler
+        );
+        
+        // Set globally sensible defaults for Chart.js
+        Chart.defaults.animation = false; // Disable animations for stability
+        
+        // Set additional safe defaults for production
+        Chart.defaults.elements = Chart.defaults.elements || {};
+        Chart.defaults.elements.line = Chart.defaults.elements.line || {};
+        Chart.defaults.elements.line.tension = 0; // Use straight lines by default
+
+        // Prevent control point errors in bezier curves more robustly
         try {
-          Chart.register(
-            CategoryScale,
-            LinearScale,
-            PointElement,
-            LineElement,
-            Title,
-            Tooltip,
-            Legend,
-            Filler
-          );
-        } catch (regError) {
-          console.error('Failed to register Chart.js components:', regError);
-          throw regError; // Rethrow to trigger retry logic
+          // @ts-ignore - accessing Chart.js internals
+          const elements = Chart.registry?.elements || {};
+          const LineElement = elements.line || Chart.elements?.line || Chart.elements?.Line;
+          
+          if (LineElement?.prototype) {
+            const originalUpdateControlPoints = LineElement.prototype.updateControlPoints;
+            
+            LineElement.prototype.updateControlPoints = function() {
+              try {
+                // Ensure 'this' has necessary properties before attempting calculation
+                if (!this || this.cp1x === undefined || this.cp1y === undefined ||
+                    this.cp2x === undefined || this.cp2y === undefined) {
+                  // Initialize control points with safe defaults if undefined
+                  this.cp1x = this.x;
+                  this.cp1y = this.y;
+                  this.cp2x = this.x;
+                  this.cp2y = this.y;
+                  return;
+                }
+                
+                return originalUpdateControlPoints.apply(this, arguments);
+              } catch (err) {
+                console.warn('Safely handling control points calculation error:', err);
+                // Set safe defaults for control points
+                if (this) {
+                  this.cp1x = this.x || 0;
+                  this.cp1y = this.y || 0;
+                  this.cp2x = this.x || 0;
+                  this.cp2y = this.y || 0;
+                }
+                return;
+              }
+            };
+          }
+        } catch (err) {
+          console.warn('Could not patch control points handling', err);
         }
         
-        // Add global Chart.js defaults for better stability
-        Chart.defaults.font.family = '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif';
-        Chart.defaults.responsive = true;
-        Chart.defaults.maintainAspectRatio = false;
-        
-        // Disable animations by default for better stability
-        Chart.defaults.animations = false;
-        Chart.defaults.transitions = {
-          active: {
-            animation: {
-              duration: 0
+        // Patch canvas if needed
+        if (typeof HTMLCanvasElement !== 'undefined' && 
+            typeof HTMLCanvasElement.prototype.getContext === 'function') {
+          const originalGetContext = HTMLCanvasElement.prototype.getContext;
+          
+          HTMLCanvasElement.prototype.getContext = function(type, options) {
+            const context = originalGetContext.call(this, type, options);
+            if (type === '2d' && context) {
+              // Ensure canvas has proper dimensions
+              if (!this.style.width) this.style.width = '100%';
+              if (!this.style.height) this.style.height = '100%';
             }
-          }
-        };
+            return context;
+          };
+        }
         
         setChartPluginsInitialized(true);
         setChartsLoaded(true);
-        setChartError(false); // Reset error state on success
       } catch (error) {
-        console.error(`Failed to initialize Chart.js (attempt ${retryCount + 1}/${maxRetries}):`, error);
-        
-        // Implement retry logic
-        if (retryCount < maxRetries - 1) {
-          retryCount++;
-          console.log(`Retrying Chart.js initialization, attempt ${retryCount + 1}...`);
-          // Add increasing delay between retries
-          setTimeout(initChartJs, 1000 * retryCount);
-          return;
-        }
-        
+        console.error('Failed to initialize Chart.js:', error);
         setChartError(true);
-        setShouldUseTextFallback(true);
-        console.warn('All Chart.js initialization attempts failed, using fallback');
       }
     };
     
     initChartJs();
-    
-    // Cleanup function
-    return () => {
-      retryCount = maxRetries; // Stop any pending retries
-    };
   }, [chartPluginsInitialized]);
   
   // Force a rerender when new results come in
@@ -270,8 +246,7 @@ const ResultsDisplay: React.FC = () => {
            event.message.includes('cp1x') || 
            event.message.includes('unexpected identifier'))) {
         setChartError(true);
-        setShouldUseTextFallback(true);
-        console.warn('Detected chart rendering error, using text fallback');
+        console.warn('Detected chart rendering error');
       }
     };
     
@@ -642,41 +617,45 @@ const ResultsDisplay: React.FC = () => {
           </div>
         )}
 
-        <div className="h-auto mt-6 relative w-full overflow-hidden" ref={inflationChartRef}>
-          {/* Container for both chart and data */}
-          <div className="grid grid-cols-1 gap-4 items-start">
-            {/* Chart Container with fixed height */}
-            <div className="min-h-[300px] relative w-full rounded-lg p-2 bg-white dark:bg-gray-800 shadow-sm border border-gray-200 dark:border-gray-700">
-              {isMounted ? (
-                  chartPluginsInitialized && !chartError && !shouldUseTextFallback ? (
-                <div className="absolute inset-0 p-4 overflow-hidden">
-                  <div className="w-full h-full" style={{ position: 'relative', minHeight: '300px' }}>
-                    <Line 
-                      options={{
-                        ...chartOptions, 
-                        responsive: true, 
-                        maintainAspectRatio: false,
-                        devicePixelRatio: 2, // Higher resolution rendering
-                      }} 
-                      data={inflationChartData} 
-                      plugins={[gradientPlugin]}
-                      key={`inflation-chart-${isDarkMode}`} // Force rerender on theme change
-                    />
-                  </div>
-                </div>
-              ) : (
-                <div className="absolute inset-0 flex items-center justify-center">
-                  <div className="animate-pulse flex flex-col items-center">
-                    <div className="rounded-md bg-gray-200 dark:bg-gray-700 h-8 w-44 mb-2.5"></div>
-                    <div className="rounded-md bg-gray-200 dark:bg-gray-700 h-4 w-32 mb-2.5"></div>
-                    <div className="rounded-md bg-gray-200 dark:bg-gray-700 h-4 w-40"></div>
-                  </div>
-                </div>
-              )}
+        <div className="h-72 mt-6 relative w-full overflow-hidden" ref={inflationChartRef}>
+          {/* Try to render chart first if conditions are good */}
+          {isMounted && chartPluginsInitialized && !chartError && (
+            <div className="relative h-full w-full" style={{ minHeight: '288px' }}>
+              <Line 
+                options={{...chartOptions, responsive: true, maintainAspectRatio: false}} 
+                data={inflationChartData} 
+                plugins={[gradientPlugin]}
+                key={`inflation-chart-${isDarkMode}`} // Force rerender on theme change
+              />
             </div>
-            
-
-          </div>
+          )}
+          
+          {/* Fallback when charts fail to load */}
+          {chartError && (
+            <div className="absolute inset-0 flex items-center justify-center bg-opacity-90 bg-white dark:bg-gray-800 dark:bg-opacity-90 rounded-lg border dark:border-gray-700 border-gray-200">
+              <div className={`text-center p-4 ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>
+                <p className="font-medium mb-2">Investment Value Over Time</p>
+                <div className="flex flex-col gap-2">
+                  <div className="flex items-center justify-between border-b dark:border-gray-700 border-gray-200 pb-2">
+                    <span>Starting value ({startYear}):</span>
+                    <span className="font-bold">{formatCurrency(amount)}</span>
+                  </div>
+                  <div className="flex items-center justify-between border-b dark:border-gray-700 border-gray-200 pb-2">
+                    <span>Ending value ({endYear}):</span>
+                    <span className={`font-bold ${inflationImpact < 0 ? 'text-red-500' : 'text-green-500'}`}>
+                      {formatCurrency(result.inflationAdjustedValue)}
+                    </span>
+                  </div>
+                  <div className="flex items-center justify-between pt-1">
+                    <span>Percent change:</span>
+                    <span className={`font-bold ${inflationImpact < 0 ? 'text-red-500' : 'text-green-500'}`}>
+                      {formatPercentage(inflationImpact)}
+                    </span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
         </div>
 
         {investmentType === 'stocks' && (
@@ -752,42 +731,51 @@ const ResultsDisplay: React.FC = () => {
           </div>
 
           {investmentChartData && (
-            <div className="h-auto mt-6 relative w-full overflow-hidden" ref={investmentChartRef}>
-              {/* Container for both chart and data */}
-              <div className="grid grid-cols-1 gap-4 items-start">
-                {/* Chart Container with fixed height */}
-                <div className="min-h-[300px] relative w-full rounded-lg p-2 bg-white dark:bg-gray-800 shadow-sm border border-gray-200 dark:border-gray-700">
-                  {isMounted ? (
-                  chartPluginsInitialized && !chartError && !shouldUseTextFallback ? (
-                    <div className="absolute inset-0 p-4 overflow-hidden">
-                      <div className="w-full h-full" style={{ position: 'relative', minHeight: '300px' }}>
-                        <Line 
-                          options={{
-                            ...chartOptions, 
-                            responsive: true, 
-                            maintainAspectRatio: false,
-                            devicePixelRatio: 2, // Higher resolution rendering
-                          }} 
-                          data={investmentChartData} 
-                          plugins={[gradientPlugin]}
-                          key={`investment-chart-${isDarkMode}`} // Force rerender on theme change
-                        />
-                      </div>
-                    </div>
-                  ) : (
-                    // Enhanced fallback for chart loading issues
-                    <div className="absolute inset-0 flex items-center justify-center">
-                      <div className="animate-pulse flex flex-col items-center">
-                        <div className="rounded-md bg-gray-200 dark:bg-gray-700 h-8 w-44 mb-2.5"></div>
-                        <div className="rounded-md bg-gray-200 dark:bg-gray-700 h-4 w-32 mb-2.5"></div>
-                        <div className="rounded-md bg-gray-200 dark:bg-gray-700 h-4 w-40"></div>
-                      </div>
-                    </div>
-                  )}
+            <div className="h-72 mt-6 relative w-full overflow-hidden" ref={investmentChartRef}>
+              {/* Try to render chart first if conditions are good */}
+              {isMounted && chartPluginsInitialized && !chartError && (
+                <div className="relative h-full w-full" style={{ minHeight: '288px' }}>
+                  <Line 
+                    options={{...chartOptions, responsive: true, maintainAspectRatio: false}} 
+                    data={investmentChartData} 
+                    plugins={[gradientPlugin]}
+                    key={`investment-chart-${isDarkMode}`} // Force rerender on theme change
+                  />
                 </div>
-                
-
-              </div>
+              )}
+              
+              {/* Fallback when charts fail to load */}
+              {chartError && (
+                <div className="absolute inset-0 flex items-center justify-center bg-opacity-90 bg-white dark:bg-gray-800 dark:bg-opacity-90 rounded-lg border dark:border-gray-700 border-gray-200">
+                  <div className={`text-center p-4 ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>
+                    <p className="font-medium mb-2">{getInvestmentTypeName()} Performance</p>
+                    <div className="flex flex-col gap-2">
+                      <div className="flex items-center justify-between border-b dark:border-gray-700 border-gray-200 pb-2">
+                        <span>Initial amount ({startYear}):</span>
+                        <span className="font-bold">{formatCurrency(amount)}</span>
+                      </div>
+                      <div className="flex items-center justify-between border-b dark:border-gray-700 border-gray-200 pb-2">
+                        <span>Investment return:</span>
+                        <span className="font-bold text-green-500">
+                          {formatCurrency(result.opportunityCostValue)}
+                        </span>
+                      </div>
+                      <div className="flex items-center justify-between border-b dark:border-gray-700 border-gray-200 pb-2">
+                        <span>After inflation ({endYear}):</span>
+                        <span className={`font-bold ${realInvestmentImpact < 0 ? 'text-red-500' : 'text-purple-500'}`}>
+                          {formatCurrency(result.combinedValue)}
+                        </span>
+                      </div>
+                      <div className="flex items-center justify-between pt-1">
+                        <span>Real growth:</span>
+                        <span className={`font-bold ${realInvestmentImpact < 0 ? 'text-red-500' : 'text-purple-500'}`}>
+                          {formatPercentage(realInvestmentImpact)}
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              )}
             </div>
           )}
 
