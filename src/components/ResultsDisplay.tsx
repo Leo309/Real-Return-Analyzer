@@ -85,27 +85,16 @@ const ResultsDisplay: React.FC = () => {
   const [chartsLoaded, setChartsLoaded] = useState(false);
   const [chartError, setChartError] = useState(false);
   const [chartPluginsInitialized, setChartPluginsInitialized] = useState(false);
-  const [shouldUseTextFallback, setShouldUseTextFallback] = useState(false);
+  
+  // IMPORTANT: Remove the fallback timer that was causing charts to disappear
+  // const [shouldUseTextFallback, setShouldUseTextFallback] = useState(false);
   
   // Important: Only run on client-side
   useEffect(() => {
     setIsMounted(true);
     setIsDarkMode(document.documentElement.classList.contains('dark'));
     
-    // Check if we're in production - Vercel sets VERCEL_ENV
-    const isProduction = typeof window !== 'undefined' && 
-      (window.location.hostname !== 'localhost' && 
-       window.location.hostname !== '127.0.0.1');
-       
-    // In production, we might want to use the text fallback more aggressively
-    if (isProduction) {
-      // Give charts a chance to load, but use text fallback as backup
-      const fallbackTimer = setTimeout(() => {
-        setShouldUseTextFallback(true);
-      }, 5000); // 5 second fallback timer for production
-      
-      return () => clearTimeout(fallbackTimer);
-    }
+    // REMOVE the fallback timer logic that was causing the charts to disappear
     
     // Listen for theme changes
     const observer = new MutationObserver((mutations) => {
@@ -126,16 +115,8 @@ const ResultsDisplay: React.FC = () => {
     
     const initChartJs = async () => {
       try {
-        // Set a timeout to catch potential loading issues
-        const timeoutPromise = new Promise((_, reject) => {
-          setTimeout(() => reject(new Error('Chart.js initialization timed out')), 5000);
-        });
-        
-        // Race the import against the timeout
-        const chartImport = await Promise.race([
-          import('chart.js'),
-          timeoutPromise
-        ]);
+        // Import Chart.js modules
+        const chartImport = await import('chart.js');
         
         const { 
           Chart, 
@@ -166,10 +147,7 @@ const ResultsDisplay: React.FC = () => {
         );
         
         // Set globally sensible defaults for Chart.js
-        Chart.defaults.animation = {
-          duration: 800,
-          easing: 'easeOutQuart'
-        };
+        Chart.defaults.animation = false; // Disable animations for stability
         
         // Set additional safe defaults for production
         Chart.defaults.elements = Chart.defaults.elements || {};
@@ -234,19 +212,9 @@ const ResultsDisplay: React.FC = () => {
         
         setChartPluginsInitialized(true);
         setChartsLoaded(true);
-        
-        // Production safety - if we're on Vercel, use text fallback as a backup
-        if (typeof window !== 'undefined' && window.location.hostname.includes('vercel.app')) {
-          console.log('Running on Vercel, enabling text fallback safety');
-          // Use text fallback after 3 seconds in production just to be safe
-          setTimeout(() => {
-            setShouldUseTextFallback(true);
-          }, 3000);
-        }
       } catch (error) {
         console.error('Failed to initialize Chart.js:', error);
         setChartError(true);
-        setShouldUseTextFallback(true);
       }
     };
     
@@ -278,8 +246,7 @@ const ResultsDisplay: React.FC = () => {
            event.message.includes('cp1x') || 
            event.message.includes('unexpected identifier'))) {
         setChartError(true);
-        setShouldUseTextFallback(true);
-        console.warn('Detected chart rendering error, using text fallback');
+        console.warn('Detected chart rendering error');
       }
     };
     
@@ -652,7 +619,7 @@ const ResultsDisplay: React.FC = () => {
 
         <div className="h-72 mt-6 relative w-full overflow-hidden" ref={inflationChartRef}>
           {/* Try to render chart first if conditions are good */}
-          {isMounted && chartPluginsInitialized && !chartError && !shouldUseTextFallback && (
+          {isMounted && chartPluginsInitialized && !chartError && (
             <div className="relative h-full w-full" style={{ minHeight: '288px' }}>
               <Line 
                 options={{...chartOptions, responsive: true, maintainAspectRatio: false}} 
@@ -663,8 +630,8 @@ const ResultsDisplay: React.FC = () => {
             </div>
           )}
           
-          {/* Fallback when charts fail to load or we're in production with issues */}
-          {(chartError || !chartPluginsInitialized || shouldUseTextFallback) && (
+          {/* Fallback when charts fail to load */}
+          {chartError && (
             <div className="absolute inset-0 flex items-center justify-center bg-opacity-90 bg-white dark:bg-gray-800 dark:bg-opacity-90 rounded-lg border dark:border-gray-700 border-gray-200">
               <div className={`text-center p-4 ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>
                 <p className="font-medium mb-2">Investment Value Over Time</p>
@@ -766,7 +733,7 @@ const ResultsDisplay: React.FC = () => {
           {investmentChartData && (
             <div className="h-72 mt-6 relative w-full overflow-hidden" ref={investmentChartRef}>
               {/* Try to render chart first if conditions are good */}
-              {isMounted && chartPluginsInitialized && !chartError && !shouldUseTextFallback && (
+              {isMounted && chartPluginsInitialized && !chartError && (
                 <div className="relative h-full w-full" style={{ minHeight: '288px' }}>
                   <Line 
                     options={{...chartOptions, responsive: true, maintainAspectRatio: false}} 
@@ -777,8 +744,8 @@ const ResultsDisplay: React.FC = () => {
                 </div>
               )}
               
-              {/* Fallback when charts fail to load or we're in production with issues */}
-              {(chartError || !chartPluginsInitialized || shouldUseTextFallback) && (
+              {/* Fallback when charts fail to load */}
+              {chartError && (
                 <div className="absolute inset-0 flex items-center justify-center bg-opacity-90 bg-white dark:bg-gray-800 dark:bg-opacity-90 rounded-lg border dark:border-gray-700 border-gray-200">
                   <div className={`text-center p-4 ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>
                     <p className="font-medium mb-2">{getInvestmentTypeName()} Performance</p>
