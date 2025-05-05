@@ -98,7 +98,7 @@ export default function Footer() {
                     </svg>
                   </span>
                   <div className="flex-1">
-                    <span className="text-gray-300 group-hover:text-white font-medium transition-colors duration-300">Inflation Impact Calculator</span>
+                    <span className="text-gray-300 group-hover:text-white font-medium transition-colors duration-300">{siteConfig.siteInfo.name}</span>
                   </div>
                 </a>
               </li>

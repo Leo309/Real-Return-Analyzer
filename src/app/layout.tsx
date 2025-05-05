@@ -13,19 +13,19 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Investment Calculator | SKYNEX DIGITAL",
-  description: "Calculate how investments perform over time. Compare stocks, bonds, and real estate returns while accounting for inflation. Visualize your financial future with historical data.",
-  keywords: "investment calculator, inflation calculator, stock returns, bond returns, real estate investment, historical returns, financial planning, investment time machine",
+  title: "Real Return Analyzer | SKYNEX DIGITAL",
+  description: "Calculate your real returns over time. See how inflation affects your purchasing power, and compare stocks, bonds, and real estate performance. Visualize your financial future.",
+  keywords: "real return analyzer, investment calculator, inflation calculator, purchasing power, stock returns, bond returns, real estate investment, historical returns, financial planning",
   
   openGraph: {
-    title: "Investment Calculator | SKYNEX DIGITAL",
-    description: "Calculate how investments perform over time. Compare stocks, bonds, and real estate returns while accounting for inflation. Visualize your financial future with historical data.",
+    title: "Real Return Analyzer | SKYNEX DIGITAL",
+    description: "Calculate your real returns over time. See how inflation affects your purchasing power, and compare stocks, bonds, and real estate performance. Visualize your financial future.",
     images: [
       {
         url: "/social-preview.png",
         width: 1200,
         height: 630,
-        alt: "Investment Time Machine Preview",
+        alt: "Real Return Analyzer Preview",
       }
     ],
     type: "website",
@@ -35,8 +35,8 @@ export const metadata: Metadata = {
   
   twitter: {
     card: "summary_large_image",
-    title: "Investment Calculator | SKYNEX DIGITAL",
-    description: "Calculate how investments perform over time. Compare stocks, bonds, and real estate returns while accounting for inflation. Visualize your financial future with historical data.",
+    title: "Real Return Analyzer | SKYNEX DIGITAL",
+    description: "Calculate your real returns over time. See how inflation affects your purchasing power, and compare stocks, bonds, and real estate performance.",
     images: ["/social-preview.png"],
     creator: "@skynexdigital",
   },
@@ -58,9 +58,9 @@ export const metadata: Metadata = {
   },
   
   alternates: {
-    canonical: "https://investment.skynexdigital.com",
+    canonical: "https://realreturns.skynexdigital.com",
     languages: {
-      'en': 'https://investment.skynexdigital.com',
+      'en': 'https://realreturns.skynexdigital.com',
       // Additional languages can be added later
     },
   },
@@ -81,8 +81,8 @@ export default function RootLayout({
             __html: JSON.stringify({
               "@context": "https://schema.org",
               "@type": "WebApplication",
-              "name": "Investment Calculator",
-              "description": "Calculate how investments perform over time. Compare stocks, bonds, and real estate returns while accounting for inflation.",
+              "name": "Real Return Analyzer",
+              "description": "Calculate your real returns over time. See how inflation affects your purchasing power, and compare stocks, bonds, and real estate performance.",
               "applicationCategory": "FinanceApplication",
               "operatingSystem": "Any",
               "offers": {
