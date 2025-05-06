@@ -44,10 +44,10 @@ const ShareCard: React.FC = () => {
       }
     })();
     
-    return `I just used the Inflation Impact Calculator to see how ${originalAmount} would change from ${startYear} to ${endYear} in ${countryData.name}. With ${investmentName}, it would be worth ${finalValue} (${changePercent}% change). Try it yourself at inflation.skynexdigital.com`;
+    return `I just used the Real Return Analyzer to see how ${originalAmount} would change from ${startYear} to ${endYear} in ${countryData.name}. With ${investmentName}, it would be worth ${finalValue} (${changePercent}% change). Try it yourself at realreturns.skynexdigital.com`;
   };
   
-  const shareUrl = 'https://inflation.skynexdigital.com';
+  const shareUrl = 'https://realreturns.skynexdigital.com';
   const shareText = getShareText();
   
   const handleCopyLink = async () => {
@@ -132,7 +132,7 @@ const ShareCard: React.FC = () => {
                     className="w-auto h-full object-contain" 
                   />
                 </div>
-                <span className={`text-xs ${isDarkMode ? 'text-gray-400' : 'text-gray-500'}`}>inflation.skynexdigital.com</span>
+                <span className={`text-xs ${isDarkMode ? 'text-gray-400' : 'text-gray-500'}`}>realreturns.skynexdigital.com</span>
               </div>
               {shareText}
             </div>
