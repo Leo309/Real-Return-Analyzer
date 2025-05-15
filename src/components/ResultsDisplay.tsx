@@ -44,11 +44,11 @@ const createGradientPlugin = (isDarkMode: boolean) => {
         
         const gradient = ctx.createLinearGradient(0, top, 0, bottom);
         if (isDarkMode) {
-          gradient.addColorStop(0, 'rgba(34, 197, 94, 0.1)');
-          gradient.addColorStop(1, 'rgba(59, 130, 246, 0.02)');
+          gradient.addColorStop(0, 'rgba(73, 145, 214, 0.1)'); // Lighter primary-blue with low opacity
+          gradient.addColorStop(1, 'rgba(90, 130, 167, 0.02)'); // Lighter secondary-blue with very low opacity
         } else {
-          gradient.addColorStop(0, 'rgba(34, 197, 94, 0.1)');
-          gradient.addColorStop(1, 'rgba(59, 130, 246, 0.05)');
+          gradient.addColorStop(0, 'rgba(46, 117, 182, 0.1)'); // primary-blue with low opacity
+          gradient.addColorStop(1, 'rgba(169, 196, 226, 0.05)'); // secondary-blue with very low opacity
         }
         
         ctx.fillStyle = gradient;
@@ -322,20 +322,22 @@ const ResultsDisplay: React.FC = () => {
       {
         label: t('calculator.originalAmount'),
         data: validateDataPoints(filteredBreakdown.map(() => amount)),
-        borderColor: isDarkMode ? 'rgb(100, 116, 139)' : 'rgb(75, 85, 99)',
-        backgroundColor: isDarkMode ? 'rgba(100, 116, 139, 0.5)' : 'rgba(75, 85, 99, 0.5)',
-        borderWidth: 2,
-        borderDash: [5, 5],
-        tension: 0, // Use straight lines for stability
+        borderColor: isDarkMode ? '#9F9F9F' : '#555555', // 更深的灰色以增加对比度
+        backgroundColor: 'transparent',
+        borderWidth: 2.5, // 增加线宽
+        borderDash: [6, 4], // 调整虚线样式，更加明显
+        tension: 0 // Use straight lines for stability
       },
       {
         label: t('calculator.trueValueToday'),
         data: validateDataPoints(filteredBreakdown.map(item => item.inflationAdjusted)),
-        borderColor: isDarkMode ? 'rgb(248, 113, 113)' : 'rgb(239, 68, 68)',
-        backgroundColor: isDarkMode ? 'rgba(248, 113, 113, 0.5)' : 'rgba(239, 68, 68, 0.5)',
+        borderColor: isDarkMode ? '#4991D6' : '#1E63A0', // 更深的主蓝色
+        backgroundColor: isDarkMode ? 'rgba(90, 154, 210, 0.5)' : 'rgba(90, 154, 210, 0.65)', // 增加填充区域的不透明度
         borderWidth: 3,
         fill: true,
         tension: 0, // Use straight lines for stability
+        pointRadius: 0, // 通常隐藏点
+        pointHoverRadius: 7, // 悬停时显示更大的点
       },
     ]
   };
@@ -367,15 +369,24 @@ const ResultsDisplay: React.FC = () => {
       },
       title: { display: false },
       tooltip: {
-        backgroundColor: isDarkMode ? 'rgba(50, 50, 50, 0.8)' : 'rgba(255, 255, 255, 0.9)',
-        titleColor: isDarkMode ? '#FFFFFF' : '#000000',
-        bodyColor: isDarkMode ? '#FFFFFF' : '#000000',
-        borderColor: isDarkMode ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.1)',
+        backgroundColor: isDarkMode ? 'rgba(30, 41, 59, 0.9)' : 'rgba(255, 255, 255, 0.95)',
+        titleColor: isDarkMode ? '#FFFFFF' : '#595959', // dark-grey
+        bodyColor: isDarkMode ? '#FFFFFF' : '#595959', // dark-grey
+        borderColor: isDarkMode ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.05)',
         borderWidth: 1,
-        padding: 12,
+        padding: 14,
         cornerRadius: 8,
-        boxPadding: 6,
+        boxPadding: 8,
         usePointStyle: true,
+        titleFont: {
+          family: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
+          size: 13,
+          weight: 'bold'
+        },
+        bodyFont: {
+          family: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
+          size: 13
+        },
         callbacks: {
           label: (context: TooltipItem<"line">) => {
             return `${context.dataset.label}: ${formatCurrency(context.parsed.y)}`;
@@ -387,17 +398,21 @@ const ResultsDisplay: React.FC = () => {
       x: {
         type: 'category',
         ticks: {
-          autoSkip: true,
-          maxRotation: 0,
-          maxTicksLimit: 8,
-          color: isDarkMode ? '#CCCCCC' : '#666666',
-          font: {
-            family: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
-            size: 11
-          }
+        autoSkip: true,
+        maxRotation: 0,
+        maxTicksLimit: 8,
+        color: isDarkMode ? '#BBBBBB' : '#333333', // 深色的文本提高对比度
+        font: {
+        family: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
+        size: 11,
+        weight: '600' // 增加字重
+        },
+        padding: 8
         },
         grid: {
-          color: isDarkMode ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.05)'
+        color: isDarkMode ? 'rgba(255, 255, 255, 0.1)' : 'rgba(170, 170, 170, 0.7)', // 加深网格线
+        tickLength: 8,
+        lineWidth: 0.7 // 增加线宽
         },
         border: {
           display: false
@@ -407,18 +422,22 @@ const ResultsDisplay: React.FC = () => {
         type: 'linear',
         beginAtZero: false,
         ticks: {
-          color: isDarkMode ? '#CCCCCC' : '#666666',
-          callback: (value: string | number) => {
-            // Ensure numeric value handling
-            return formatCurrency(Number(value));
-          },
-          font: {
-            family: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
-            size: 11
-          }
+        color: isDarkMode ? '#BBBBBB' : '#333333', // 深色的文本提高对比度
+        callback: (value: string | number) => {
+        // Ensure numeric value handling
+        return formatCurrency(Number(value));
+        },
+        font: {
+        family: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
+        size: 11,
+        weight: '600' // 增加字重
+        },
+        padding: 8
         },
         grid: {
-          color: isDarkMode ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.05)'
+        color: isDarkMode ? 'rgba(255, 255, 255, 0.1)' : 'rgba(170, 170, 170, 0.7)', // 加深网格线
+        tickLength: 8,
+        lineWidth: 0.7 // 增加线宽
         },
         border: {
           display: false
@@ -474,8 +493,8 @@ const ResultsDisplay: React.FC = () => {
       {
         label: t('calculator.originalAmount'),
         data: validateDataPoints(filteredBreakdown.map(() => amount)),
-        borderColor: isDarkMode ? 'rgb(100, 116, 139)' : 'rgb(75, 85, 99)',
-        backgroundColor: isDarkMode ? 'rgba(100, 116, 139, 0.5)' : 'rgba(75, 85, 99, 0.5)',
+        borderColor: isDarkMode ? '#9F9F9F' : '#7F7F7F', // medium-grey, lighter for dark mode
+        backgroundColor: 'transparent',
         borderWidth: 2,
         borderDash: [5, 5],
         tension: 0, // Use straight lines for stability
@@ -483,20 +502,24 @@ const ResultsDisplay: React.FC = () => {
       {
         label: getInvestmentTypeName(),
         data: validateDataPoints(filteredBreakdown.map(item => item.opportunityCost)),
-        borderColor: isDarkMode ? 'rgb(74, 222, 128)' : 'rgb(34, 197, 94)',
-        backgroundColor: isDarkMode ? 'rgba(74, 222, 128, 0.5)' : 'rgba(34, 197, 94, 0.5)',
-        borderWidth: 3,
+        borderColor: isDarkMode ? '#4991D6' : '#1E63A0', // 更深的主蓝色
+        backgroundColor: 'transparent',
+        borderWidth: 3.5, // 增加线宽
         fill: false,
         tension: 0, // Use straight lines for stability
+        pointRadius: 0,
+        pointHoverRadius: 7,
       },
       {
         label: t('calculator.realGrowthAfterInflation'),
         data: validateDataPoints(filteredBreakdown.map(item => item.combined)),
-        borderColor: isDarkMode ? 'rgb(192, 132, 252)' : 'rgb(168, 85, 247)',
-        backgroundColor: isDarkMode ? 'rgba(192, 132, 252, 0.5)' : 'rgba(168, 85, 247, 0.5)',
+        borderColor: isDarkMode ? '#9F9F9F' : '#555555', // 更深的灰色
+        backgroundColor: isDarkMode ? 'rgba(169, 196, 226, 0.4)' : 'rgba(90, 154, 210, 0.4)', // 增加填充区域的对比度
         borderWidth: 3,
         fill: true,
         tension: 0, // Use straight lines for stability
+        pointRadius: 0,
+        pointHoverRadius: 7,
       },
     ]
   } : undefined;
@@ -510,85 +533,67 @@ const ResultsDisplay: React.FC = () => {
 
       {/* Enhanced Animation Cards */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
-        <div className={`p-5 rounded-lg ${isDarkMode ? 'bg-gray-700/70' : 'bg-white'} shadow-lg transform transition-all duration-500 hover:shadow-xl hover:-translate-y-1`}>
+        <div className={`p-5 rounded-lg ${isDarkMode ? 'bg-gray-700/70' : 'bg-white'} shadow-md transition-all duration-300 hover:shadow-lg border ${isDarkMode ? 'border-gray-600' : 'border-gray-100'}`}>
           <div className="flex flex-col h-full justify-between">
             <div>
-              <p className={`text-sm ${isDarkMode ? 'text-gray-300' : 'text-gray-600'}`}>
+              <p className={`text-sm ${isDarkMode ? 'text-gray-300' : 'text-dark-grey'}`}>
                 {t('calculator.originalAmount')} ({startYear})
               </p>
-              <p className={`text-3xl font-bold mt-2 mb-1 ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
+              <p className={`text-3xl font-bold mt-2 mb-1 ${isDarkMode ? 'text-white' : 'text-primary-blue'}`}>
                 {formatCurrency(amount)}
               </p>
             </div>
-            <div className={`mt-3 h-1 w-full rounded-full overflow-hidden ${isDarkMode ? 'bg-gray-600' : 'bg-gray-200'}`}>
-              <div className={`h-full rounded-full ${isDarkMode ? 'bg-blue-500' : 'bg-blue-600'}`} style={{ width: '100%' }}></div>
-            </div>
+
           </div>
         </div>
 
         <div className={`p-5 rounded-lg ${inflationImpact < 0
-          ? (isDarkMode ? 'bg-red-900/30' : 'bg-red-50')
-          : (isDarkMode ? 'bg-green-900/30' : 'bg-green-50')
-          } shadow-lg transform transition-all duration-500 hover:shadow-xl hover:-translate-y-1`}>
+          ? (isDarkMode ? 'bg-red-900/20' : 'bg-red-50')
+          : (isDarkMode ? 'bg-blue-900/20' : 'bg-secondary-blue/20')
+          } shadow-md transition-all duration-300 hover:shadow-lg border ${inflationImpact < 0 
+            ? (isDarkMode ? 'border-red-800' : 'border-red-200')
+            : (isDarkMode ? 'border-blue-800' : 'border-secondary-blue')}`}>
           <div className="flex flex-col h-full justify-between">
             <div>
-              <p className={`text-sm ${isDarkMode ? 'text-gray-300' : 'text-gray-600'}`}>
+              <p className={`text-sm ${isDarkMode ? 'text-gray-300' : 'text-dark-grey'}`}>
                 {t('calculator.trueValueToday')} ({endYear})
               </p>
-              <p className={`text-3xl font-bold mt-2 mb-1 ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
+              <p className={`text-3xl font-bold mt-2 mb-1 ${isDarkMode ? 'text-white' : inflationImpact < 0 ? 'text-warning-red' : 'text-primary-blue'}`}>
                 {formatCurrency(result.inflationAdjustedValue)}
               </p>
               <p className={`text-sm font-medium ${inflationImpact < 0
-                ? (isDarkMode ? 'text-red-300' : 'text-red-600')
-                : (isDarkMode ? 'text-green-300' : 'text-green-600')}`}>
-                {`${inflationImpact >= 0 ? '+' : ''}${formatPercentage(inflationImpact)}`} {t('calculator.changeInPurchasingPower')}
+                ? (isDarkMode ? 'text-red-300' : 'text-warning-red')
+                : (isDarkMode ? 'text-blue-300' : 'text-primary-blue')}`}>
+                {`${inflationImpact >= 0 ? '+' : ''}${formatPercentage(inflationImpact)}`}
               </p>
             </div>
-            <div className={`mt-3 h-1 w-full rounded-full overflow-hidden ${isDarkMode ? 'bg-gray-600' : 'bg-gray-200'}`}>
-              <div 
-                className={`h-full rounded-full ${
-                  inflationImpact < 0
-                    ? (isDarkMode ? 'bg-red-500' : 'bg-red-600')
-                    : (isDarkMode ? 'bg-green-500' : 'bg-green-600')
-                }`} 
-                style={{ width: `${Math.min(100, Math.max(0, (result.inflationAdjustedValue / amount) * 100))}%` }}
-              ></div>
-            </div>
+
           </div>
         </div>
 
         {investmentType !== 'none' ? (
           <div className={`p-5 rounded-lg ${realInvestmentImpact < 0
-            ? (isDarkMode ? 'bg-red-900/30' : 'bg-red-50')
-            : (isDarkMode ? 'bg-purple-900/30' : 'bg-purple-50')
-            } shadow-lg transform transition-all duration-500 hover:shadow-xl hover:-translate-y-1`}>
+            ? (isDarkMode ? 'bg-red-900/30' : 'bg-red-100')
+            : (isDarkMode ? 'bg-blue-900/30' : 'bg-secondary-blue/25')
+            } shadow-md hover:shadow-lg transition-shadow border ${realInvestmentImpact < 0
+              ? (isDarkMode ? 'border-red-800' : 'border-red-200')
+              : (isDarkMode ? 'border-blue-800' : 'border-secondary-blue')}`}>
             <div className="flex flex-col h-full justify-between">
               <div>
-                <p className={`text-sm ${isDarkMode ? 'text-gray-300' : 'text-gray-600'}`}>
+                <p className={`text-sm ${isDarkMode ? 'text-gray-300' : 'text-dark-grey'}`}>
                   {t('calculator.realGrowthAfterInflation')}
                 </p>
-                <p className={`text-3xl font-bold mt-2 mb-1 ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
+                <p className={`text-3xl font-bold mt-2 mb-1 ${isDarkMode ? 'text-white' : realInvestmentImpact < 0 ? 'text-warning-red' : 'text-primary-blue'}`}>
                   {formatCurrency(result.combinedValue)}
                 </p>
                 <p className={`text-sm font-medium ${realInvestmentImpact >= 0
-                  ? (isDarkMode ? 'text-purple-300' : 'text-purple-600')
-                  : (isDarkMode ? 'text-red-300' : 'text-red-600')
+                  ? (isDarkMode ? 'text-blue-300' : 'text-primary-blue')
+                  : (isDarkMode ? 'text-red-300' : 'text-warning-red')
                   }`}>
-                  {`${realInvestmentImpact >= 0 ? '+' : ''}${formatPercentage(realInvestmentImpact)}`} {t('calculator.realGrowth')}
+                  {`${realInvestmentImpact >= 0 ? '+' : ''}${formatPercentage(realInvestmentImpact)}`}
                 </p>
               </div>
-              <div className={`mt-3 h-1 w-full rounded-full overflow-hidden ${isDarkMode ? 'bg-gray-600' : 'bg-gray-200'}`}>
-                <div 
-                  className={`h-full rounded-full ${
-                    realInvestmentImpact < 0
-                      ? (isDarkMode ? 'bg-red-500' : 'bg-red-600')
-                      : (isDarkMode ? 'bg-purple-500' : 'bg-purple-600')
-                  }`} 
-                  style={{ 
-                    width: `${Math.min(100, Math.max(0, (result.combinedValue / amount) * 100))}%` 
-                  }}
-                ></div>
-              </div>
+
             </div>
           </div>
         ) : (
@@ -597,20 +602,20 @@ const ResultsDisplay: React.FC = () => {
       </div>
 
       {/* Inflation Impact Section */}
-      <div className={`p-6 rounded-lg ${isDarkMode ? 'bg-gray-700/50' : 'bg-gray-100'}`}>
-        <h3 className={`text-lg font-semibold mb-4 ${isDarkMode ? 'text-white' : 'text-gray-800'}`}>
+      <div className={`p-6 rounded-lg shadow-md ${isDarkMode ? 'bg-gray-800/70' : 'bg-white'} border ${isDarkMode ? 'border-gray-600' : 'border-gray-200'}`}>
+        <h3 className={`text-xl font-semibold mb-4 ${isDarkMode ? 'text-white' : 'text-dark-grey'}`}>
           {t('calculator.inflationImpact')} ({startYear} - {endYear})
         </h3>
 
         {inflationImpact < 0 && (
-          <div className={`p-4 mb-4 rounded-lg ${isDarkMode ? 'bg-red-900/30' : 'bg-red-50'}`}>
+          <div className={`p-5 mb-4 rounded-lg shadow-md ${isDarkMode ? 'bg-red-900/30' : 'bg-red-50 border border-red-200'}`}>
             <div className="flex items-center">
-              <DollarSign className={isDarkMode ? 'text-red-300' : 'text-red-600'} size={20} />
-              <h4 className={`ml-2 font-bold ${isDarkMode ? 'text-red-300' : 'text-red-800'}`}>
+              <DollarSign className={isDarkMode ? 'text-red-300' : 'text-warning-red'} size={20} />
+              <h4 className={`ml-2 font-bold ${isDarkMode ? 'text-red-300' : 'text-dark-grey'}`}>
                 {t('calculator.moneyLostToInflation')}: {formatCurrency(Math.abs(amount - result.inflationAdjustedValue))}
               </h4>
             </div>
-            <p className={`mt-1 ${isDarkMode ? 'text-red-200' : 'text-red-700'}`}>
+            <p className={`mt-2 text-sm ${isDarkMode ? 'text-red-200' : 'text-medium-grey font-medium'}`}>
               That&apos;s equivalent to {Math.round((amount - result.inflationAdjustedValue) / (countryCode === 'US' ? 5 : 6))} premium coffees
               or {Math.round((amount - result.inflationAdjustedValue) / (countryCode === 'US' ? 20 : 25))} hours of work.
             </p>
@@ -665,8 +670,8 @@ const ResultsDisplay: React.FC = () => {
         )}
 
         {investmentType === 'none' && (
-          <div className={`p-5 rounded-lg ${isDarkMode ? 'bg-blue-900/30' : 'bg-blue-50'} shadow-md text-center mt-6`}>
-            <p className={`text-lg font-medium ${isDarkMode ? 'text-blue-200' : 'text-blue-800'}`}>
+          <div className={`p-5 rounded-lg ${isDarkMode ? 'bg-blue-900/30' : 'bg-secondary-blue/30'} shadow-md text-center mt-6 border ${isDarkMode ? 'border-blue-800' : 'border-secondary-blue'}`}>
+            <p className={`text-lg font-medium ${isDarkMode ? 'text-blue-200' : 'text-primary-blue'}`}>
               {`Due to inflation, your ${formatCurrency(amount)} ${inflationImpact < 0 ? 'lost' : 'gained'} ${formatCurrency(Math.abs(amount - result.inflationAdjustedValue))} 
               purchasing power (${formatPercentage(inflationImpact)}) from ${startYear} to ${endYear}`}
             </p>
@@ -675,55 +680,57 @@ const ResultsDisplay: React.FC = () => {
       </div>
 
       {investmentType !== 'none' && (
-        <div className={`p-6 rounded-lg ${isDarkMode ? 'bg-gray-700/50' : 'bg-gray-100'}`}>
-          <h3 className={`text-lg font-semibold mb-4 ${isDarkMode ? 'text-white' : 'text-gray-800'}`}>
-            {getInvestmentTypeName()} {t('calculator.investmentPerformance')}
+        <div className={`p-6 rounded-lg shadow-md ${isDarkMode ? 'bg-gray-800/70' : 'bg-white'} border ${isDarkMode ? 'border-gray-600' : 'border-gray-200'}`}>
+          <h3 className={`text-xl font-semibold mb-4 ${isDarkMode ? 'text-white' : 'text-dark-grey'}`}>
+          {getInvestmentTypeName()} {t('calculator.investmentPerformance')}
           </h3>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
-            <div className={`p-5 rounded-lg ${isDarkMode ? 'bg-green-900/40' : 'bg-green-100'} shadow-md`}>
+            <div className={`p-5 rounded-lg ${isDarkMode ? 'bg-blue-900/30' : 'bg-secondary-blue/25'} shadow-md hover:shadow-lg transition-shadow border ${isDarkMode ? 'border-blue-800' : 'border-secondary-blue'}`}>
               <div className="flex items-center justify-between">
                 <div>
-                  <p className={`text-sm ${isDarkMode ? 'text-gray-300' : 'text-gray-600'}`}>
+                  <p className={`text-sm ${isDarkMode ? 'text-gray-300' : 'text-dark-grey'}`}>
                     {t('calculator.withInvestmentReturns')}
                   </p>
-                  <p className={`text-3xl font-bold ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
+                  <p className={`text-3xl font-bold ${isDarkMode ? 'text-white' : 'text-primary-blue'}`}>
                     {formatCurrency(result.opportunityCostValue)}
                   </p>
                 </div>
-                <div className={`p-3 rounded-full ${isDarkMode ? 'bg-green-800/50' : 'bg-green-200'}`}>
-                  <TrendingUp size={24} className={isDarkMode ? 'text-green-300' : 'text-green-600'} />
+                <div className={`p-3 rounded-full ${isDarkMode ? 'bg-blue-800/50' : 'bg-primary-blue/20'}`}>
+                  <TrendingUp size={24} className={isDarkMode ? 'text-blue-300' : 'text-primary-blue'} />
                 </div>
               </div>
-              <p className={`mt-2 text-sm font-medium ${isDarkMode ? 'text-green-300' : 'text-green-600'}`}>
+              <p className={`mt-2 text-sm font-medium ${isDarkMode ? 'text-blue-300' : 'text-primary-blue'}`}>
                 {`${opportunityCostImpact >= 0 ? '+' : ''}${formatPercentage(opportunityCostImpact)}`} {t('calculator.nominalGrowth')}
               </p>
             </div>
 
             <div className={`p-5 rounded-lg ${realInvestmentImpact < 0
-              ? (isDarkMode ? 'bg-red-900/40' : 'bg-red-100')
-              : (isDarkMode ? 'bg-purple-900/40' : 'bg-purple-100')
-              } shadow-md`}>
+              ? (isDarkMode ? 'bg-red-900/30' : 'bg-red-100')
+              : (isDarkMode ? 'bg-gray-800/70' : 'bg-gray-200/60')
+              } shadow-md hover:shadow-lg transition-shadow border ${realInvestmentImpact < 0
+                ? (isDarkMode ? 'border-red-800' : 'border-red-200')
+                : (isDarkMode ? 'border-gray-700' : 'border-gray-300')}`}>
               <div className="flex items-center justify-between">
                 <div>
-                  <p className={`text-sm ${isDarkMode ? 'text-gray-300' : 'text-gray-600'}`}>
+                  <p className={`text-sm ${isDarkMode ? 'text-gray-300' : 'text-dark-grey'}`}>
                     {t('calculator.realGrowthAfterInflation')}
                   </p>
-                  <p className={`text-3xl font-bold ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
+                  <p className={`text-3xl font-bold ${isDarkMode ? 'text-white' : realInvestmentImpact < 0 ? 'text-warning-red' : 'text-medium-grey'}`}>
                     {formatCurrency(result.combinedValue)}
                   </p>
                 </div>
                 <div className={`p-3 rounded-full ${realInvestmentImpact < 0
-                  ? (isDarkMode ? 'bg-red-800/50' : 'bg-red-200')
-                  : (isDarkMode ? 'bg-purple-800/50' : 'bg-purple-200')}`}>
+                  ? (isDarkMode ? 'bg-red-800/50' : 'bg-red-100')
+                  : (isDarkMode ? 'bg-gray-700' : 'bg-gray-300')}`}>
                   {realInvestmentImpact < 0
-                    ? <TrendingDown size={24} className={isDarkMode ? 'text-red-300' : 'text-red-600'} />
-                    : <TrendingUp size={24} className={isDarkMode ? 'text-purple-300' : 'text-purple-600'} />}
+                    ? <TrendingDown size={24} className={isDarkMode ? 'text-red-300' : 'text-warning-red'} />
+                    : <TrendingUp size={24} className={isDarkMode ? 'text-gray-300' : 'text-medium-grey'} />}
                 </div>
               </div>
               <p className={`mt-2 text-sm font-medium ${realInvestmentImpact >= 0
-                ? (isDarkMode ? 'text-purple-300' : 'text-purple-600')
-                : (isDarkMode ? 'text-red-300' : 'text-red-600')
+                ? (isDarkMode ? 'text-gray-300' : 'text-medium-grey')
+                : (isDarkMode ? 'text-red-300' : 'text-warning-red')
                 }`}>
                 {`${realInvestmentImpact >= 0 ? '+' : ''}${formatPercentage(realInvestmentImpact)}`} {t('calculator.realGrowth')}
               </p>
@@ -779,8 +786,8 @@ const ResultsDisplay: React.FC = () => {
             </div>
           )}
 
-          <div className={`p-5 rounded-lg ${isDarkMode ? 'bg-purple-900/30' : 'bg-purple-50'} shadow-md text-center mt-6`}>
-            <p className={`text-lg font-medium ${isDarkMode ? 'text-purple-200' : 'text-purple-800'}`}>
+          <div className={`p-5 rounded-lg ${isDarkMode ? 'bg-gray-700/60' : 'bg-gray-200/50'} shadow-md text-center mt-6 border ${isDarkMode ? 'border-gray-600' : 'border-gray-300'}`}>
+            <p className={`text-lg font-medium ${isDarkMode ? 'text-gray-300' : 'text-dark-grey'}`}>
               {investmentType === 'custom'
                 ? `With ${customRate}% annual returns: ${formatCurrency(amount)} ➔ 
                   ${formatCurrency(result.combinedValue)} after inflation`

@@ -60,7 +60,7 @@ const CalculatorForm: React.FC<CalculatorFormProps> = ({ darkMode = false }) => 
   const currencySymbol = countryData?.symbol || '$';
 
   return (
-    <form onSubmit={handleSubmit} className="p-6 rounded-lg">
+    <form onSubmit={handleSubmit} className="p-6 rounded-lg w-full max-w-xl mx-auto">
       <div className="mb-4">
         <label htmlFor="amount" className={`block font-medium mb-2 ${isDarkMode ? 'text-gray-200' : 'text-gray-700'}`}>
           {t('calculator.initialAmount')}
@@ -76,7 +76,7 @@ const CalculatorForm: React.FC<CalculatorFormProps> = ({ darkMode = false }) => 
             step="any"
             value={amount || ''}
             onChange={(e) => setAmount(Number(e.target.value) || 0)}
-            className={`pl-8 w-full p-2 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500
+            className={`pl-8 w-full max-w-md p-2 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500
               ${isDarkMode
                 ? 'bg-gray-700 border-gray-600 text-white'
                 : 'border-gray-300 text-gray-900'}`}
@@ -166,7 +166,7 @@ const CalculatorForm: React.FC<CalculatorFormProps> = ({ darkMode = false }) => 
             step="0.1"
             value={customRateInput}
             onChange={handleCustomRateChange}
-            className={`w-full p-2 border rounded focus:outline-none focus:ring-2 focus:ring-purple-500
+            className={`w-full max-w-md p-2 border rounded focus:outline-none focus:ring-2 focus:ring-purple-500
               ${isDarkMode
                 ? 'bg-gray-700 border-gray-600 text-white placeholder-gray-400'
                 : 'border-gray-300 text-gray-900 placeholder-gray-500'}`}
