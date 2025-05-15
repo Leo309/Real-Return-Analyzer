@@ -61,12 +61,12 @@ const CalculatorForm: React.FC<CalculatorFormProps> = ({ darkMode = false }) => 
 
   return (
     <form onSubmit={handleSubmit} className="p-6 rounded-lg w-full max-w-xl mx-auto">
-      <div className="mb-4">
+      <div className="mb-6">
         <label htmlFor="amount" className={`block font-medium mb-2 ${isDarkMode ? 'text-gray-200' : 'text-gray-700'}`}>
           {t('calculator.initialAmount')}
         </label>
-        <div className="relative">
-          <span className={`absolute left-3 top-3 ${isDarkMode ? 'text-gray-400' : 'text-gray-500'}`}>
+        <div className="relative w-full max-w-md mx-auto border-b-2 border-gray-300 focus-within:border-blue-500 transition-colors pb-2 group">
+          <span className={`absolute left-0 top-0 text-xl font-semibold ${isDarkMode ? 'text-gray-300' : 'text-gray-600'}`}>
             {currencySymbol}
           </span>
           <input
@@ -76,55 +76,121 @@ const CalculatorForm: React.FC<CalculatorFormProps> = ({ darkMode = false }) => 
             step="any"
             value={amount || ''}
             onChange={(e) => setAmount(Number(e.target.value) || 0)}
-            className={`pl-8 w-full max-w-md p-2 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500
-              ${isDarkMode
-                ? 'bg-gray-700 border-gray-600 text-white'
-                : 'border-gray-300 text-gray-900'}`}
+            className={`text-right w-full pl-8 bg-transparent text-2xl focus:outline-none ${isDarkMode
+              ? 'text-white'
+              : 'text-gray-800'}`}
             required
           />
         </div>
       </div>
 
-      <div className="grid grid-cols-2 gap-4 mb-4">
-        <div>
-          <label htmlFor="startYear" className={`block font-medium mb-2 ${isDarkMode ? 'text-gray-200' : 'text-gray-700'}`}>
-            {t('calculator.startYear')}
+      <div className="mb-6 w-full max-w-md mx-auto">
+        <div className="flex justify-between items-center mb-2">
+          <label className={`font-medium ${isDarkMode ? 'text-gray-200' : 'text-gray-700'}`}>
+            {t('calculator.timeRange')}
           </label>
-          <select
-            id="startYear"
-            value={startYear}
-            onChange={(e) => setStartYear(Number(e.target.value))}
-            className={`w-full p-2 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500
-              ${isDarkMode
-                ? 'bg-gray-700 border-gray-600 text-white'
-                : 'border-gray-300 text-gray-900'}`}
-          >
-            {availableYears.map((year) => (
-              <option key={`start-${year}`} value={year}>
-                {year}
-              </option>
-            ))}
-          </select>
+          <div className="flex space-x-2">
+            <button 
+              type="button" 
+              onClick={() => {
+                const currentYear = new Date().getFullYear();
+                setStartYear(currentYear - 10);
+                setEndYear(currentYear);
+              }}
+              className={`text-xs px-2 py-1 rounded ${isDarkMode ? 'bg-gray-700 hover:bg-gray-600 text-gray-200' : 'bg-gray-200 hover:bg-gray-300 text-gray-700'}`}
+            >
+              10Y
+            </button>
+            <button 
+              type="button" 
+              onClick={() => {
+                const currentYear = new Date().getFullYear();
+                setStartYear(currentYear - 20);
+                setEndYear(currentYear);
+              }}
+              className={`text-xs px-2 py-1 rounded ${isDarkMode ? 'bg-gray-700 hover:bg-gray-600 text-gray-200' : 'bg-gray-200 hover:bg-gray-300 text-gray-700'}`}
+            >
+              20Y
+            </button>
+            <button 
+              type="button" 
+              onClick={() => {
+                const currentYear = new Date().getFullYear();
+                setStartYear(currentYear - 50);
+                setEndYear(currentYear);
+              }}
+              className={`text-xs px-2 py-1 rounded ${isDarkMode ? 'bg-gray-700 hover:bg-gray-600 text-gray-200' : 'bg-gray-200 hover:bg-gray-300 text-gray-700'}`}
+            >
+              50Y
+            </button>
+          </div>
         </div>
-        <div>
-          <label htmlFor="endYear" className={`block font-medium mb-2 ${isDarkMode ? 'text-gray-200' : 'text-gray-700'}`}>
-            {t('calculator.endYear')}
-          </label>
-          <select
-            id="endYear"
-            value={endYear}
-            onChange={(e) => setEndYear(Number(e.target.value))}
-            className={`w-full p-2 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500
-              ${isDarkMode
-                ? 'bg-gray-700 border-gray-600 text-white'
-                : 'border-gray-300 text-gray-900'}`}
-          >
-            {availableYears.filter(year => year >= startYear).map((year) => (
-              <option key={`end-${year}`} value={year}>
-                {year}
-              </option>
-            ))}
-          </select>
+        
+        <div className="bg-gray-100 dark:bg-gray-800 p-4 rounded-lg shadow-inner">
+          <div className="flex justify-between mb-2">
+            <div className="text-center">
+              <span className={`block text-sm mb-1 ${isDarkMode ? 'text-gray-400' : 'text-gray-500'}`}>From</span>
+              <div className="relative inline-block">
+                <select
+                  id="startYear"
+                  value={startYear}
+                  onChange={(e) => setStartYear(Number(e.target.value))}
+                  className={`appearance-none py-1 pl-3 pr-7 rounded border-0 text-lg font-medium focus:outline-none focus:ring-1 focus:ring-blue-500 ${isDarkMode ? 'bg-gray-700 text-white' : 'bg-white text-gray-800'}`}
+                >
+                  {availableYears.map((year) => (
+                    <option key={`start-${year}`} value={year}>
+                      {year}
+                    </option>
+                  ))}
+                </select>
+                <div className="absolute inset-y-0 right-0 flex items-center pr-1 pointer-events-none">
+                  <svg className="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7"></path>
+                  </svg>
+                </div>
+              </div>
+            </div>
+            
+            <div className="text-center">
+              <span className={`block text-sm mb-1 ${isDarkMode ? 'text-gray-400' : 'text-gray-500'}`}>To</span>
+              <div className="relative inline-block">
+                <select
+                  id="endYear"
+                  value={endYear}
+                  onChange={(e) => setEndYear(Number(e.target.value))}
+                  className={`appearance-none py-1 pl-3 pr-7 rounded border-0 text-lg font-medium focus:outline-none focus:ring-1 focus:ring-blue-500 ${isDarkMode ? 'bg-gray-700 text-white' : 'bg-white text-gray-800'}`}
+                >
+                  {availableYears.filter(year => year >= startYear).map((year) => (
+                    <option key={`end-${year}`} value={year}>
+                      {year}
+                    </option>
+                  ))}
+                </select>
+                <div className="absolute inset-y-0 right-0 flex items-center pr-1 pointer-events-none">
+                  <svg className="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7"></path>
+                  </svg>
+                </div>
+              </div>
+            </div>
+          </div>
+          
+          <div className="mt-4 px-2">
+            <div className="relative h-2 bg-gray-300 dark:bg-gray-600 rounded-full overflow-hidden">
+              {/* Duration indicator */}
+              <div 
+                className="absolute h-full bg-blue-500 dark:bg-blue-600"
+                style={{
+                  left: `${((startYear - availableYears[0]) / (availableYears[availableYears.length-1] - availableYears[0])) * 100}%`,
+                  right: `${100 - ((endYear - availableYears[0]) / (availableYears[availableYears.length-1] - availableYears[0])) * 100}%`
+                }}
+              ></div>
+            </div>
+            <div className="flex justify-between mt-1">
+              <span className={`text-xs ${isDarkMode ? 'text-gray-400' : 'text-gray-500'}`}>{availableYears[0]}</span>
+              <span className={`text-xs ${isDarkMode ? 'text-gray-400' : 'text-gray-500'}`}>{availableYears[availableYears.length-1]}</span>
+            </div>
+          </div>
         </div>
       </div>
 
@@ -179,17 +245,18 @@ const CalculatorForm: React.FC<CalculatorFormProps> = ({ darkMode = false }) => 
         </div>
       )}
 
-      <button
-        type="submit"
-        className={`w-full py-2 px-4 rounded font-medium transition-colors mt-6 flex items-center justify-center
-          ${isDarkMode
-            ? 'bg-blue-600 hover:bg-blue-700 text-white'
-            : 'bg-blue-500 hover:bg-blue-600 text-white'
-          }`}
-      >
-        {t('calculator.calculateButton')}
-        <ArrowRight size={16} className="ml-2" />
-      </button>
+      <div className="flex justify-center mt-8 mb-2">
+        <button
+          type="submit"
+          className={`px-8 py-3 rounded-full font-medium text-base shadow-lg transform transition-all duration-300 flex items-center
+            ${isDarkMode
+              ? 'bg-blue-600 hover:bg-blue-700 text-white shadow-blue-500/30 hover:shadow-blue-600/40 hover:translate-y-[-2px]'
+              : 'bg-blue-500 hover:bg-blue-600 text-white shadow-blue-500/30 hover:shadow-lg hover:translate-y-[-2px]'}`}
+        >
+          Calculate
+          <ArrowRight size={18} className="ml-2" strokeWidth={2.5} />
+        </button>
+      </div>
     </form>
   );
 };
