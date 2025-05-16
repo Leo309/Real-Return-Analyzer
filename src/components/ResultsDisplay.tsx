@@ -24,6 +24,7 @@ import { historicalData } from '@/data/historical';
 import { TrendingDown, TrendingUp, DollarSign } from 'lucide-react';
 import ShareCard from '@/components/ShareCard';
 import { useTranslation } from '@/hooks/useTranslation';
+import { getThemeColor, getValueColor } from '@/lib/themeColors';
 
 // Improved gradient plugin for better SSR compatibility
 const createGradientPlugin = (isDarkMode: boolean) => {
@@ -72,6 +73,48 @@ const createGradientPlugin = (isDarkMode: boolean) => {
   };
 };
 
+/**
+ * Result Summary Card Component
+ * A reusable component for displaying result values with semantic color coding
+ */
+const ResultSummaryCard = ({ 
+  title, 
+  value, 
+  percentage = 0, 
+  isDarkMode,
+  currencyFormatter,
+  icon = null,
+  className = ''
+}) => {
+  return (
+    <div className={`p-5 rounded-lg ${isDarkMode ? 'bg-gray-800' : 'bg-white'} shadow-sm border ${isDarkMode ? 'border-gray-700' : 'border-gray-200'} ${className}`}>
+      <div className="flex flex-col h-full justify-between">
+        <div>
+          <p className={`text-sm ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>
+            {title}
+          </p>
+          <p className={`text-2xl font-bold mt-2 mb-1 ${percentage !== 0 ? getValueColor(percentage, isDarkMode, 'text') : (isDarkMode ? 'text-white' : 'text-gray-900')}`}>
+            {currencyFormatter(value)}
+          </p>
+          
+          {percentage !== 0 && (
+            <div className="flex items-center mt-1">
+              {icon || (
+                percentage < 0 
+                  ? <TrendingDown size={16} className={getValueColor(percentage, isDarkMode, 'text')} /> 
+                  : <TrendingUp size={16} className={getValueColor(percentage, isDarkMode, 'text')} />
+              )}
+              <p className={`text-sm font-medium ml-1 ${getValueColor(percentage, isDarkMode, 'text')}`}>
+                {`${percentage >= 0 ? '+' : ''}${percentage.toFixed(2)}%`}
+              </p>
+            </div>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+};
+
 const ResultsDisplay: React.FC = () => {
   const { t } = useTranslation();
   const inflationChartRef = useRef<HTMLDivElement | null>(null);
@@ -86,15 +129,10 @@ const ResultsDisplay: React.FC = () => {
   const [chartError, setChartError] = useState(false);
   const [chartPluginsInitialized, setChartPluginsInitialized] = useState(false);
   
-  // IMPORTANT: Remove the fallback timer that was causing charts to disappear
-  // const [shouldUseTextFallback, setShouldUseTextFallback] = useState(false);
-  
   // Important: Only run on client-side
   useEffect(() => {
     setIsMounted(true);
     setIsDarkMode(document.documentElement.classList.contains('dark'));
-    
-    // REMOVE the fallback timer logic that was causing the charts to disappear
     
     // Listen for theme changes
     const observer = new MutationObserver((mutations) => {
@@ -322,28 +360,27 @@ const ResultsDisplay: React.FC = () => {
       {
         label: t('calculator.originalAmount'),
         data: validateDataPoints(filteredBreakdown.map(() => amount)),
-        borderColor: isDarkMode ? '#9F9F9F' : '#555555', // 更深的灰色以增加对比度
+        borderColor: isDarkMode ? '#9F9F9F' : '#555555',
         backgroundColor: 'transparent',
-        borderWidth: 2.5, // 增加线宽
-        borderDash: [6, 4], // 调整虚线样式，更加明显
+        borderWidth: 2.5,
+        borderDash: [6, 4],
         tension: 0 // Use straight lines for stability
       },
       {
         label: t('calculator.trueValueToday'),
         data: validateDataPoints(filteredBreakdown.map(item => item.inflationAdjusted)),
-        borderColor: isDarkMode ? '#4991D6' : '#1E63A0', // 更深的主蓝色
-        backgroundColor: isDarkMode ? 'rgba(90, 154, 210, 0.5)' : 'rgba(90, 154, 210, 0.65)', // 增加填充区域的不透明度
+        borderColor: isDarkMode ? '#60A5FA' : '#2563EB', // Use theme colors
+        backgroundColor: isDarkMode ? 'rgba(96, 165, 250, 0.5)' : 'rgba(37, 99, 235, 0.65)',
         borderWidth: 3,
         fill: true,
         tension: 0, // Use straight lines for stability
-        pointRadius: 0, // 通常隐藏点
-        pointHoverRadius: 7, // 悬停时显示更大的点
+        pointRadius: 0,
+        pointHoverRadius: 7,
       },
     ]
   };
 
   const chartOptions: ChartOptions<"line"> = {
-    // Disable bezier curves in production to prevent control point errors
     responsive: true,
     maintainAspectRatio: false,
     layout: {
@@ -370,8 +407,8 @@ const ResultsDisplay: React.FC = () => {
       title: { display: false },
       tooltip: {
         backgroundColor: isDarkMode ? 'rgba(30, 41, 59, 0.9)' : 'rgba(255, 255, 255, 0.95)',
-        titleColor: isDarkMode ? '#FFFFFF' : '#595959', // dark-grey
-        bodyColor: isDarkMode ? '#FFFFFF' : '#595959', // dark-grey
+        titleColor: isDarkMode ? '#FFFFFF' : '#595959',
+        bodyColor: isDarkMode ? '#FFFFFF' : '#595959',
         borderColor: isDarkMode ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.05)',
         borderWidth: 1,
         padding: 14,
@@ -398,21 +435,21 @@ const ResultsDisplay: React.FC = () => {
       x: {
         type: 'category',
         ticks: {
-        autoSkip: true,
-        maxRotation: 0,
-        maxTicksLimit: 8,
-        color: isDarkMode ? '#BBBBBB' : '#333333', // 深色的文本提高对比度
-        font: {
-        family: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
-        size: 11,
-        weight: '600' // 增加字重
-        },
-        padding: 8
+          autoSkip: true,
+          maxRotation: 0,
+          maxTicksLimit: 8,
+          color: isDarkMode ? '#BBBBBB' : '#333333',
+          font: {
+            family: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
+            size: 11,
+            weight: '600'
+          },
+          padding: 8
         },
         grid: {
-        color: isDarkMode ? 'rgba(255, 255, 255, 0.1)' : 'rgba(170, 170, 170, 0.7)', // 加深网格线
-        tickLength: 8,
-        lineWidth: 0.7 // 增加线宽
+          color: isDarkMode ? 'rgba(255, 255, 255, 0.1)' : 'rgba(170, 170, 170, 0.7)',
+          tickLength: 8,
+          lineWidth: 0.7
         },
         border: {
           display: false
@@ -422,22 +459,21 @@ const ResultsDisplay: React.FC = () => {
         type: 'linear',
         beginAtZero: false,
         ticks: {
-        color: isDarkMode ? '#BBBBBB' : '#333333', // 深色的文本提高对比度
-        callback: (value: string | number) => {
-        // Ensure numeric value handling
-        return formatCurrency(Number(value));
-        },
-        font: {
-        family: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
-        size: 11,
-        weight: '600' // 增加字重
-        },
-        padding: 8
+          color: isDarkMode ? '#BBBBBB' : '#333333',
+          callback: (value: string | number) => {
+            return formatCurrency(Number(value));
+          },
+          font: {
+            family: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
+            size: 11,
+            weight: '600'
+          },
+          padding: 8
         },
         grid: {
-        color: isDarkMode ? 'rgba(255, 255, 255, 0.1)' : 'rgba(170, 170, 170, 0.7)', // 加深网格线
-        tickLength: 8,
-        lineWidth: 0.7 // 增加线宽
+          color: isDarkMode ? 'rgba(255, 255, 255, 0.1)' : 'rgba(170, 170, 170, 0.7)',
+          tickLength: 8,
+          lineWidth: 0.7
         },
         border: {
           display: false
@@ -449,13 +485,12 @@ const ResultsDisplay: React.FC = () => {
       intersect: false,
     },
     animations: {
-      // Disable animations that could cause issues with control points
       tension: false
     },
     elements: {
       point: {
-        radius: 0, // Hide points normally
-        hoverRadius: 6, // Show on hover
+        radius: 0,
+        hoverRadius: 6,
       }
     }
   };
@@ -493,31 +528,31 @@ const ResultsDisplay: React.FC = () => {
       {
         label: t('calculator.originalAmount'),
         data: validateDataPoints(filteredBreakdown.map(() => amount)),
-        borderColor: isDarkMode ? '#9F9F9F' : '#7F7F7F', // medium-grey, lighter for dark mode
+        borderColor: isDarkMode ? '#9F9F9F' : '#7F7F7F',
         backgroundColor: 'transparent',
         borderWidth: 2,
         borderDash: [5, 5],
-        tension: 0, // Use straight lines for stability
+        tension: 0,
       },
       {
         label: getInvestmentTypeName(),
         data: validateDataPoints(filteredBreakdown.map(item => item.opportunityCost)),
-        borderColor: isDarkMode ? '#4991D6' : '#1E63A0', // 更深的主蓝色
+        borderColor: isDarkMode ? '#60A5FA' : '#2563EB',
         backgroundColor: 'transparent',
-        borderWidth: 3.5, // 增加线宽
+        borderWidth: 3.5,
         fill: false,
-        tension: 0, // Use straight lines for stability
+        tension: 0,
         pointRadius: 0,
         pointHoverRadius: 7,
       },
       {
         label: t('calculator.realGrowthAfterInflation'),
         data: validateDataPoints(filteredBreakdown.map(item => item.combined)),
-        borderColor: isDarkMode ? '#9F9F9F' : '#555555', // 更深的灰色
-        backgroundColor: isDarkMode ? 'rgba(169, 196, 226, 0.4)' : 'rgba(90, 154, 210, 0.4)', // 增加填充区域的对比度
+        borderColor: isDarkMode ? '#9F9F9F' : '#555555',
+        backgroundColor: isDarkMode ? 'rgba(96, 165, 250, 0.2)' : 'rgba(37, 99, 235, 0.1)',
         borderWidth: 3,
         fill: true,
-        tension: 0, // Use straight lines for stability
+        tension: 0,
         pointRadius: 0,
         pointHoverRadius: 7,
       },
@@ -531,91 +566,57 @@ const ResultsDisplay: React.FC = () => {
     <div className="flex flex-col gap-6 max-w-full overflow-hidden">
       <h2 className={`text-xl font-bold ${isDarkMode ? 'text-white' : 'text-gray-900'} mb-4`}>Results</h2>
 
-      {/* Enhanced Animation Cards */}
+      {/* Summary Cards - Using the semantic color approach */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
-        <div className={`p-5 rounded-lg ${isDarkMode ? 'bg-gray-700/70' : 'bg-white'} shadow-md transition-all duration-300 hover:shadow-lg border ${isDarkMode ? 'border-gray-600' : 'border-gray-100'}`}>
-          <div className="flex flex-col h-full justify-between">
-            <div>
-              <p className={`text-sm ${isDarkMode ? 'text-gray-300' : 'text-dark-grey'}`}>
-                {t('calculator.originalAmount')} ({startYear})
-              </p>
-              <p className={`text-3xl font-bold mt-2 mb-1 ${isDarkMode ? 'text-white' : 'text-primary-blue'}`}>
-                {formatCurrency(amount)}
-              </p>
-            </div>
-
-          </div>
-        </div>
-
-        <div className={`p-5 rounded-lg ${inflationImpact < 0
-          ? (isDarkMode ? 'bg-red-900/20' : 'bg-red-50')
-          : (isDarkMode ? 'bg-blue-900/20' : 'bg-secondary-blue/20')
-          } shadow-md transition-all duration-300 hover:shadow-lg border ${inflationImpact < 0 
-            ? (isDarkMode ? 'border-red-800' : 'border-red-200')
-            : (isDarkMode ? 'border-blue-800' : 'border-secondary-blue')}`}>
-          <div className="flex flex-col h-full justify-between">
-            <div>
-              <p className={`text-sm ${isDarkMode ? 'text-gray-300' : 'text-dark-grey'}`}>
-                {t('calculator.trueValueToday')} ({endYear})
-              </p>
-              <p className={`text-3xl font-bold mt-2 mb-1 ${isDarkMode ? 'text-white' : inflationImpact < 0 ? 'text-warning-red' : 'text-primary-blue'}`}>
-                {formatCurrency(result.inflationAdjustedValue)}
-              </p>
-              <p className={`text-sm font-medium ${inflationImpact < 0
-                ? (isDarkMode ? 'text-red-300' : 'text-warning-red')
-                : (isDarkMode ? 'text-blue-300' : 'text-primary-blue')}`}>
-                {`${inflationImpact >= 0 ? '+' : ''}${formatPercentage(inflationImpact)}`}
-              </p>
-            </div>
-
-          </div>
-        </div>
-
+        {/* Original Amount Card */}
+        <ResultSummaryCard
+          title={`${t('calculator.originalAmount')} (${startYear})`}
+          value={amount}
+          percentage={0}
+          isDarkMode={isDarkMode}
+          currencyFormatter={formatCurrency}
+        />
+        
+        {/* True Value Today Card */}
+        <ResultSummaryCard
+          title={`${t('calculator.trueValueToday')} (${endYear})`}
+          value={result.inflationAdjustedValue}
+          percentage={inflationImpact}
+          isDarkMode={isDarkMode}
+          currencyFormatter={formatCurrency}
+        />
+        
+        {/* Real Growth After Inflation Card */}
         {investmentType !== 'none' ? (
-          <div className={`p-5 rounded-lg ${realInvestmentImpact < 0
-            ? (isDarkMode ? 'bg-red-900/30' : 'bg-red-100')
-            : (isDarkMode ? 'bg-blue-900/30' : 'bg-secondary-blue/25')
-            } shadow-md hover:shadow-lg transition-shadow border ${realInvestmentImpact < 0
-              ? (isDarkMode ? 'border-red-800' : 'border-red-200')
-              : (isDarkMode ? 'border-blue-800' : 'border-secondary-blue')}`}>
-            <div className="flex flex-col h-full justify-between">
-              <div>
-                <p className={`text-sm ${isDarkMode ? 'text-gray-300' : 'text-dark-grey'}`}>
-                  {t('calculator.realGrowthAfterInflation')}
-                </p>
-                <p className={`text-3xl font-bold mt-2 mb-1 ${isDarkMode ? 'text-white' : realInvestmentImpact < 0 ? 'text-warning-red' : 'text-primary-blue'}`}>
-                  {formatCurrency(result.combinedValue)}
-                </p>
-                <p className={`text-sm font-medium ${realInvestmentImpact >= 0
-                  ? (isDarkMode ? 'text-blue-300' : 'text-primary-blue')
-                  : (isDarkMode ? 'text-red-300' : 'text-warning-red')
-                  }`}>
-                  {`${realInvestmentImpact >= 0 ? '+' : ''}${formatPercentage(realInvestmentImpact)}`}
-                </p>
-              </div>
-
-            </div>
-          </div>
+          <ResultSummaryCard
+            title={t('calculator.realGrowthAfterInflation')}
+            value={result.combinedValue}
+            percentage={realInvestmentImpact}
+            isDarkMode={isDarkMode}
+            currencyFormatter={formatCurrency}
+          />
         ) : (
           <div></div> // Empty div for grid alignment when no investment is selected
         )}
       </div>
 
       {/* Inflation Impact Section */}
-      <div className={`p-6 rounded-lg shadow-md ${isDarkMode ? 'bg-gray-800/70' : 'bg-white'} border ${isDarkMode ? 'border-gray-600' : 'border-gray-200'}`}>
-        <h3 className={`text-xl font-semibold mb-4 ${isDarkMode ? 'text-white' : 'text-dark-grey'}`}>
+      <div className={`p-6 rounded-lg shadow-sm ${isDarkMode ? 'bg-gray-800 border border-gray-700' : 'bg-white border border-gray-200'}`}>
+        <h3 className={`text-xl font-semibold mb-4 ${isDarkMode ? 'text-white' : 'text-gray-800'}`}>
           {t('calculator.inflationImpact')} ({startYear} - {endYear})
         </h3>
 
         {inflationImpact < 0 && (
-          <div className={`p-5 mb-4 rounded-lg shadow-md ${isDarkMode ? 'bg-red-900/30' : 'bg-red-50 border border-red-200'}`}>
+          <div className={`p-4 mb-4 rounded-lg ${isDarkMode ? 'bg-gray-800 border border-gray-700' : 'bg-white border border-gray-200'}`}>
             <div className="flex items-center">
-              <DollarSign className={isDarkMode ? 'text-red-300' : 'text-warning-red'} size={20} />
-              <h4 className={`ml-2 font-bold ${isDarkMode ? 'text-red-300' : 'text-dark-grey'}`}>
+              <div className={`p-2 rounded-full ${isDarkMode ? 'bg-red-900/30 text-red-400' : 'bg-red-50 text-red-600'}`}>
+                <DollarSign size={20} />
+              </div>
+              <h4 className={`ml-2 font-bold ${isDarkMode ? 'text-white' : 'text-gray-800'}`}>
                 {t('calculator.moneyLostToInflation')}: {formatCurrency(Math.abs(amount - result.inflationAdjustedValue))}
               </h4>
             </div>
-            <p className={`mt-2 text-sm ${isDarkMode ? 'text-red-200' : 'text-medium-grey font-medium'}`}>
+            <p className={`mt-2 text-sm ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>
               That&apos;s equivalent to {Math.round((amount - result.inflationAdjustedValue) / (countryCode === 'US' ? 5 : 6))} premium coffees
               or {Math.round((amount - result.inflationAdjustedValue) / (countryCode === 'US' ? 20 : 25))} hours of work.
             </p>
@@ -670,8 +671,12 @@ const ResultsDisplay: React.FC = () => {
         )}
 
         {investmentType === 'none' && (
-          <div className={`p-5 rounded-lg ${isDarkMode ? 'bg-blue-900/30' : 'bg-secondary-blue/30'} shadow-md text-center mt-6 border ${isDarkMode ? 'border-blue-800' : 'border-secondary-blue'}`}>
-            <p className={`text-lg font-medium ${isDarkMode ? 'text-blue-200' : 'text-primary-blue'}`}>
+          <div className={`p-5 rounded-lg shadow-sm text-center mt-6 border ${
+            isDarkMode 
+              ? 'bg-gray-700 border-gray-600 text-gray-300' 
+              : 'bg-gray-50 border-gray-200 text-gray-700'
+          }`}>
+            <p className={`text-lg font-medium`}>
               {`Due to inflation, your ${formatCurrency(amount)} ${inflationImpact < 0 ? 'lost' : 'gained'} ${formatCurrency(Math.abs(amount - result.inflationAdjustedValue))} 
               purchasing power (${formatPercentage(inflationImpact)}) from ${startYear} to ${endYear}`}
             </p>
@@ -680,55 +685,54 @@ const ResultsDisplay: React.FC = () => {
       </div>
 
       {investmentType !== 'none' && (
-        <div className={`p-6 rounded-lg shadow-md ${isDarkMode ? 'bg-gray-800/70' : 'bg-white'} border ${isDarkMode ? 'border-gray-600' : 'border-gray-200'}`}>
-          <h3 className={`text-xl font-semibold mb-4 ${isDarkMode ? 'text-white' : 'text-dark-grey'}`}>
+        <div className={`p-6 rounded-lg shadow-sm ${isDarkMode ? 'bg-gray-800 border border-gray-700' : 'bg-white border border-gray-200'}`}>
+          <h3 className={`text-xl font-semibold mb-4 ${isDarkMode ? 'text-white' : 'text-gray-800'}`}>
           {getInvestmentTypeName()} {t('calculator.investmentPerformance')}
           </h3>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
-            <div className={`p-5 rounded-lg ${isDarkMode ? 'bg-blue-900/30' : 'bg-gray-200'} shadow-md hover:shadow-lg transition-shadow border ${isDarkMode ? 'border-blue-800' : 'border-secondary-blue'}`}>
+            <div className={`p-5 rounded-lg ${isDarkMode ? 'bg-gray-700' : 'bg-gray-50'} shadow-sm border ${isDarkMode ? 'border-gray-600' : 'border-gray-200'}`}>
               <div className="flex items-center justify-between">
                 <div>
-                  <p className={`text-sm ${isDarkMode ? 'text-gray-300' : 'text-dark-grey'}`}>
+                  <p className={`text-sm ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>
                     {t('calculator.withInvestmentReturns')}
                   </p>
-                  <p className={`text-3xl font-bold ${isDarkMode ? 'text-white' : 'text-primary-blue'}`}>
+                  <p className={`text-2xl font-bold ${isDarkMode ? 'text-blue-400' : 'text-blue-600'}`}>
                     {formatCurrency(result.opportunityCostValue)}
                   </p>
+                  <p className={`mt-1 text-sm font-medium ${isDarkMode ? 'text-blue-400' : 'text-blue-600'}`}>
+                    {`${opportunityCostImpact >= 0 ? '+' : ''}${formatPercentage(opportunityCostImpact)}`} {t('calculator.nominalGrowth')}
+                  </p>
                 </div>
-                <div className={`p-3 rounded-full ${isDarkMode ? 'bg-blue-800/50' : 'bg-primary-blue/20'}`}>
-                  <TrendingUp size={24} className={isDarkMode ? 'text-blue-300' : 'text-primary-blue'} />
+                <div className={`p-3 rounded-full ${isDarkMode ? 'bg-blue-900/50' : 'bg-blue-100'}`}>
+                  <TrendingUp size={24} className={isDarkMode ? 'text-blue-400' : 'text-blue-600'} />
                 </div>
               </div>
-              <p className={`mt-2 text-sm font-medium ${isDarkMode ? 'text-blue-300' : 'text-primary-blue'}`}>
-                {`${opportunityCostImpact >= 0 ? '+' : ''}${formatPercentage(opportunityCostImpact)}`} {t('calculator.nominalGrowth')}
-              </p>
             </div>
 
-            <div className={`p-5 rounded-lg ${isDarkMode ? 'bg-gray-800/70' : 'bg-gray-200'} shadow-md hover:shadow-lg transition-shadow border ${realInvestmentImpact < 0 ? (isDarkMode ? 'border-red-800' : 'border-red-200') : (isDarkMode ? 'border-gray-700' : 'border-gray-300')}`}>
+            <div className={`p-5 rounded-lg ${isDarkMode ? 'bg-gray-700' : 'bg-gray-50'} shadow-sm border ${isDarkMode ? 'border-gray-600' : 'border-gray-200'}`}>
               <div className="flex items-center justify-between">
                 <div>
-                  <p className={`text-sm ${isDarkMode ? 'text-gray-300' : 'text-dark-grey'}`}>
+                  <p className={`text-sm ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>
                     {t('calculator.realGrowthAfterInflation')}
                   </p>
-                  <p className={`text-3xl font-bold ${isDarkMode ? 'text-white' : realInvestmentImpact < 0 ? 'text-warning-red' : 'text-medium-grey'}`}>
+                  <p className={`text-2xl font-bold ${getValueColor(realInvestmentImpact, isDarkMode, 'text')}`}>
                     {formatCurrency(result.combinedValue)}
                   </p>
+                  <p className={`mt-1 text-sm font-medium ${getValueColor(realInvestmentImpact, isDarkMode, 'text')}`}>
+                    {`${realInvestmentImpact >= 0 ? '+' : ''}${formatPercentage(realInvestmentImpact)}`} {t('calculator.realGrowth')}
+                  </p>
                 </div>
-                <div className={`p-3 rounded-full ${realInvestmentImpact < 0
-                  ? (isDarkMode ? 'bg-red-800/50' : 'bg-red-100')
-                  : (isDarkMode ? 'bg-gray-700' : 'bg-gray-300')}`}>
+                <div className={`p-3 rounded-full ${
+                  realInvestmentImpact < 0
+                    ? (isDarkMode ? 'bg-red-900/50' : 'bg-red-100')
+                    : (isDarkMode ? 'bg-blue-900/50' : 'bg-blue-100')
+                }`}>
                   {realInvestmentImpact < 0
-                    ? <TrendingDown size={24} className={isDarkMode ? 'text-red-300' : 'text-warning-red'} />
-                    : <TrendingUp size={24} className={isDarkMode ? 'text-gray-300' : 'text-medium-grey'} />}
+                    ? <TrendingDown size={24} className={isDarkMode ? 'text-red-400' : 'text-red-600'} />
+                    : <TrendingUp size={24} className={isDarkMode ? 'text-blue-400' : 'text-blue-600'} />}
                 </div>
               </div>
-              <p className={`mt-2 text-sm font-medium ${realInvestmentImpact >= 0
-                ? (isDarkMode ? 'text-gray-300' : 'text-medium-grey')
-                : (isDarkMode ? 'text-red-300' : 'text-warning-red')
-                }`}>
-                {`${realInvestmentImpact >= 0 ? '+' : ''}${formatPercentage(realInvestmentImpact)}`} {t('calculator.realGrowth')}
-              </p>
             </div>
           </div>
 
@@ -781,8 +785,8 @@ const ResultsDisplay: React.FC = () => {
             </div>
           )}
 
-          <div className={`p-5 rounded-lg ${isDarkMode ? 'bg-gray-700/60' : 'bg-gray-200/50'} shadow-md text-center mt-6 border ${isDarkMode ? 'border-gray-600' : 'border-gray-300'}`}>
-            <p className={`text-lg font-medium ${isDarkMode ? 'text-gray-300' : 'text-dark-grey'}`}>
+          <div className={`p-5 rounded-lg ${isDarkMode ? 'bg-gray-700' : 'bg-gray-50'} shadow-sm text-center mt-6 border ${isDarkMode ? 'border-gray-600' : 'border-gray-200'}`}>
+            <p className={`text-lg font-medium ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>
               {investmentType === 'custom'
                 ? `With ${customRate}% annual returns: ${formatCurrency(amount)} ➔ 
                   ${formatCurrency(result.combinedValue)} after inflation`
