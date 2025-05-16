@@ -25,6 +25,56 @@ const InvestmentGrid: React.FC<InvestmentGridProps> = ({ darkMode }) => {
   const handleBack = () => {
     goBack();
   };
+
+  // Find base coverage info for consistent data across cards
+  const baseCoverage = investmentCoverage.find(c => c.investmentType === 'none') || investmentCoverage[0] || {
+    yearsAvailable: 0,
+    startYear: 2000,
+    endYear: new Date().getFullYear(),
+    dataCompleteness: 'full' as const
+  };
+  
+  // Create a unified list of all investment types to render
+  const allInvestmentTypes: Array<{
+    type: InvestmentType,
+    yearsAvailable: number,
+    startYear: number,
+    endYear: number,
+    dataCompleteness: string,
+    averageReturn: number | null
+  }> = [
+    // Add "No Investment" card
+    {
+      type: 'none',
+      yearsAvailable: baseCoverage.yearsAvailable,
+      startYear: baseCoverage.startYear,
+      endYear: baseCoverage.endYear,
+      dataCompleteness: baseCoverage.dataCompleteness,
+      averageReturn: 0
+    },
+    
+    // Add all dynamic investment options
+    ...investmentCoverage
+      .filter(coverage => coverage.investmentType !== 'none')
+      .map(coverage => ({
+        type: coverage.investmentType as InvestmentType,
+        yearsAvailable: coverage.yearsAvailable,
+        startYear: coverage.startYear,
+        endYear: coverage.endYear,
+        dataCompleteness: coverage.dataCompleteness,
+        averageReturn: coverage.averageReturn ?? null
+      })),
+    
+    // Add custom option
+    {
+      type: 'custom',
+      yearsAvailable: baseCoverage.yearsAvailable,
+      startYear: baseCoverage.startYear,
+      endYear: baseCoverage.endYear,
+      dataCompleteness: 'full',
+      averageReturn: null
+    }
+  ];
   
   return (
     <div className="max-w-4xl mx-auto">
@@ -52,48 +102,20 @@ const InvestmentGrid: React.FC<InvestmentGridProps> = ({ darkMode }) => {
       </div>
       
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-        {/* No Investment option always available */}
-        <InvestmentCard
-          key="none"
-          investmentType="none"
-          darkMode={darkMode}
-          onClick={() => handleSelectInvestment('none')}
-          yearsAvailable={investmentCoverage[0]?.yearsAvailable || 0}
-          startYear={investmentCoverage[0]?.startYear || 2000}
-          endYear={investmentCoverage[0]?.endYear || new Date().getFullYear()}
-          dataCompleteness={investmentCoverage[0]?.dataCompleteness || 'full'}
-          averageReturn={0}
-        />
-        
-        {/* Dynamic investment options based on data availability */}
-        {investmentCoverage
-          .filter((coverage) => coverage.investmentType !== 'none')
-          .map((coverage) => (
-            <InvestmentCard
-              key={coverage.investmentType}
-              investmentType={coverage.investmentType}
-              darkMode={darkMode}
-              onClick={() => handleSelectInvestment(coverage.investmentType)}
-              yearsAvailable={coverage.yearsAvailable}
-              startYear={coverage.startYear}
-              endYear={coverage.endYear}
-              dataCompleteness={coverage.dataCompleteness}
-              averageReturn={coverage.averageReturn ?? null}
-            />
-          ))}
-          
-        {/* Custom option always available */}
-        <InvestmentCard
-          key="custom"
-          investmentType="custom"
-          darkMode={darkMode}
-          onClick={() => handleSelectInvestment('custom')}
-          yearsAvailable={investmentCoverage[0]?.yearsAvailable || 0}
-          startYear={investmentCoverage[0]?.startYear || 2000}
-          endYear={investmentCoverage[0]?.endYear || new Date().getFullYear()}
-          dataCompleteness="full"
-          averageReturn={null}
-        />
+        {/* Render all investment cards using the unified list */}
+        {allInvestmentTypes.map((investment) => (
+          <InvestmentCard
+            key={investment.type}
+            investmentType={investment.type}
+            darkMode={darkMode}
+            onClick={() => handleSelectInvestment(investment.type)}
+            yearsAvailable={investment.yearsAvailable}
+            startYear={investment.startYear}
+            endYear={investment.endYear}
+            dataCompleteness={investment.dataCompleteness as any}
+            averageReturn={investment.averageReturn}
+          />
+        ))}
       </div>
     </div>
   );
