@@ -686,7 +686,7 @@ const ResultsDisplay: React.FC = () => {
           </h3>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
-            <div className={`p-5 rounded-lg ${isDarkMode ? 'bg-blue-900/30' : 'bg-secondary-blue/25'} shadow-md hover:shadow-lg transition-shadow border ${isDarkMode ? 'border-blue-800' : 'border-secondary-blue'}`}>
+            <div className={`p-5 rounded-lg ${isDarkMode ? 'bg-blue-900/30' : 'bg-gray-200'} shadow-md hover:shadow-lg transition-shadow border ${isDarkMode ? 'border-blue-800' : 'border-secondary-blue'}`}>
               <div className="flex items-center justify-between">
                 <div>
                   <p className={`text-sm ${isDarkMode ? 'text-gray-300' : 'text-dark-grey'}`}>
@@ -705,12 +705,7 @@ const ResultsDisplay: React.FC = () => {
               </p>
             </div>
 
-            <div className={`p-5 rounded-lg ${realInvestmentImpact < 0
-              ? (isDarkMode ? 'bg-red-900/30' : 'bg-red-100')
-              : (isDarkMode ? 'bg-gray-800/70' : 'bg-gray-200/60')
-              } shadow-md hover:shadow-lg transition-shadow border ${realInvestmentImpact < 0
-                ? (isDarkMode ? 'border-red-800' : 'border-red-200')
-                : (isDarkMode ? 'border-gray-700' : 'border-gray-300')}`}>
+            <div className={`p-5 rounded-lg ${isDarkMode ? 'bg-gray-800/70' : 'bg-gray-200'} shadow-md hover:shadow-lg transition-shadow border ${realInvestmentImpact < 0 ? (isDarkMode ? 'border-red-800' : 'border-red-200') : (isDarkMode ? 'border-gray-700' : 'border-gray-300')}`}>
               <div className="flex items-center justify-between">
                 <div>
                   <p className={`text-sm ${isDarkMode ? 'text-gray-300' : 'text-dark-grey'}`}>
