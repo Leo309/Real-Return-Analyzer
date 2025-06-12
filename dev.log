@@ -42,3 +42,254 @@
  ○ Compiling /favicon.ico ...
  ✓ Compiled /favicon.ico in 3.5s (535 modules)
  GET /favicon.ico 200 in 6816ms
+ ⚠ metadataBase property in metadata export is not set for resolving social open graph or twitter images, using "http://localhost:3001". See https://nextjs.org/docs/app/api-reference/functions/generate-metadata#metadatabase
+ GET / 200 in 173ms
+ ✓ Compiled in 192ms (418 modules)
+ GET / 200 in 28ms
+ ✓ Compiled in 112ms (418 modules)
+ GET / 200 in 15ms
+ ⨯ ./src/hooks/useTranslation.ts:8:13
+Module not found: Can't resolve '@/locales/zh'
+   6 | const translations = {
+   7 |   en: () => Promise.resolve({ default: en }),
+>  8 |   zh: () => import('@/locales/zh').then(m => ({ default: m.zh })),
+     |             ^
+   9 |   fr: () => import('@/locales/fr').then(m => ({ default: m.fr }))
+  10 | };
+  11 |
+
+https://nextjs.org/docs/messages/module-not-found
+
+Import trace for requested module:
+./src/app/page.tsx
+ ⨯ ./src/hooks/useTranslation.ts:8:13
+Module not found: Can't resolve '@/locales/zh'
+   6 | const translations = {
+   7 |   en: () => Promise.resolve({ default: en }),
+>  8 |   zh: () => import('@/locales/zh').then(m => ({ default: m.zh })),
+     |             ^
+   9 |   fr: () => import('@/locales/fr').then(m => ({ default: m.fr }))
+  10 | };
+  11 |
+
+https://nextjs.org/docs/messages/module-not-found
+
+Import trace for requested module:
+./src/app/page.tsx
+ ⨯ ./src/hooks/useTranslation.ts:8:13
+Module not found: Can't resolve '@/locales/zh'
+   6 | const translations = {
+   7 |   en: () => Promise.resolve({ default: en }),
+>  8 |   zh: () => import('@/locales/zh').then(m => ({ default: m.zh })),
+     |             ^
+   9 |   fr: () => import('@/locales/fr').then(m => ({ default: m.fr }))
+  10 | };
+  11 |
+
+https://nextjs.org/docs/messages/module-not-found
+
+Import trace for requested module:
+./src/app/page.tsx
+ ⨯ ./src/hooks/useTranslation.ts:8:13
+Module not found: Can't resolve '@/locales/zh'
+   6 | const translations = {
+   7 |   en: () => Promise.resolve({ default: en }),
+>  8 |   zh: () => import('@/locales/zh').then(m => ({ default: m.zh })),
+     |             ^
+   9 |   fr: () => import('@/locales/fr').then(m => ({ default: m.fr }))
+  10 | };
+  11 |
+
+https://nextjs.org/docs/messages/module-not-found
+
+Import trace for requested module:
+./src/app/page.tsx
+ ⨯ ./src/hooks/useTranslation.ts:8:13
+Module not found: Can't resolve '@/locales/zh'
+   6 | const translations = {
+   7 |   en: () => Promise.resolve({ default: en }),
+>  8 |   zh: () => import('@/locales/zh').then(m => ({ default: m.zh })),
+     |             ^
+   9 |   fr: () => import('@/locales/fr').then(m => ({ default: m.fr }))
+  10 | };
+  11 |
+
+https://nextjs.org/docs/messages/module-not-found
+
+Import trace for requested module:
+./src/app/page.tsx
+ ⨯ ./src/hooks/useTranslation.ts:8:13
+Module not found: Can't resolve '@/locales/zh'
+   6 | const translations = {
+   7 |   en: () => Promise.resolve({ default: en }),
+>  8 |   zh: () => import('@/locales/zh').then(m => ({ default: m.zh })),
+     |             ^
+   9 |   fr: () => import('@/locales/fr').then(m => ({ default: m.fr }))
+  10 | };
+  11 |
+
+https://nextjs.org/docs/messages/module-not-found
+
+Import trace for requested module:
+./src/app/page.tsx
+ ⨯ ./src/hooks/useTranslation.ts:8:13
+Module not found: Can't resolve '@/locales/zh'
+   6 | const translations = {
+   7 |   en: () => Promise.resolve({ default: en }),
+>  8 |   zh: () => import('@/locales/zh').then(m => ({ default: m.zh })),
+     |             ^
+   9 |   fr: () => import('@/locales/fr').then(m => ({ default: m.fr }))
+  10 | };
+  11 |
+
+https://nextjs.org/docs/messages/module-not-found
+
+Import trace for requested module:
+./src/app/page.tsx
+ ⨯ ./src/hooks/useTranslation.ts:8:13
+Module not found: Can't resolve '@/locales/zh'
+   6 | const translations = {
+   7 |   en: () => Promise.resolve({ default: en }),
+>  8 |   zh: () => import('@/locales/zh').then(m => ({ default: m.zh })),
+     |             ^
+   9 |   fr: () => import('@/locales/fr').then(m => ({ default: m.fr }))
+  10 | };
+  11 |
+
+https://nextjs.org/docs/messages/module-not-found
+
+Import trace for requested module:
+./src/app/page.tsx
+ GET / 500 in 733ms
+ GET / 200 in 428ms
+ ○ Compiling /_error ...
+<w> [webpack.cache.PackFileCacheStrategy] Caching failed for pack: Error: ENOENT: no such file or directory, rename '/Users/leo309/Documents/Github/Real-Return-Analyzer/.next/cache/webpack/client-development-fallback/0.pack.gz_' -> '/Users/leo309/Documents/Github/Real-Return-Analyzer/.next/cache/webpack/client-development-fallback/0.pack.gz'
+ ⨯ ./src/hooks/useTranslation.ts:8:13
+Module not found: Can't resolve '@/locales/zh'
+   6 | const translations = {
+   7 |   en: () => Promise.resolve({ default: en }),
+>  8 |   zh: () => import('@/locales/zh').then(m => ({ default: m.zh })),
+     |             ^
+   9 |   fr: () => import('@/locales/fr').then(m => ({ default: m.fr }))
+  10 | };
+  11 |
+
+https://nextjs.org/docs/messages/module-not-found
+
+Import trace for requested module:
+./src/app/page.tsx
+ GET / 500 in 20800ms
+ GET / 500 in 37ms
+ GET / 500 in 16ms
+ ⨯ ./src/hooks/useTranslation.ts:9:13
+Module not found: Can't resolve '@/locales/fr'
+   7 |   en: () => Promise.resolve({ default: en }),
+   8 |   zh: () => import('@/locales/zh').then(m => ({ default: m.zh })),
+>  9 |   fr: () => import('@/locales/fr').then(m => ({ default: m.fr }))
+     |             ^
+  10 | };
+  11 |
+  12 | export function useTranslation() {
+
+https://nextjs.org/docs/messages/module-not-found
+
+Import trace for requested module:
+./src/app/page.tsx
+ ✓ Compiled /_not-found in 547ms (1279 modules)
+ ⚠ metadataBase property in metadata export is not set for resolving social open graph or twitter images, using "http://localhost:3001". See https://nextjs.org/docs/app/api-reference/functions/generate-metadata#metadatabase
+ GET /_next/static/webpack/b552916efdef4017.webpack.hot-update.json 404 in 489ms
+ ⚠ Fast Refresh had to perform a full reload. Read more: https://nextjs.org/docs/messages/fast-refresh-reload
+ GET / 200 in 173ms
+ ⚠ Fast Refresh had to perform a full reload. Read more: https://nextjs.org/docs/messages/fast-refresh-reload
+ ✓ Compiled in 229ms (1293 modules)
+ ⚠ metadataBase property in metadata export is not set for resolving social open graph or twitter images, using "http://localhost:3001". See https://nextjs.org/docs/app/api-reference/functions/generate-metadata#metadatabase
+ GET / 200 in 255ms
+ GET / 200 in 333ms
+ GET / 200 in 60ms
+ ✓ Compiled in 364ms (1246 modules)
+ ⚠ metadataBase property in metadata export is not set for resolving social open graph or twitter images, using "http://localhost:3001". See https://nextjs.org/docs/app/api-reference/functions/generate-metadata#metadatabase
+ GET / 200 in 85ms
+ ✓ Compiled in 211ms (1246 modules)
+ ⚠ metadataBase property in metadata export is not set for resolving social open graph or twitter images, using "http://localhost:3001". See https://nextjs.org/docs/app/api-reference/functions/generate-metadata#metadatabase
+ GET / 200 in 47ms
+ ⚠ Fast Refresh had to perform a full reload. Read more: https://nextjs.org/docs/messages/fast-refresh-reload
+ GET / 200 in 148ms
+ ⚠ Fast Refresh had to perform a full reload. Read more: https://nextjs.org/docs/messages/fast-refresh-reload
+ ✓ Compiled in 197ms (1246 modules)
+ ⚠ metadataBase property in metadata export is not set for resolving social open graph or twitter images, using "http://localhost:3001". See https://nextjs.org/docs/app/api-reference/functions/generate-metadata#metadatabase
+ GET / 200 in 188ms
+ GET / 200 in 236ms
+ ✓ Compiled in 535ms (1246 modules)
+ ⚠ metadataBase property in metadata export is not set for resolving social open graph or twitter images, using "http://localhost:3001". See https://nextjs.org/docs/app/api-reference/functions/generate-metadata#metadatabase
+ GET / 200 in 35ms
+ GET / 200 in 126ms
+ GET / 200 in 83ms
+ GET / 200 in 77ms
+ GET / 200 in 56ms
+ GET / 200 in 56ms
+ ✓ Compiled in 483ms (1246 modules)
+ ⚠ metadataBase property in metadata export is not set for resolving social open graph or twitter images, using "http://localhost:3001". See https://nextjs.org/docs/app/api-reference/functions/generate-metadata#metadatabase
+ GET / 200 in 54ms
+ ✓ Compiled in 195ms (1246 modules)
+ ⚠ metadataBase property in metadata export is not set for resolving social open graph or twitter images, using "http://localhost:3001". See https://nextjs.org/docs/app/api-reference/functions/generate-metadata#metadatabase
+ GET / 200 in 34ms
+ ✓ Compiled in 163ms (1246 modules)
+ ⚠ metadataBase property in metadata export is not set for resolving social open graph or twitter images, using "http://localhost:3001". See https://nextjs.org/docs/app/api-reference/functions/generate-metadata#metadatabase
+ GET / 200 in 33ms
+ HEAD / 200 in 75ms
+ ✓ Compiled in 124ms (672 modules)
+ GET / 200 in 12ms
+ ⚠ Fast Refresh had to perform a full reload. Read more: https://nextjs.org/docs/messages/fast-refresh-reload
+ ✓ Compiled in 188ms (1246 modules)
+ ⚠ metadataBase property in metadata export is not set for resolving social open graph or twitter images, using "http://localhost:3001". See https://nextjs.org/docs/app/api-reference/functions/generate-metadata#metadatabase
+ GET / 200 in 148ms
+ GET / 200 in 193ms
+ ✓ Compiled in 440ms (1248 modules)
+ ⚠ metadataBase property in metadata export is not set for resolving social open graph or twitter images, using "http://localhost:3001". See https://nextjs.org/docs/app/api-reference/functions/generate-metadata#metadatabase
+ GET / 200 in 53ms
+ ⚠ Fast Refresh had to perform a full reload. Read more: https://nextjs.org/docs/messages/fast-refresh-reload
+ GET / 200 in 77ms
+ GET / 200 in 65ms
+ GET / 200 in 56ms
+ ✓ Compiled in 251ms (1248 modules)
+ ⚠ metadataBase property in metadata export is not set for resolving social open graph or twitter images, using "http://localhost:3001". See https://nextjs.org/docs/app/api-reference/functions/generate-metadata#metadatabase
+ GET / 200 in 29ms
+ ⚠ Fast Refresh had to perform a full reload. Read more: https://nextjs.org/docs/messages/fast-refresh-reload
+ GET / 200 in 114ms
+ GET / 200 in 51ms
+ GET / 200 in 65ms
+ GET / 200 in 46ms
+ ✓ Compiled in 678ms (1248 modules)
+ ⚠ metadataBase property in metadata export is not set for resolving social open graph or twitter images, using "http://localhost:3001". See https://nextjs.org/docs/app/api-reference/functions/generate-metadata#metadatabase
+ GET / 200 in 57ms
+ ✓ Compiled in 252ms (1248 modules)
+ ⚠ metadataBase property in metadata export is not set for resolving social open graph or twitter images, using "http://localhost:3001". See https://nextjs.org/docs/app/api-reference/functions/generate-metadata#metadatabase
+ GET / 200 in 36ms
+ ⚠ Fast Refresh had to perform a full reload. Read more: https://nextjs.org/docs/messages/fast-refresh-reload
+ GET / 200 in 121ms
+ ✓ Compiled in 234ms (1248 modules)
+ ⚠ metadataBase property in metadata export is not set for resolving social open graph or twitter images, using "http://localhost:3001". See https://nextjs.org/docs/app/api-reference/functions/generate-metadata#metadatabase
+ GET / 200 in 40ms
+ ⚠ Fast Refresh had to perform a full reload. Read more: https://nextjs.org/docs/messages/fast-refresh-reload
+ GET / 200 in 129ms
+ GET / 200 in 66ms
+ GET / 200 in 52ms
+ GET / 200 in 57ms
+ GET / 200 in 61ms
+ GET / 200 in 60ms
+ ✓ Compiled in 759ms (1248 modules)
+ ✓ Compiled in 268ms (1248 modules)
+ ✓ Compiled in 207ms (1248 modules)
+ ✓ Compiled in 236ms (1248 modules)
+ ✓ Compiled in 186ms (1248 modules)
+ ✓ Compiled in 181ms (1248 modules)
+ ✓ Compiled in 265ms (1248 modules)
+ ✓ Compiled in 202ms (1248 modules)
+ ✓ Compiled in 431ms (1248 modules)
+<w> [webpack.cache.PackFileCacheStrategy] Caching failed for pack: Error: ENOENT: no such file or directory, rename '/Users/leo309/Documents/Github/Real-Return-Analyzer/.next/cache/webpack/client-development/2.pack.gz_' -> '/Users/leo309/Documents/Github/Real-Return-Analyzer/.next/cache/webpack/client-development/2.pack.gz'
+ ✓ Compiled in 316ms (673 modules)
+ ✓ Compiled in 334ms (1248 modules)
+ ✓ Compiled in 188ms (1248 modules)
+ ✓ Compiled in 169ms (1248 modules)
+<w> [webpack.cache.PackFileCacheStrategy] Caching failed for pack: Error: ENOENT: no such file or directory, rename '/Users/leo309/Documents/Github/Real-Return-Analyzer/.next/cache/webpack/server-development/1.pack.gz_' -> '/Users/leo309/Documents/Github/Real-Return-Analyzer/.next/cache/webpack/server-development/1.pack.gz'
+[?25h

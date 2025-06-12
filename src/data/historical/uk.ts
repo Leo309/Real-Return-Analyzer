@@ -18,7 +18,8 @@ export const ukHistoricalData: HistoricalCountryData = {
     inflationSource: ukDataSources.inflation,
     stockMarketBenchmark: ukDataSources.stocks,
     bondBenchmark: ukDataSources.bonds,
-    savingsRateDescription: ukDataSources.cash
+    savingsRateDescription: ukDataSources.cash,
+    minimumWagePerHour2024: 11.44 // 英国国家最低工资 (GBP/小时) - 23岁及以上
   },
   inflationRates: {
     // Annual inflation rates (%) - UK

@@ -7,17 +7,23 @@ import InvestmentSelector from '@/components/InvestmentSelector';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import useCalculatorStore from '@/store/calculatorStore';
+import useLanguageStore from '@/store/languageStore';
 import { ArrowLeft } from 'lucide-react';
 import { useTranslation } from '@/hooks/useTranslation';
 
 export default function Home() {
   const { t } = useTranslation();
   const { currentStep, goBack } = useCalculatorStore();
+  const { initializeLanguage } = useLanguageStore();
   const [darkMode, setDarkMode] = useState(false);
 
-  // Initialize dark mode based on user's system preference
+  // Initialize dark mode and language
   useEffect(() => {
     if (typeof window !== 'undefined') {
+      // Initialize language first
+      initializeLanguage();
+      
+      // Then initialize dark mode
       const savedTheme = localStorage.getItem('theme');
       const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
       const isDark = savedTheme === 'dark' || (!savedTheme && prefersDark);
@@ -29,7 +35,7 @@ export default function Home() {
         document.documentElement.classList.remove('dark');
       }
     }
-  }, []);
+  }, [initializeLanguage]);
 
   // Toggle dark mode
   const toggleDarkMode = () => {
@@ -113,7 +119,7 @@ export default function Home() {
         title={t('calculator.title')}
       />
 
-      <main className="flex-grow pt-28 pb-16 px-4">
+      <main className="flex-grow pt-20 pb-16 px-4">
         {renderContent()}
       </main>
 

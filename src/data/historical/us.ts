@@ -18,7 +18,8 @@ export const usHistoricalData: HistoricalCountryData = {
     inflationSource: usDataSources.inflation,
     stockMarketBenchmark: usDataSources.stocks,
     bondBenchmark: usDataSources.bonds,
-    savingsRateDescription: usDataSources.cash
+    savingsRateDescription: usDataSources.cash,
+    minimumWagePerHour2024: 15.00 // 美国平均最低工资 (USD/小时) - 考虑各州差异的加权平均
   },
   inflationRates: {
     // 年度通胀率 (%)

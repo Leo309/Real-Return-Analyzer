@@ -641,7 +641,7 @@ const ResultsDisplay: React.FC = () => {
                 </div>
                 <div className={`flex items-center ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>
                   <span className="mr-2">⏰</span>
-                  <span>{Math.round(Math.abs(amount - result.inflationAdjustedValue) / (countryCode === 'US' ? 15 : 18)).toLocaleString()} hours of minimum wage work</span>
+                  <span>{Math.round(Math.abs(amount - result.inflationAdjustedValue) / (countryData?.metadata?.minimumWagePerHour2024 || 15)).toLocaleString()} hours of minimum wage work</span>
                 </div>
                 <div className={`flex items-center ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>
                   <span className="mr-2">⛽</span>

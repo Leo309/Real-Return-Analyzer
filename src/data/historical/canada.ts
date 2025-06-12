@@ -18,7 +18,8 @@ export const canadaHistoricalData: HistoricalCountryData = {
     inflationSource: canadaDataSources.inflation,
     stockMarketBenchmark: canadaDataSources.stocks,
     bondBenchmark: canadaDataSources.bonds,
-    savingsRateDescription: canadaDataSources.cash
+    savingsRateDescription: canadaDataSources.cash,
+    minimumWagePerHour2024: 16.50 // 加拿大平均最低工资 (CAD/小时) - 各省加权平均
   },
   inflationRates: {
     // 年度通胀率 (%)

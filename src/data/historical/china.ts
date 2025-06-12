@@ -18,7 +18,8 @@ export const chinaHistoricalData: HistoricalCountryData = {
     inflationSource: chinaDataSources.inflation,
     stockMarketBenchmark: chinaDataSources.stocks,
     bondBenchmark: chinaDataSources.bonds,
-    savingsRateDescription: chinaDataSources.cash
+    savingsRateDescription: chinaDataSources.cash,
+    minimumWagePerHour2024: 22.00 // 中国一线城市平均最低工资 (CNY/小时)
   },
   inflationRates: {
     // Annual inflation rates (%) - China (data more complete from 1986 onward)

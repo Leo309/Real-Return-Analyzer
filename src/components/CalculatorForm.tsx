@@ -16,9 +16,12 @@ const CalculatorForm: React.FC<CalculatorFormProps> = ({ darkMode = false }) => 
     countryCode,
     startYear,
     endYear,
+    investmentType,
+    customRate,
     setAmount,
     setStartYear,
     setEndYear,
+    setCustomRate,
     calculate,
     getAvailableYearsForCountry
   } = useCalculatorStore();
@@ -149,6 +152,41 @@ const CalculatorForm: React.FC<CalculatorFormProps> = ({ darkMode = false }) => 
           </select>
         </div>
       </div>
+
+      {/* Custom Rate Input - only show when investment type is custom */}
+      {investmentType === 'custom' && (
+        <div>
+          <label htmlFor="customRate" className={`block text-base font-medium mb-2 ${isDarkMode ? 'text-gray-200' : 'text-gray-700'}`}>
+            {t('calculator.customRate') || 'Custom Annual Return Rate (%)'}
+          </label>
+          <div className={`${isDarkMode ? 'bg-gray-700' : 'bg-gray-50'} rounded-lg flex items-center`}>
+            <div className={`relative flex-grow`}>
+              <input
+                type="number"
+                id="customRate"
+                min="-50"
+                max="100"
+                step="0.1"
+                value={customRate || ''}
+                onChange={(e) => setCustomRate(Number(e.target.value) || null)}
+                className={`block w-full px-3 py-3 text-lg border-0 ${
+                  isDarkMode ? 'focus:ring-blue-400' : 'focus:ring-blue-500'
+                } focus:ring-2 focus:outline-none rounded-lg ${
+                  isDarkMode ? 'bg-gray-700 text-white' : 'bg-gray-50 text-gray-900'
+                }`}
+                placeholder="5.0"
+                required
+              />
+            </div>
+            <div className="flex space-x-1 px-3">
+              <span className={`text-lg ${isDarkMode ? 'text-gray-400' : 'text-gray-500'}`}>%</span>
+            </div>
+          </div>
+          <p className={`text-sm mt-1 ${isDarkMode ? 'text-gray-400' : 'text-gray-500'}`}>
+            {t('calculator.customRateHint') || 'Enter the expected annual return rate for your custom investment'}
+          </p>
+        </div>
+      )}
 
       {/* Calculate Button */}
       <div className="flex justify-center pt-2">

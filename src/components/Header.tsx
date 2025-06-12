@@ -3,8 +3,10 @@
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
-import { TrendingUp, Sun, Moon } from 'lucide-react';
+import { TrendingUp, Sun, Moon, Globe, ChevronDown } from 'lucide-react';
 import siteConfig from '@/config/siteConfig';
+import LanguageSwitcher from '@/components/LanguageSwitcher';
+import ClientOnly from '@/components/ClientOnly';
 
 interface HeaderProps {
   darkMode: boolean;
@@ -68,19 +70,19 @@ export default function Header({ darkMode, toggleDarkMode, title }: HeaderProps)
             </div>
           </Link>
 
-          {/* Site Title - Mobile Hidden, Desktop Visible */}
-          <div className="hidden md:block absolute left-1/2 transform -translate-x-1/2">
-            <h1 className={`text-2xl font-bold animated-title title-glow ${
+          {/* Site Title - Only on very wide screens where there's plenty of space */}
+          <div className="hidden 2xl:block absolute left-1/2 transform -translate-x-1/2 max-w-lg">
+            <h1 className={`text-xl font-bold animated-title title-glow ${
               darkMode 
                 ? 'bg-gradient-to-r from-blue-400 via-cyan-300 to-blue-500 text-transparent bg-clip-text' 
                 : 'bg-gradient-to-r from-blue-600 via-sky-500 to-blue-700 text-transparent bg-clip-text'
-            } flex items-center`}>
-              <span className={`mr-2 p-2 rounded-full title-icon ${
+            } flex items-center justify-center whitespace-nowrap`}>
+              <span className={`mr-2 p-1.5 rounded-full title-icon ${
                 darkMode 
                   ? 'bg-gradient-to-br from-blue-600 to-cyan-500' 
                   : 'bg-gradient-to-br from-blue-700 to-sky-500'
               } text-white shadow-lg`}>
-                <TrendingUp size={20} />
+                <TrendingUp size={18} />
               </span>
               {title}
             </h1>
@@ -107,6 +109,23 @@ export default function Header({ darkMode, toggleDarkMode, title }: HeaderProps)
               Contact
             </Link>
             
+            {/* Language Switcher */}
+            <ClientOnly 
+              fallback={
+                <div className={`flex items-center space-x-2 px-3 py-2 rounded-lg ${
+                  darkMode 
+                    ? 'bg-gray-800 text-gray-300 border border-gray-700' 
+                    : 'bg-gray-100 text-gray-700 border border-gray-200'
+                }`}>
+                  <Globe size={16} />
+                  <span className="text-sm">English</span>
+                  <ChevronDown size={14} />
+                </div>
+              }
+            >
+              <LanguageSwitcher darkMode={darkMode} />
+            </ClientOnly>
+            
             {/* Dark/Light Toggle */}
             <button 
               onClick={toggleDarkMode}
@@ -122,7 +141,24 @@ export default function Header({ darkMode, toggleDarkMode, title }: HeaderProps)
           </nav>
 
           {/* Mobile Menu Button */}
-          <div className="md:hidden flex items-center space-x-4">
+          <div className="md:hidden flex items-center space-x-2">
+            {/* Mobile Language Switcher */}
+            <ClientOnly 
+              fallback={
+                <div className={`flex items-center space-x-2 px-3 py-2 rounded-lg ${
+                  darkMode 
+                    ? 'bg-gray-800 text-gray-300 border border-gray-700' 
+                    : 'bg-gray-100 text-gray-700 border border-gray-200'
+                }`}>
+                  <Globe size={16} />
+                  <span className="text-sm">English</span>
+                  <ChevronDown size={14} />
+                </div>
+              }
+            >
+              <LanguageSwitcher darkMode={darkMode} />
+            </ClientOnly>
+            
             <button 
               onClick={toggleDarkMode}
               className="p-2 rounded-full bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors z-20"
@@ -165,23 +201,6 @@ export default function Header({ darkMode, toggleDarkMode, title }: HeaderProps)
           </div>
         </div>
 
-        {/* Site Title - Mobile Visible */}
-        <div className="md:hidden flex justify-center pb-3">
-          <h1 className={`text-xl font-bold animated-title title-glow ${
-            darkMode 
-              ? 'bg-gradient-to-r from-blue-400 via-cyan-300 to-blue-500 text-transparent bg-clip-text' 
-              : 'bg-gradient-to-r from-blue-600 via-sky-500 to-blue-700 text-transparent bg-clip-text'
-          } flex items-center`}>
-            <span className={`mr-2 p-1.5 rounded-full title-icon ${
-              darkMode 
-                ? 'bg-gradient-to-br from-blue-600 to-cyan-500' 
-                : 'bg-gradient-to-br from-blue-700 to-sky-500'
-            } text-white shadow-md`}>
-              <TrendingUp size={16} />
-            </span>
-            {title}
-          </h1>
-        </div>
 
         {/* Mobile Navigation */}
         {isMenuOpen && (

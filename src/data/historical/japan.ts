@@ -18,7 +18,8 @@ export const japanHistoricalData: HistoricalCountryData = {
     inflationSource: japanDataSources.inflation,
     stockMarketBenchmark: japanDataSources.stocks,
     bondBenchmark: japanDataSources.bonds,
-    savingsRateDescription: japanDataSources.cash
+    savingsRateDescription: japanDataSources.cash,
+    minimumWagePerHour2024: 1004 // 日本全国平均最低工资 (JPY/小时)
   },
   inflationRates: {
     // Annual inflation rates (%) - Japan

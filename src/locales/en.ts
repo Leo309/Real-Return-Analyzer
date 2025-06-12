@@ -39,7 +39,7 @@ export const en = {
     historicalReturn: 'Avg. historical return: {returnRate}%'
   },
   calculator: {
-    title: 'Investment Time Machine',
+    title: 'Real Return Analyzer',
     subtitle: 'See how inflation and investments affect your money over time',
     initialAmount: 'Initial Amount',
     startYear: 'Start Year',
@@ -55,7 +55,9 @@ export const en = {
     moneyLostToInflation: 'Money Lost to Inflation',
     changeInPurchasingPower: 'change in purchasing power',
     nominalGrowth: 'nominal growth',
-    realGrowth: 'real growth'
+    realGrowth: 'real growth',
+    customRate: 'Custom Annual Return Rate (%)',
+    customRateHint: 'Enter the expected annual return rate for your custom investment'
   },
   feedback: {
     title: 'Help us improve',
@@ -72,8 +74,8 @@ export const en = {
       description: 'See the impact of inflation only, without any investment returns',
     },
     cash: {
-      name: 'Cash/Savings',
-      description: 'Low-risk savings accounts or short-term government bills with minimal volatility',
+      name: 'Savings Account',
+      description: 'Low-risk savings accounts or time deposits with minimal volatility',
     },
     bonds: {
       name: 'Government Bonds',
