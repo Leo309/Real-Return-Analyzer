@@ -10,6 +10,7 @@ export interface HistoricalCountryData {
     bondBenchmark: string; // 例如 "10-Year Treasury"
     savingsRateDescription: string; // 例如 "High-yield savings accounts"
     realEstateBenchmark?: string; // 例如 "Case-Shiller National Home Price Index"
+    minimumWagePerHour2024?: number; // 2024年法定最低工资 (每小时，本国货币)
   };
   // 通胀率数据 (%)
   inflationRates: Record<number, number>;

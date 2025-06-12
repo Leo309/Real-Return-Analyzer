@@ -277,3 +277,13 @@ Import trace for requested module:
  GET / 200 in 57ms
  GET / 200 in 61ms
  GET / 200 in 60ms
+ ✓ Compiled in 759ms (1248 modules)
+ ✓ Compiled in 268ms (1248 modules)
+ ✓ Compiled in 207ms (1248 modules)
+ ✓ Compiled in 236ms (1248 modules)
+ ✓ Compiled in 186ms (1248 modules)
+ ✓ Compiled in 181ms (1248 modules)
+ ✓ Compiled in 265ms (1248 modules)
+ ✓ Compiled in 202ms (1248 modules)
+ ✓ Compiled in 431ms (1248 modules)
+<w> [webpack.cache.PackFileCacheStrategy] Caching failed for pack: Error: ENOENT: no such file or directory, rename '/Users/leo309/Documents/Github/Real-Return-Analyzer/.next/cache/webpack/client-development/2.pack.gz_' -> '/Users/leo309/Documents/Github/Real-Return-Analyzer/.next/cache/webpack/client-development/2.pack.gz'

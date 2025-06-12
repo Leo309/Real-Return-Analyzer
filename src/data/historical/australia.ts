@@ -18,7 +18,8 @@ export const australiaHistoricalData: HistoricalCountryData = {
     inflationSource: australiaDataSources.inflation,
     stockMarketBenchmark: australiaDataSources.stocks,
     bondBenchmark: australiaDataSources.bonds,
-    savingsRateDescription: australiaDataSources.cash
+    savingsRateDescription: australiaDataSources.cash,
+    minimumWagePerHour2024: 23.23 // 澳大利亚最低工资 (AUD/小时)
   },
   inflationRates: {
     // Annual inflation rates (%) - Australia

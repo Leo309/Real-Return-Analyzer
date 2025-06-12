@@ -18,7 +18,8 @@ export const germanyHistoricalData: HistoricalCountryData = {
     inflationSource: germanyDataSources.inflation,
     stockMarketBenchmark: germanyDataSources.stocks,
     bondBenchmark: germanyDataSources.bonds,
-    savingsRateDescription: germanyDataSources.cash
+    savingsRateDescription: germanyDataSources.cash,
+    minimumWagePerHour2024: 12.41 // 德国最低工资 (EUR/小时)
   },
   inflationRates: {
     // Annual inflation rates (%) - Germany
