@@ -11,8 +11,8 @@ import { australiaHistoricalData, australiaDataSources } from './australia';
 export const investmentTypes: Record<string, InvestmentTypeInfo> = {
   cash: {
     id: 'cash',
-    name: 'Cash/Savings',
-    description: 'Low-risk savings accounts or short-term government bills with minimal volatility',
+    name: 'Savings Account',
+    description: 'Low-risk savings accounts or time deposits with minimal volatility',
     riskLevel: 'low'
   },
   bonds: {

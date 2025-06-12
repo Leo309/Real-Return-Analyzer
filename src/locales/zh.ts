@@ -52,7 +52,9 @@ export const zh = {
     moneyLostToInflation: '通胀损失',
     changeInPurchasingPower: '购买力变化',
     nominalGrowth: '名义增长',
-    realGrowth: '实际增长'
+    realGrowth: '实际增长',
+    customRate: '自定义年回报率 (%)',
+    customRateHint: '输入您自定义投资的预期年回报率'
   },
   feedback: {
     title: '帮助我们改进',
@@ -69,8 +71,8 @@ export const zh = {
       description: '仅查看通胀影响，不包含任何投资回报',
     },
     cash: {
-      name: '现金/储蓄',
-      description: '低风险储蓄账户或短期政府票据，波动性最小',
+      name: '银行定存',
+      description: '低风险银行定期存款账户，波动性最小',
     },
     bonds: {
       name: '政府债券',

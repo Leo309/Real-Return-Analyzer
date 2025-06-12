@@ -9,7 +9,6 @@ export interface LanguageConfig {
   code: Language;
   name: string;
   nativeName: string;
-  flag: string;
   currencyLocale: string; // For number formatting
 }
 
@@ -18,21 +17,18 @@ export const languages: LanguageConfig[] = [
     code: 'en',
     name: 'English',
     nativeName: 'English',
-    flag: '🇺🇸',
     currencyLocale: 'en-US'
   },
   {
     code: 'zh',
     name: 'Chinese (Simplified)',
     nativeName: '简体中文',
-    flag: '🇨🇳', 
     currencyLocale: 'zh-CN'
   },
   {
     code: 'fr',
     name: 'French',
     nativeName: 'Français',
-    flag: '🇫🇷',
     currencyLocale: 'fr-FR'
   }
 ];

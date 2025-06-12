@@ -13,6 +13,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
+  metadataBase: new URL(process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : 'https://realreturns.skynexdigital.com'),
   title: "Real Return Analyzer | SKYNEX DIGITAL",
   description: "Calculate your real returns over time. See how inflation affects your purchasing power, and compare stocks, bonds, and real estate performance. Visualize your financial future.",
   keywords: "real return analyzer, investment calculator, inflation calculator, purchasing power, stock returns, bond returns, real estate investment, historical returns, financial planning",

@@ -3,9 +3,11 @@ import Image from 'next/image';
 import { Share2, Copy, Check, Twitter, Facebook, Linkedin, Instagram } from 'lucide-react';
 import useCalculatorStore from '@/store/calculatorStore';
 import { historicalData } from '@/data/historical';
+import { useTranslation } from '@/hooks/useTranslation';
 
 const ShareCard: React.FC = () => {
   const { result, amount, countryCode, startYear, endYear, investmentType, customRate } = useCalculatorStore();
+  const { t } = useTranslation();
   const [isExpanded, setIsExpanded] = useState(false);
   const [copySuccess, setCopySuccess] = useState(false);
   const isDarkMode = document.documentElement.classList.contains('dark');
@@ -35,12 +37,12 @@ const ShareCard: React.FC = () => {
     
     const investmentName = (() => {
       switch(investmentType) {
-        case 'cash': return 'Cash/Savings';
-        case 'bonds': return 'Government Bonds';
-        case 'stocks': return 'Stock Market';
-        case 'realEstate': return 'Real Estate';
-        case 'custom': return `Custom Investment (${customRate}%)`;
-        default: return 'No Investment';
+        case 'cash': return t('investmentTypes.cash.name');
+        case 'bonds': return t('investmentTypes.bonds.name');
+        case 'stocks': return t('investmentTypes.stocks.name');
+        case 'realEstate': return t('investmentTypes.realEstate.name');
+        case 'custom': return `${t('investmentTypes.custom.name')} (${customRate}%)`;
+        default: return t('investmentTypes.none.name');
       }
     })();
     

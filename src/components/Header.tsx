@@ -70,19 +70,19 @@ export default function Header({ darkMode, toggleDarkMode, title }: HeaderProps)
             </div>
           </Link>
 
-          {/* Site Title - Mobile Hidden, Desktop Visible */}
-          <div className="hidden md:block absolute left-1/2 transform -translate-x-1/2">
-            <h1 className={`text-2xl font-bold animated-title title-glow ${
+          {/* Site Title - Only on very wide screens where there's plenty of space */}
+          <div className="hidden 2xl:block absolute left-1/2 transform -translate-x-1/2 max-w-lg">
+            <h1 className={`text-xl font-bold animated-title title-glow ${
               darkMode 
                 ? 'bg-gradient-to-r from-blue-400 via-cyan-300 to-blue-500 text-transparent bg-clip-text' 
                 : 'bg-gradient-to-r from-blue-600 via-sky-500 to-blue-700 text-transparent bg-clip-text'
-            } flex items-center`}>
-              <span className={`mr-2 p-2 rounded-full title-icon ${
+            } flex items-center justify-center whitespace-nowrap`}>
+              <span className={`mr-2 p-1.5 rounded-full title-icon ${
                 darkMode 
                   ? 'bg-gradient-to-br from-blue-600 to-cyan-500' 
                   : 'bg-gradient-to-br from-blue-700 to-sky-500'
               } text-white shadow-lg`}>
-                <TrendingUp size={20} />
+                <TrendingUp size={18} />
               </span>
               {title}
             </h1>
@@ -118,8 +118,7 @@ export default function Header({ darkMode, toggleDarkMode, title }: HeaderProps)
                     : 'bg-gray-100 text-gray-700 border border-gray-200'
                 }`}>
                   <Globe size={16} />
-                  <span className="text-sm font-medium">🇺🇸</span>
-                  <span className="hidden sm:inline text-sm">English</span>
+                  <span className="text-sm">English</span>
                   <ChevronDown size={14} />
                 </div>
               }
@@ -152,7 +151,7 @@ export default function Header({ darkMode, toggleDarkMode, title }: HeaderProps)
                     : 'bg-gray-100 text-gray-700 border border-gray-200'
                 }`}>
                   <Globe size={16} />
-                  <span className="text-sm font-medium">🇺🇸</span>
+                  <span className="text-sm">English</span>
                   <ChevronDown size={14} />
                 </div>
               }
@@ -202,23 +201,6 @@ export default function Header({ darkMode, toggleDarkMode, title }: HeaderProps)
           </div>
         </div>
 
-        {/* Site Title - Mobile Visible */}
-        <div className="md:hidden flex justify-center pb-3">
-          <h1 className={`text-xl font-bold animated-title title-glow ${
-            darkMode 
-              ? 'bg-gradient-to-r from-blue-400 via-cyan-300 to-blue-500 text-transparent bg-clip-text' 
-              : 'bg-gradient-to-r from-blue-600 via-sky-500 to-blue-700 text-transparent bg-clip-text'
-          } flex items-center`}>
-            <span className={`mr-2 p-1.5 rounded-full title-icon ${
-              darkMode 
-                ? 'bg-gradient-to-br from-blue-600 to-cyan-500' 
-                : 'bg-gradient-to-br from-blue-700 to-sky-500'
-            } text-white shadow-md`}>
-              <TrendingUp size={16} />
-            </span>
-            {title}
-          </h1>
-        </div>
 
         {/* Mobile Navigation */}
         {isMenuOpen && (

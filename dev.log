@@ -287,3 +287,9 @@ Import trace for requested module:
  ✓ Compiled in 202ms (1248 modules)
  ✓ Compiled in 431ms (1248 modules)
 <w> [webpack.cache.PackFileCacheStrategy] Caching failed for pack: Error: ENOENT: no such file or directory, rename '/Users/leo309/Documents/Github/Real-Return-Analyzer/.next/cache/webpack/client-development/2.pack.gz_' -> '/Users/leo309/Documents/Github/Real-Return-Analyzer/.next/cache/webpack/client-development/2.pack.gz'
+ ✓ Compiled in 316ms (673 modules)
+ ✓ Compiled in 334ms (1248 modules)
+ ✓ Compiled in 188ms (1248 modules)
+ ✓ Compiled in 169ms (1248 modules)
+<w> [webpack.cache.PackFileCacheStrategy] Caching failed for pack: Error: ENOENT: no such file or directory, rename '/Users/leo309/Documents/Github/Real-Return-Analyzer/.next/cache/webpack/server-development/1.pack.gz_' -> '/Users/leo309/Documents/Github/Real-Return-Analyzer/.next/cache/webpack/server-development/1.pack.gz'
+[?25h

@@ -52,7 +52,9 @@ export const fr = {
     moneyLostToInflation: 'Argent Perdu à Cause de l\'Inflation',
     changeInPurchasingPower: 'changement du pouvoir d\'achat',
     nominalGrowth: 'croissance nominale',
-    realGrowth: 'croissance réelle'
+    realGrowth: 'croissance réelle',
+    customRate: 'Taux de Rendement Annuel Personnalisé (%)',
+    customRateHint: 'Entrez le taux de rendement annuel attendu pour votre investissement personnalisé'
   },
   feedback: {
     title: 'Aidez-nous à nous améliorer',
@@ -69,8 +71,8 @@ export const fr = {
       description: 'Voir l\'impact de l\'inflation uniquement, sans aucun rendement d\'investissement',
     },
     cash: {
-      name: 'Liquidités/Épargne',
-      description: 'Comptes d\'épargne à faible risque ou bons du Trésor à court terme avec volatilité minimale',
+      name: 'Compte d\'épargne',
+      description: 'Comptes d\'épargne à faible risque ou dépôts à terme avec volatilité minimale',
     },
     bonds: {
       name: 'Obligations d\'État',

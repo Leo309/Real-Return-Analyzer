@@ -119,7 +119,7 @@ export default function Home() {
         title={t('calculator.title')}
       />
 
-      <main className="flex-grow pt-28 pb-16 px-4">
+      <main className="flex-grow pt-20 pb-16 px-4">
         {renderContent()}
       </main>
 

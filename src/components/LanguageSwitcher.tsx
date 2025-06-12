@@ -48,8 +48,7 @@ const LanguageSwitcher: React.FC<LanguageSwitcherProps> = ({ darkMode }) => {
           : 'bg-gray-100 text-gray-700 border border-gray-200'
       }`}>
         <Globe size={16} />
-        <span className="text-sm font-medium">🇺🇸</span>
-        <span className="hidden sm:inline text-sm">English</span>
+        <span className="text-sm">English</span>
         <ChevronDown size={14} />
       </div>
     );
@@ -69,8 +68,7 @@ const LanguageSwitcher: React.FC<LanguageSwitcherProps> = ({ darkMode }) => {
         aria-expanded={isOpen}
       >
         <Globe size={16} />
-        <span className="text-sm font-medium">{currentLangConfig.flag}</span>
-        <span className="hidden sm:inline text-sm">{currentLangConfig.nativeName}</span>
+        <span className="text-sm">{currentLangConfig.nativeName}</span>
         <ChevronDown 
           size={14} 
           className={`transition-transform duration-200 ${isOpen ? 'rotate-180' : ''}`} 
@@ -94,14 +92,13 @@ const LanguageSwitcher: React.FC<LanguageSwitcherProps> = ({ darkMode }) => {
                 <button
                   key={language.code}
                   onClick={() => handleLanguageChange(language.code)}
-                  className={`w-full text-left px-4 py-3 flex items-center space-x-3 transition-colors duration-150 ${
+                  className={`w-full text-left px-4 py-3 flex items-center transition-colors duration-150 ${
                     currentLanguage === language.code
                       ? (darkMode ? 'bg-blue-900/50 text-blue-300' : 'bg-blue-50 text-blue-700')
                       : (darkMode ? 'hover:bg-gray-700 text-gray-300 hover:text-white' : 'hover:bg-gray-50 text-gray-700 hover:text-gray-900')
                   }`}
                 >
-                  <span className="text-lg">{language.flag}</span>
-                  <div className="flex flex-col">
+                  <div className="flex flex-col flex-1">
                     <span className="text-sm font-medium">{language.nativeName}</span>
                     <span className={`text-xs ${
                       darkMode ? 'text-gray-400' : 'text-gray-500'
@@ -110,7 +107,7 @@ const LanguageSwitcher: React.FC<LanguageSwitcherProps> = ({ darkMode }) => {
                     </span>
                   </div>
                   {currentLanguage === language.code && (
-                    <div className={`ml-auto w-2 h-2 rounded-full ${
+                    <div className={`ml-3 w-2 h-2 rounded-full ${
                       darkMode ? 'bg-blue-400' : 'bg-blue-600'
                     }`} />
                   )}
