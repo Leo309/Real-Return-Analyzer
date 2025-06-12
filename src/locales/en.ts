@@ -57,7 +57,9 @@ export const en = {
     nominalGrowth: 'nominal growth',
     realGrowth: 'real growth',
     customRate: 'Custom Annual Return Rate (%)',
-    customRateHint: 'Enter the expected annual return rate for your custom investment'
+    customRateHint: 'Enter the expected annual return rate for your custom investment',
+    results: 'Results',
+    inflationReducedPurchasingPower: 'Even with investment, inflation reduced your purchasing power by {percentage}%'
   },
   feedback: {
     title: 'Help us improve',

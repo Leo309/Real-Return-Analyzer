@@ -44,7 +44,7 @@ const CalculatorForm: React.FC<CalculatorFormProps> = ({ darkMode = false }) => 
       {/* Initial Amount */}
       <div>
         <label htmlFor="amount" className={`block text-base font-medium mb-2 ${isDarkMode ? 'text-gray-200' : 'text-gray-700'}`}>
-          Initial Amount
+          {t('calculator.initialAmount') || 'Initial Amount'}
         </label>
         <div className={`${isDarkMode ? 'bg-gray-700' : 'bg-gray-50'} rounded-lg flex items-center`}>
           <div className={`relative flex-grow`}>
@@ -109,7 +109,7 @@ const CalculatorForm: React.FC<CalculatorFormProps> = ({ darkMode = false }) => 
         {/* Start Year */}
         <div>
           <label htmlFor="startYear" className={`block text-base font-medium mb-2 ${isDarkMode ? 'text-gray-200' : 'text-gray-700'}`}>
-            Start Year
+            {t('calculator.startYear') || 'Start Year'}
           </label>
           <select
             id="startYear"
@@ -132,7 +132,7 @@ const CalculatorForm: React.FC<CalculatorFormProps> = ({ darkMode = false }) => 
         {/* End Year */}
         <div>
           <label htmlFor="endYear" className={`block text-base font-medium mb-2 ${isDarkMode ? 'text-gray-200' : 'text-gray-700'}`}>
-            End Year
+            {t('calculator.endYear') || 'End Year'}
           </label>
           <select
             id="endYear"
@@ -198,7 +198,7 @@ const CalculatorForm: React.FC<CalculatorFormProps> = ({ darkMode = false }) => 
               : 'bg-blue-500 hover:bg-blue-600'
           } focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-colors shadow-sm hover:shadow`}
         >
-          Calculate
+          {t('calculator.calculateButton') || 'Calculate'}
           <ArrowRight size={18} className="ml-2" strokeWidth={2} />
         </button>
       </div>

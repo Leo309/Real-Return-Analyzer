@@ -47,14 +47,16 @@ export const fr = {
     trueValueToday: 'Valeur Réelle Aujourd\'hui',
     withInvestmentReturns: 'Avec Rendements d\'Investissement',
     realGrowthAfterInflation: 'Croissance Réelle Après Inflation',
-    calculateButton: 'Calculer les Résultats',
+    calculateButton: 'Calculer',
     backToInvestments: 'Changer le type d\'investissement',
     moneyLostToInflation: 'Argent Perdu à Cause de l\'Inflation',
     changeInPurchasingPower: 'changement du pouvoir d\'achat',
     nominalGrowth: 'croissance nominale',
     realGrowth: 'croissance réelle',
     customRate: 'Taux de Rendement Annuel Personnalisé (%)',
-    customRateHint: 'Entrez le taux de rendement annuel attendu pour votre investissement personnalisé'
+    customRateHint: 'Entrez le taux de rendement annuel attendu pour votre investissement personnalisé',
+    results: 'Résultats',
+    inflationReducedPurchasingPower: 'Même avec l\'investissement, l\'inflation a réduit votre pouvoir d\'achat de {percentage}%'
   },
   feedback: {
     title: 'Aidez-nous à nous améliorer',

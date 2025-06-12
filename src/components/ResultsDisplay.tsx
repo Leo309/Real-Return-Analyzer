@@ -574,7 +574,7 @@ const ResultsDisplay: React.FC = () => {
 
   return (
     <div className="flex flex-col gap-6 max-w-full overflow-hidden">
-      <h2 className={`text-xl font-bold ${isDarkMode ? 'text-white' : 'text-gray-900'} mb-4`}>Results</h2>
+      <h2 className={`text-xl font-bold ${isDarkMode ? 'text-white' : 'text-gray-900'} mb-4`}>{t('calculator.results') || 'Results'}</h2>
 
       {/* Summary Cards - Using the semantic color approach */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
@@ -902,7 +902,7 @@ const ResultsDisplay: React.FC = () => {
               ) : (
                 <div className={`p-3 rounded-lg ${isDarkMode ? 'bg-red-800/30' : 'bg-red-100'}`}>
                   <p className={`text-sm ${isDarkMode ? 'text-red-200' : 'text-red-800'}`}>
-                    📉 Even with investment, inflation reduced your purchasing power by {formatPercentage(Math.abs(realInvestmentImpact))}
+                    📉 {t('calculator.inflationReducedPurchasingPower', { percentage: formatPercentage(Math.abs(realInvestmentImpact)).replace('%', '') }) || `Even with investment, inflation reduced your purchasing power by ${formatPercentage(Math.abs(realInvestmentImpact))}`}
                   </p>
                 </div>
               )}

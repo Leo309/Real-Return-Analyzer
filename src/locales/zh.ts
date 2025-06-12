@@ -47,14 +47,16 @@ export const zh = {
     trueValueToday: '今日真实价值',
     withInvestmentReturns: '包含投资回报',
     realGrowthAfterInflation: '通胀后实际增长',
-    calculateButton: '计算结果',
+    calculateButton: '计算',
     backToInvestments: '更改投资类型',
     moneyLostToInflation: '通胀损失',
     changeInPurchasingPower: '购买力变化',
     nominalGrowth: '名义增长',
     realGrowth: '实际增长',
     customRate: '自定义年回报率 (%)',
-    customRateHint: '输入您自定义投资的预期年回报率'
+    customRateHint: '输入您自定义投资的预期年回报率',
+    results: '计算结果',
+    inflationReducedPurchasingPower: '即使有投资，通胀仍使您的购买力减少了 {percentage}%'
   },
   feedback: {
     title: '帮助我们改进',
