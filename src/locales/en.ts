@@ -39,7 +39,7 @@ export const en = {
     historicalReturn: 'Avg. historical return: {returnRate}%'
   },
   calculator: {
-    title: 'Investment Time Machine',
+    title: 'Real Return Analyzer',
     subtitle: 'See how inflation and investments affect your money over time',
     initialAmount: 'Initial Amount',
     startYear: 'Start Year',

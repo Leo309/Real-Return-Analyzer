@@ -3,8 +3,10 @@
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
-import { TrendingUp, Sun, Moon } from 'lucide-react';
+import { TrendingUp, Sun, Moon, Globe, ChevronDown } from 'lucide-react';
 import siteConfig from '@/config/siteConfig';
+import LanguageSwitcher from '@/components/LanguageSwitcher';
+import ClientOnly from '@/components/ClientOnly';
 
 interface HeaderProps {
   darkMode: boolean;
@@ -107,6 +109,24 @@ export default function Header({ darkMode, toggleDarkMode, title }: HeaderProps)
               Contact
             </Link>
             
+            {/* Language Switcher */}
+            <ClientOnly 
+              fallback={
+                <div className={`flex items-center space-x-2 px-3 py-2 rounded-lg ${
+                  darkMode 
+                    ? 'bg-gray-800 text-gray-300 border border-gray-700' 
+                    : 'bg-gray-100 text-gray-700 border border-gray-200'
+                }`}>
+                  <Globe size={16} />
+                  <span className="text-sm font-medium">🇺🇸</span>
+                  <span className="hidden sm:inline text-sm">English</span>
+                  <ChevronDown size={14} />
+                </div>
+              }
+            >
+              <LanguageSwitcher darkMode={darkMode} />
+            </ClientOnly>
+            
             {/* Dark/Light Toggle */}
             <button 
               onClick={toggleDarkMode}
@@ -122,7 +142,24 @@ export default function Header({ darkMode, toggleDarkMode, title }: HeaderProps)
           </nav>
 
           {/* Mobile Menu Button */}
-          <div className="md:hidden flex items-center space-x-4">
+          <div className="md:hidden flex items-center space-x-2">
+            {/* Mobile Language Switcher */}
+            <ClientOnly 
+              fallback={
+                <div className={`flex items-center space-x-2 px-3 py-2 rounded-lg ${
+                  darkMode 
+                    ? 'bg-gray-800 text-gray-300 border border-gray-700' 
+                    : 'bg-gray-100 text-gray-700 border border-gray-200'
+                }`}>
+                  <Globe size={16} />
+                  <span className="text-sm font-medium">🇺🇸</span>
+                  <ChevronDown size={14} />
+                </div>
+              }
+            >
+              <LanguageSwitcher darkMode={darkMode} />
+            </ClientOnly>
+            
             <button 
               onClick={toggleDarkMode}
               className="p-2 rounded-full bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors z-20"
