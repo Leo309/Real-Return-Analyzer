@@ -77,7 +77,17 @@ const createGradientPlugin = (isDarkMode: boolean) => {
  * Result Summary Card Component
  * A reusable component for displaying result values with semantic color coding
  */
-const ResultSummaryCard = ({ 
+interface ResultSummaryCardProps {
+  title: string;
+  value: number;
+  percentage?: number;
+  isDarkMode: boolean;
+  currencyFormatter: (value: number) => string;
+  icon?: React.ReactNode;
+  className?: string;
+}
+
+const ResultSummaryCard: React.FC<ResultSummaryCardProps> = ({ 
   title, 
   value, 
   percentage = 0, 
@@ -332,7 +342,7 @@ const ResultsDisplay: React.FC = () => {
   const labels = filteredBreakdown.map(item => item.year.toString());
 
   // This additional function explicitly ensures all data points are valid numbers
-  const validateDataPoints = (data) => {
+  const validateDataPoints = (data: any[]) => {
     if (!Array.isArray(data)) return [];
     
     // Create a new array with guaranteed valid points
@@ -442,7 +452,7 @@ const ResultsDisplay: React.FC = () => {
           font: {
             family: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
             size: 11,
-            weight: '600'
+            weight: 600
           },
           padding: 8
         },
@@ -466,7 +476,7 @@ const ResultsDisplay: React.FC = () => {
           font: {
             family: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
             size: 11,
-            weight: '600'
+            weight: 600
           },
           padding: 8
         },
@@ -616,10 +626,29 @@ const ResultsDisplay: React.FC = () => {
                 {t('calculator.moneyLostToInflation')}: {formatCurrency(Math.abs(amount - result.inflationAdjustedValue))}
               </h4>
             </div>
-            <p className={`mt-2 text-sm ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>
-              That&apos;s equivalent to {Math.round((amount - result.inflationAdjustedValue) / (countryCode === 'US' ? 5 : 6))} premium coffees
-              or {Math.round((amount - result.inflationAdjustedValue) / (countryCode === 'US' ? 20 : 25))} hours of work.
-            </p>
+            <div className={`mt-3 p-3 rounded-lg ${isDarkMode ? 'bg-red-900/20 border border-red-800/30' : 'bg-red-50 border border-red-200'}`}>
+              <p className={`text-sm font-medium ${isDarkMode ? 'text-red-300' : 'text-red-700'} mb-2`}>
+                💸 That purchasing power loss equals:
+              </p>
+              <div className="grid grid-cols-2 gap-3 text-sm">
+                <div className={`flex items-center ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>
+                  <span className="mr-2">☕</span>
+                  <span>{Math.round(Math.abs(amount - result.inflationAdjustedValue) / (countryCode === 'US' ? 5 : 6)).toLocaleString()} premium coffees</span>
+                </div>
+                <div className={`flex items-center ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>
+                  <span className="mr-2">🎬</span>
+                  <span>{Math.round(Math.abs(amount - result.inflationAdjustedValue) / (countryCode === 'US' ? 15 : 18)).toLocaleString()} movie tickets</span>
+                </div>
+                <div className={`flex items-center ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>
+                  <span className="mr-2">⏰</span>
+                  <span>{Math.round(Math.abs(amount - result.inflationAdjustedValue) / (countryCode === 'US' ? 15 : 18)).toLocaleString()} hours of minimum wage work</span>
+                </div>
+                <div className={`flex items-center ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>
+                  <span className="mr-2">⛽</span>
+                  <span>{Math.round(Math.abs(amount - result.inflationAdjustedValue) / (countryCode === 'US' ? 4 : 5)).toLocaleString()} gallons of gas</span>
+                </div>
+              </div>
+            </div>
           </div>
         )}
 
@@ -671,15 +700,67 @@ const ResultsDisplay: React.FC = () => {
         )}
 
         {investmentType === 'none' && (
-          <div className={`p-5 rounded-lg shadow-sm text-center mt-6 border ${
-            isDarkMode 
-              ? 'bg-gray-700 border-gray-600 text-gray-300' 
-              : 'bg-gray-50 border-gray-200 text-gray-700'
+          <div className={`p-6 rounded-lg shadow-sm mt-6 border ${
+            inflationImpact < 0
+              ? (isDarkMode ? 'bg-red-900/20 border-red-800/30' : 'bg-red-50 border-red-200')
+              : (isDarkMode ? 'bg-green-900/20 border-green-800/30' : 'bg-green-50 border-green-200')
           }`}>
-            <p className={`text-lg font-medium`}>
-              {`Due to inflation, your ${formatCurrency(amount)} ${inflationImpact < 0 ? 'lost' : 'gained'} ${formatCurrency(Math.abs(amount - result.inflationAdjustedValue))} 
-              purchasing power (${formatPercentage(inflationImpact)}) from ${startYear} to ${endYear}`}
-            </p>
+            <div className="text-center">
+              <p className={`text-xl font-bold mb-4 ${
+                inflationImpact < 0 
+                  ? (isDarkMode ? 'text-red-300' : 'text-red-700')
+                  : (isDarkMode ? 'text-green-300' : 'text-green-700')
+              }`}>
+                {inflationImpact < 0 ? '💸 INFLATION DAMAGE' : '🎉 RARE WIN AGAINST INFLATION'}
+              </p>
+              
+              <p className={`text-lg mb-4 ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>
+                Your {formatCurrency(amount)} {inflationImpact < 0 ? 'lost' : 'gained'} {' '}
+                <span className={`font-bold ${
+                  inflationImpact < 0 ? 'text-red-500' : 'text-green-500'
+                }`}>
+                  {formatCurrency(Math.abs(amount - result.inflationAdjustedValue))}
+                </span> purchasing power
+              </p>
+              
+              <div className={`p-4 rounded-lg ${
+                inflationImpact < 0
+                  ? (isDarkMode ? 'bg-red-800/30' : 'bg-red-100')
+                  : (isDarkMode ? 'bg-green-800/30' : 'bg-green-100')
+              }`}>
+                <p className={`text-sm font-medium mb-3 ${
+                  inflationImpact < 0 
+                    ? (isDarkMode ? 'text-red-200' : 'text-red-800')
+                    : (isDarkMode ? 'text-green-200' : 'text-green-800')
+                }`}>
+                  {inflationImpact < 0 
+                    ? `🔥 In ${endYear - startYear} years, you can buy ${formatPercentage(Math.abs(inflationImpact))} LESS stuff!`
+                    : `🎯 Rare deflationary period - your money bought MORE!`
+                  }
+                </p>
+                
+                {inflationImpact < 0 && (
+                  <div className="grid grid-cols-2 gap-3 text-sm">
+                    <div className={`flex items-center ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>
+                      <span className="mr-2">☕</span>
+                      <span>-{Math.round(Math.abs(amount - result.inflationAdjustedValue) / (countryCode === 'US' ? 5 : 6)).toLocaleString()} coffees</span>
+                    </div>
+                    <div className={`flex items-center ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>
+                      <span className="mr-2">🎬</span>
+                      <span>-{Math.round(Math.abs(amount - result.inflationAdjustedValue) / (countryCode === 'US' ? 15 : 18)).toLocaleString()} movie tickets</span>
+                    </div>
+                    <div className={`flex items-center ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>
+                      <span className="mr-2">⛽</span>
+                      <span>-{Math.round(Math.abs(amount - result.inflationAdjustedValue) / (countryCode === 'US' ? 4 : 5)).toLocaleString()} gallons of gas</span>
+                    </div>
+                    <div className={`flex items-center ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>
+                      <span className="mr-2">💡</span>
+                      <span>Time to invest!</span>
+                    </div>
+                  </div>
+                )}
+              </div>
+            </div>
           </div>
         )}
       </div>
@@ -785,15 +866,47 @@ const ResultsDisplay: React.FC = () => {
             </div>
           )}
 
-          <div className={`p-5 rounded-lg ${isDarkMode ? 'bg-gray-700' : 'bg-gray-50'} shadow-sm text-center mt-6 border ${isDarkMode ? 'border-gray-600' : 'border-gray-200'}`}>
-            <p className={`text-lg font-medium ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>
-              {investmentType === 'custom'
-                ? `With ${customRate}% annual returns: ${formatCurrency(amount)} ➔ 
-                  ${formatCurrency(result.combinedValue)} after inflation`
-                : `By investing in ${getInvestmentTypeName()}: 
-                  ${formatCurrency(amount)} ➔ ${formatCurrency(result.combinedValue)} 
-                  (${`${realInvestmentImpact >= 0 ? '+' : ''}${formatPercentage(realInvestmentImpact)}`})`}
-            </p>
+          <div className={`p-5 rounded-lg shadow-sm mt-6 border ${
+            realInvestmentImpact >= 0 
+              ? (isDarkMode ? 'bg-green-900/20 border-green-800/30' : 'bg-green-50 border-green-200')
+              : (isDarkMode ? 'bg-red-900/20 border-red-800/30' : 'bg-red-50 border-red-200')
+          }`}>
+            <div className="text-center">
+              <p className={`text-lg font-bold mb-3 ${
+                realInvestmentImpact >= 0 
+                  ? (isDarkMode ? 'text-green-300' : 'text-green-700')
+                  : (isDarkMode ? 'text-red-300' : 'text-red-700')
+              }`}>
+                {realInvestmentImpact >= 0 ? '🎉 ' : '😱 '}
+                {investmentType === 'custom'
+                  ? `${customRate}% returns: ${formatCurrency(amount)} ➔ ${formatCurrency(result.combinedValue)}`
+                  : `${getInvestmentTypeName()}: ${formatCurrency(amount)} ➔ ${formatCurrency(result.combinedValue)}`}
+              </p>
+              
+              {realInvestmentImpact >= 0 ? (
+                <div className={`p-3 rounded-lg ${isDarkMode ? 'bg-green-800/30' : 'bg-green-100'}`}>
+                  <p className={`text-sm font-medium ${isDarkMode ? 'text-green-200' : 'text-green-800'} mb-2`}>
+                    💰 Your extra purchasing power could buy:
+                  </p>
+                  <div className="grid grid-cols-2 gap-2 text-sm">
+                    <div className={`flex items-center ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>
+                      <span className="mr-2">☕</span>
+                      <span>{Math.round(Math.abs(result.combinedValue - amount) / (countryCode === 'US' ? 5 : 6)).toLocaleString()} coffees</span>
+                    </div>
+                    <div className={`flex items-center ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>
+                      <span className="mr-2">🎬</span>
+                      <span>{Math.round(Math.abs(result.combinedValue - amount) / (countryCode === 'US' ? 15 : 18)).toLocaleString()} movie tickets</span>
+                    </div>
+                  </div>
+                </div>
+              ) : (
+                <div className={`p-3 rounded-lg ${isDarkMode ? 'bg-red-800/30' : 'bg-red-100'}`}>
+                  <p className={`text-sm ${isDarkMode ? 'text-red-200' : 'text-red-800'}`}>
+                    📉 Even with investment, inflation reduced your purchasing power by {formatPercentage(Math.abs(realInvestmentImpact))}
+                  </p>
+                </div>
+              )}
+            </div>
           </div>
         </div>
       )}
