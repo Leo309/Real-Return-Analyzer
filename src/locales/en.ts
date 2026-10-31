@@ -96,6 +96,58 @@ export const en = {
       description: 'Define your own annual return rate for comparing custom investment scenarios',
     }
   },
+  landing: {
+    hero: {
+      badge: 'Real Return Analyzer',
+      titleStart: 'Wondering if you made a',
+      titleHighlight: 'smart decision',
+      titleEnd: 'in investment?',
+      subtitle: 'See how inflation silently eats your money — and what you can do about it. Backed by real historical data from 7 major economies.',
+      cta: 'Start Analyzing',
+      learnMore: 'Learn More',
+      trustBadge1: 'Free & Open Source',
+      trustBadge2: '7 Countries Covered',
+    },
+    features: {
+      title: 'What You Can Discover',
+      subtitle: 'Understand the true impact of inflation on your wealth and how different investments compare.',
+      purchasingPower: {
+        title: 'Real Purchasing Power',
+        description: 'See exactly how much your money can actually buy after years of inflation. The results might surprise you.',
+      },
+      compare: {
+        title: 'Compare Investments',
+        description: 'Stocks, bonds, real estate, savings accounts — see how each would have performed side by side.',
+      },
+      economies: {
+        title: '7 Major Economies',
+        description: 'Real historical data from the US, Canada, UK, Germany, Japan, China, and Australia since 1970.',
+      },
+    },
+    howItWorks: {
+      title: 'How It Works',
+      step1: {
+        title: 'Choose Your Region',
+        description: 'Pick from 7 countries with real historical economic data.',
+      },
+      step2: {
+        title: 'Select Investment Type',
+        description: 'Compare cash, bonds, stocks, real estate, or set custom rates.',
+      },
+      step3: {
+        title: 'See Real Results',
+        description: 'Interactive charts showing your money\'s true purchasing power over time.',
+      },
+    },
+    trust: {
+      text: 'Built with real government data sources — central banks, stock indices, and housing data — covering 1970 to present.',
+    },
+    bottomCta: {
+      title: 'Ready to see the truth about your money?',
+      subtitle: 'It takes 30 seconds. No sign-up required.',
+      cta: 'Try the Calculator',
+    },
+  },
   seo: {
     title: 'Investment Calculator | Historical Returns & Inflation Impact',
     description: 'Calculate how inflation and investments affect your money over time. Compare stocks, bonds, real estate and more based on historical data.',

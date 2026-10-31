@@ -2,13 +2,11 @@ import { useEffect, useState } from 'react';
 import useLanguageStore from '@/store/languageStore';
 import { en } from '@/locales/en';
 import { zh } from '@/locales/zh';
-import { fr } from '@/locales/fr';
 
 // Translation data mapping
 const translations = {
   en,
-  zh,
-  fr
+  zh
 };
 
 export function useTranslation() {
@@ -53,8 +51,7 @@ export function useTranslation() {
   const formatCurrency = (value: number, countryCode: string) => {
     const localeMap: Record<string, string> = {
       'en': 'en-US',
-      'zh': 'zh-CN', 
-      'fr': 'fr-FR'
+      'zh': 'zh-CN'
     };
     
     const locale = localeMap[currentLanguage] || 'en-US';

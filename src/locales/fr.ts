@@ -93,6 +93,58 @@ export const fr = {
       description: 'Définissez votre propre taux de rendement annuel pour comparer des scénarios d\'investissement personnalisés',
     }
   },
+  landing: {
+    hero: {
+      badge: 'Analyseur de Rendement Réel',
+      titleStart: 'Avez-vous fait un',
+      titleHighlight: 'choix judicieux',
+      titleEnd: 'en investissement ?',
+      subtitle: 'Découvrez comment l\'inflation dévore silencieusement votre argent — et ce que vous pouvez faire. Basé sur des données historiques réelles de 7 économies majeures.',
+      cta: 'Commencer l\'Analyse',
+      learnMore: 'En Savoir Plus',
+      trustBadge1: 'Gratuit et Open Source',
+      trustBadge2: '7 Pays Couverts',
+    },
+    features: {
+      title: 'Ce Que Vous Pouvez Découvrir',
+      subtitle: 'Comprenez l\'impact réel de l\'inflation sur votre patrimoine et comment les différents investissements se comparent.',
+      purchasingPower: {
+        title: 'Pouvoir d\'Achat Réel',
+        description: 'Voyez exactement combien votre argent peut réellement acheter après des années d\'inflation. Les résultats pourraient vous surprendre.',
+      },
+      compare: {
+        title: 'Comparer les Investissements',
+        description: 'Actions, obligations, immobilier, comptes d\'épargne — voyez comment chacun aurait performé côte à côte.',
+      },
+      economies: {
+        title: '7 Économies Majeures',
+        description: 'Données historiques réelles des États-Unis, Canada, Royaume-Uni, Allemagne, Japon, Chine et Australie depuis 1970.',
+      },
+    },
+    howItWorks: {
+      title: 'Comment Ça Marche',
+      step1: {
+        title: 'Choisissez Votre Région',
+        description: 'Choisissez parmi 7 pays avec des données économiques historiques réelles.',
+      },
+      step2: {
+        title: 'Sélectionnez le Type d\'Investissement',
+        description: 'Comparez espèces, obligations, actions, immobilier, ou définissez des taux personnalisés.',
+      },
+      step3: {
+        title: 'Voyez les Résultats Réels',
+        description: 'Des graphiques interactifs montrant le vrai pouvoir d\'achat de votre argent au fil du temps.',
+      },
+    },
+    trust: {
+      text: 'Construit avec des sources de données gouvernementales réelles — banques centrales, indices boursiers et données immobilières — couvrant 1970 à aujourd\'hui.',
+    },
+    bottomCta: {
+      title: 'Prêt à découvrir la vérité sur votre argent ?',
+      subtitle: 'Cela prend 30 secondes. Aucune inscription requise.',
+      cta: 'Essayer le Calculateur',
+    },
+  },
   seo: {
     title: 'Calculateur d\'Investissement | Rendements Historiques et Impact de l\'Inflation',
     description: 'Calculez comment l\'inflation et les investissements affectent votre argent au fil du temps. Comparez actions, obligations, immobilier et plus basé sur des données historiques.',

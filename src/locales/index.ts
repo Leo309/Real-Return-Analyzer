@@ -1,7 +1,7 @@
 // Language configuration and type definitions
 import { en } from './en';
 
-export type Language = 'en' | 'zh' | 'fr';
+export type Language = 'en' | 'zh';
 
 export type TranslationKey = keyof typeof en;
 
@@ -9,27 +9,21 @@ export interface LanguageConfig {
   code: Language;
   name: string;
   nativeName: string;
-  currencyLocale: string; // For number formatting
+  currencyLocale: string;
 }
 
 export const languages: LanguageConfig[] = [
   {
     code: 'en',
     name: 'English',
-    nativeName: 'English',
+    nativeName: 'EN',
     currencyLocale: 'en-US'
   },
   {
     code: 'zh',
     name: 'Chinese (Simplified)',
-    nativeName: '简体中文',
+    nativeName: '中',
     currencyLocale: 'zh-CN'
-  },
-  {
-    code: 'fr',
-    name: 'French',
-    nativeName: 'Français',
-    currencyLocale: 'fr-FR'
   }
 ];
 

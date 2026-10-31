@@ -47,8 +47,6 @@ const useLanguageStore = create<LanguageState>()(
           
           if (browserLang.startsWith('zh')) {
             detectedLang = 'zh';
-          } else if (browserLang.startsWith('fr')) {
-            detectedLang = 'fr';
           }
           
           if (detectedLang !== DEFAULT_LANGUAGE) {

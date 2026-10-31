@@ -2,231 +2,122 @@
 
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
-import Image from 'next/image';
-import { TrendingUp, Sun, Moon, Globe, ChevronDown } from 'lucide-react';
+import { usePathname } from 'next/navigation';
 import siteConfig from '@/config/siteConfig';
 import LanguageSwitcher from '@/components/LanguageSwitcher';
-import ClientOnly from '@/components/ClientOnly';
 
-interface HeaderProps {
-  darkMode: boolean;
-  toggleDarkMode: () => void;
-  title: string;
-}
-
-export default function Header({ darkMode, toggleDarkMode, title }: HeaderProps) {
+export default function Header() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
+  const pathname = usePathname();
+  const isLanding = pathname === '/';
 
   useEffect(() => {
-    // Add scroll listener
     const handleScroll = () => {
-      if (window.scrollY > 10) {
-        setIsScrolled(true);
-      } else {
-        setIsScrolled(false);
-      }
+      setIsScrolled(window.scrollY > 10);
     };
-    
     window.addEventListener('scroll', handleScroll);
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
-  const toggleMenu = () => {
-    setIsMenuOpen(!isMenuOpen);
-  };
-
   return (
     <header className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
-      isScrolled 
-        ? darkMode 
-          ? 'bg-gray-900/80 backdrop-blur-md shadow-lg' 
-          : 'bg-white/80 backdrop-blur-md shadow-lg'
-        : darkMode
-          ? 'bg-gray-900/30 backdrop-blur-sm'
-          : 'bg-white/30 backdrop-blur-sm'
+      isScrolled
+        ? 'bg-[var(--background)]/80 backdrop-blur-xl border-b border-[var(--border)]'
+        : isLanding
+          ? 'bg-transparent'
+          : 'bg-[var(--background)]/30 backdrop-blur-sm'
     }`}>
       <div className="container mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between py-4">
           {/* Logo */}
-          <Link href={siteConfig.externalUrls.mainSite} className="flex items-center space-x-2 relative z-10">
-            <div className="h-12 relative">
-              <Image 
-                src="/SKYNEX_500_BLUE.png" 
-                alt="SKYNEX" 
-                width={160} 
-                height={48} 
-                className="w-auto h-full object-contain block dark:hidden" 
-                priority
-              />
-              <Image 
-                src="/SKYNEX_500_WHITE.png" 
-                alt="SKYNEX" 
-                width={160} 
-                height={48} 
-                className="w-auto h-full object-contain hidden dark:block" 
-                priority
-              />
-            </div>
+          <Link href="/" className="relative z-10">
+            <span className="text-xl font-bold tracking-tight text-[var(--foreground)]">
+              SKYNEX
+            </span>
           </Link>
 
-          {/* Site Title - Only on very wide screens where there's plenty of space */}
-          <div className="hidden 2xl:block absolute left-1/2 transform -translate-x-1/2 max-w-lg">
-            <h1 className={`text-xl font-bold animated-title title-glow ${
-              darkMode 
-                ? 'bg-gradient-to-r from-blue-400 via-cyan-300 to-blue-500 text-transparent bg-clip-text' 
-                : 'bg-gradient-to-r from-blue-600 via-sky-500 to-blue-700 text-transparent bg-clip-text'
-            } flex items-center justify-center whitespace-nowrap`}>
-              <span className={`mr-2 p-1.5 rounded-full title-icon ${
-                darkMode 
-                  ? 'bg-gradient-to-br from-blue-600 to-cyan-500' 
-                  : 'bg-gradient-to-br from-blue-700 to-sky-500'
-              } text-white shadow-lg`}>
-                <TrendingUp size={18} />
-              </span>
-              {title}
-            </h1>
-          </div>
-
           {/* Desktop Navigation */}
-          <nav className="hidden md:flex items-center space-x-4">
-            <Link 
-              href={siteConfig.externalUrls.mainSite} 
-              className="text-gray-700 hover:text-blue-600 dark:text-white/80 dark:hover:text-white transition-colors"
+          <nav className="hidden md:flex items-center space-x-1">
+            {isLanding ? (
+              <Link
+                href="/calculator"
+                className="px-4 py-2 text-sm font-medium rounded-lg bg-[var(--foreground)] text-[var(--background)] hover:opacity-90 transition-opacity"
+              >
+                Try Calculator
+              </Link>
+            ) : (
+              <Link
+                href="/"
+                className="px-4 py-2 text-sm font-medium text-[var(--text-secondary)] hover:text-[var(--foreground)] transition-colors"
+              >
+                Home
+              </Link>
+            )}
+
+            <Link
+              href={siteConfig.externalUrls.mainSite}
+              className="px-4 py-2 text-sm font-medium text-[var(--text-secondary)] hover:text-[var(--foreground)] transition-colors"
             >
               Main Site
             </Link>
-            <Link 
-              href={`${siteConfig.externalUrls.mainSite}/products`} 
-              className="text-gray-700 hover:text-blue-600 dark:text-white/80 dark:hover:text-white transition-colors"
-            >
-              Products
-            </Link>
-            <Link 
-              href={siteConfig.externalUrls.contact} 
-              className="text-gray-700 hover:text-blue-600 dark:text-white/80 dark:hover:text-white transition-colors"
-            >
-              Contact
-            </Link>
-            
+
+            <div className="w-px h-5 bg-[var(--border)] mx-1" />
+
             {/* Language Switcher */}
-            <ClientOnly 
-              fallback={
-                <div className={`flex items-center space-x-2 px-3 py-2 rounded-lg ${
-                  darkMode 
-                    ? 'bg-gray-800 text-gray-300 border border-gray-700' 
-                    : 'bg-gray-100 text-gray-700 border border-gray-200'
-                }`}>
-                  <Globe size={16} />
-                  <span className="text-sm">English</span>
-                  <ChevronDown size={14} />
-                </div>
-              }
-            >
-              <LanguageSwitcher darkMode={darkMode} />
-            </ClientOnly>
-            
-            {/* Dark/Light Toggle */}
-            <button 
-              onClick={toggleDarkMode}
-              className="p-2 rounded-full bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors"
-              aria-label="Toggle dark mode"
-            >
-              {darkMode ? (
-                <Sun size={20} />
-              ) : (
-                <Moon size={20} />
-              )}
-            </button>
+            <LanguageSwitcher />
           </nav>
 
-          {/* Mobile Menu Button */}
+          {/* Mobile Controls */}
           <div className="md:hidden flex items-center space-x-2">
-            {/* Mobile Language Switcher */}
-            <ClientOnly 
-              fallback={
-                <div className={`flex items-center space-x-2 px-3 py-2 rounded-lg ${
-                  darkMode 
-                    ? 'bg-gray-800 text-gray-300 border border-gray-700' 
-                    : 'bg-gray-100 text-gray-700 border border-gray-200'
-                }`}>
-                  <Globe size={16} />
-                  <span className="text-sm">English</span>
-                  <ChevronDown size={14} />
-                </div>
-              }
-            >
-              <LanguageSwitcher darkMode={darkMode} />
-            </ClientOnly>
-            
-            <button 
-              onClick={toggleDarkMode}
-              className="p-2 rounded-full bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors z-20"
-              aria-label="Toggle dark mode"
-            >
-              {darkMode ? (
-                <Sun size={20} />
-              ) : (
-                <Moon size={20} />
-              )}
-            </button>
-            
+            <LanguageSwitcher />
+
             <button
-              className="p-2 rounded-md text-gray-700 dark:text-white z-20"
-              onClick={toggleMenu}
+              className="p-2 rounded-lg text-[var(--foreground)] z-20"
+              onClick={() => setIsMenuOpen(!isMenuOpen)}
             >
-              <svg
-                className="h-6 w-6"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-              >
+              <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 {isMenuOpen ? (
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M6 18L18 6M6 6l12 12"
-                  />
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
                 ) : (
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M4 6h16M4 12h16M4 18h16"
-                  />
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
                 )}
               </svg>
             </button>
           </div>
         </div>
 
-
         {/* Mobile Navigation */}
         {isMenuOpen && (
-          <div className={`md:hidden fixed inset-0 z-10 flex items-center justify-center ${
-            darkMode 
-              ? 'bg-gray-900/95 backdrop-blur-lg' 
-              : 'bg-white/95 backdrop-blur-lg'
-          }`}>
+          <div className="md:hidden fixed inset-0 z-10 flex items-center justify-center bg-[var(--background)]/95 backdrop-blur-lg">
             <div className="flex flex-col items-center space-y-8 text-center">
-              <Link 
+              {isLanding ? (
+                <Link
+                  href="/calculator"
+                  className="text-2xl font-medium text-[var(--foreground)]"
+                  onClick={() => setIsMenuOpen(false)}
+                >
+                  Try Calculator
+                </Link>
+              ) : (
+                <Link
+                  href="/"
+                  className="text-2xl font-medium text-[var(--foreground)]"
+                  onClick={() => setIsMenuOpen(false)}
+                >
+                  Home
+                </Link>
+              )}
+              <Link
                 href={siteConfig.externalUrls.mainSite}
-                className={`text-2xl ${darkMode ? 'text-white hover:text-cyan-400' : 'text-gray-700 hover:text-blue-600'} transition-colors`}
+                className="text-2xl text-[var(--text-secondary)] hover:text-[var(--foreground)] transition-colors"
                 onClick={() => setIsMenuOpen(false)}
               >
                 Main Site
               </Link>
-              <Link 
-                href={`${siteConfig.externalUrls.mainSite}/products`}
-                className={`text-2xl ${darkMode ? 'text-white hover:text-cyan-400' : 'text-gray-700 hover:text-blue-600'} transition-colors`}
-                onClick={() => setIsMenuOpen(false)}
-              >
-                Products
-              </Link>
-              <Link 
+              <Link
                 href={siteConfig.externalUrls.contact}
-                className={`text-2xl ${darkMode ? 'text-white hover:text-cyan-400' : 'text-gray-700 hover:text-blue-600'} transition-colors`}
+                className="text-2xl text-[var(--text-secondary)] hover:text-[var(--foreground)] transition-colors"
                 onClick={() => setIsMenuOpen(false)}
               >
                 Contact

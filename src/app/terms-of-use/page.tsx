@@ -1,33 +1,30 @@
 'use client';
 
-import React from 'react';
-import { useEffect, useState } from 'react';
+import React, { useEffect } from 'react';
 import { ArrowLeft } from 'lucide-react';
 import Link from 'next/link';
 
 export default function TermsOfUse() {
-  const [darkMode, setDarkMode] = useState(false);
-
-  // 初始化暗色模式基于用户系统偏好
   useEffect(() => {
-    if (typeof window !== 'undefined') {
-      const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-      setDarkMode(prefersDark);
-      if (prefersDark) {
-        document.documentElement.classList.add('dark');
-      }
-    }
+    const mq = window.matchMedia('(prefers-color-scheme: dark)');
+    const apply = (dark: boolean) => {
+      document.documentElement.classList.toggle('dark', dark);
+    };
+    apply(mq.matches);
+    const handler = (e: MediaQueryListEvent) => apply(e.matches);
+    mq.addEventListener('change', handler);
+    return () => mq.removeEventListener('change', handler);
   }, []);
 
   return (
-    <div className={`min-h-screen transition-colors duration-300 ${darkMode ? 'dark bg-gray-900' : 'bg-gray-50'}`}>
-      <header className={`${darkMode ? 'bg-gray-800' : 'bg-white'} sticky top-0 z-10 shadow-md border-b ${darkMode ? 'border-gray-700' : 'border-gray-200'}`}>
+    <div className="min-h-screen transition-colors duration-300 bg-[var(--background)]">
+      <header className="sticky top-0 z-10 border-b border-[var(--border)] bg-[var(--card-bg)]">
         <div className="max-w-5xl mx-auto py-4 px-4 sm:px-6 lg:px-8 flex justify-between items-center">
           <div className="flex items-center">
-            <Link href="/" className={`${darkMode ? 'text-gray-200 hover:text-white' : 'text-gray-700 hover:text-gray-900'} mr-4`}>
+            <Link href="/" className="text-[var(--text-secondary)] hover:text-[var(--foreground)] mr-4">
               <ArrowLeft size={20} />
             </Link>
-            <h1 className={`text-2xl font-bold ${darkMode ? 'text-white' : 'text-gray-900'}`}>
+            <h1 className="text-2xl font-bold text-[var(--foreground)]">
               Terms of Use
             </h1>
           </div>
@@ -35,7 +32,7 @@ export default function TermsOfUse() {
       </header>
 
       <main className="max-w-5xl mx-auto py-8 px-4 sm:px-6 lg:px-8">
-        <div className={`${darkMode ? 'bg-gray-800 text-gray-200' : 'bg-white text-gray-800'} p-6 rounded-lg shadow`}>
+        <div className="bg-[var(--card-bg)] text-[var(--foreground)] p-6 rounded-lg border border-[var(--border)]">
           <h2 className="text-2xl font-bold mb-4">Terms of Use</h2>
           <p className="mb-4"><strong>Last Updated: March 14, 2025</strong></p>
 
@@ -50,13 +47,13 @@ export default function TermsOfUse() {
           </p>
 
           <h3 className="text-xl font-semibold mt-6 mb-3">3. Data Sources</h3>
-          <div className="mb-4 prose prose-gray dark:prose-invert">
+          <div className="mb-4">
             <p>Our calculations utilize the following historical market data:</p>
-            <ul>
+            <ul className="list-disc ml-6 mt-2">
               <li>United States: S&P 500 Index returns</li>
               <li>Canada: S&P/TSX Composite Index returns</li>
             </ul>
-            <p>Inflation data is sourced from official government statistics of each country.</p>
+            <p className="mt-2">Inflation data is sourced from official government statistics of each country.</p>
           </div>
 
           <h3 className="text-xl font-semibold mt-6 mb-3">4. Support</h3>
@@ -70,16 +67,16 @@ export default function TermsOfUse() {
         </div>
       </main>
 
-      <footer className={`${darkMode ? 'bg-gray-800 border-t border-gray-700' : 'bg-white border-t border-gray-200'} mt-auto py-6`}>
+      <footer className="border-t border-[var(--border)] bg-[var(--card-bg)] mt-auto py-6">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex flex-col md:flex-row justify-between items-center">
-            <p className={`text-center md:text-left ${darkMode ? 'text-gray-400' : 'text-gray-500'}`}>
+            <p className="text-center md:text-left text-[var(--text-secondary)]">
               © {new Date().getFullYear()} SKYNEX GLOBAL COMMERCE & TECH INC. All rights reserved.
             </p>
             <div className="mt-4 md:mt-0">
-              <Link href="/privacy" className={`${darkMode ? 'text-gray-400 hover:text-gray-300' : 'text-gray-500 hover:text-gray-700'} mx-3`}>Privacy Policy</Link>
-              <Link href="/terms" className={`${darkMode ? 'text-gray-400 hover:text-gray-300' : 'text-gray-500 hover:text-gray-700'} mx-3`}>Terms of Use</Link>
-              <a href="mailto:support@skynexdigital.com" className={`${darkMode ? 'text-gray-400 hover:text-gray-300' : 'text-gray-500 hover:text-gray-700'} mx-3`}>Contact</a>
+              <Link href="/privacy-policy" className="text-[var(--text-secondary)] hover:text-[var(--foreground)] mx-3">Privacy Policy</Link>
+              <Link href="/terms-of-use" className="text-[var(--text-secondary)] hover:text-[var(--foreground)] mx-3">Terms of Use</Link>
+              <a href="mailto:support@skynexdigital.com" className="text-[var(--text-secondary)] hover:text-[var(--foreground)] mx-3">Contact</a>
             </div>
           </div>
         </div>

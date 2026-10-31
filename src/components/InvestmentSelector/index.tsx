@@ -1,14 +1,10 @@
 import React from 'react';
 import InvestmentGrid from './InvestmentGrid';
 
-interface InvestmentSelectorProps {
-  darkMode: boolean;
-}
-
-const InvestmentSelector: React.FC<InvestmentSelectorProps> = ({ darkMode }) => {
+const InvestmentSelector: React.FC = () => {
   return (
     <div className="w-full">
-      <InvestmentGrid darkMode={darkMode} />
+      <InvestmentGrid />
     </div>
   );
 };
